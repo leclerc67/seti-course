@@ -715,6 +715,7 @@
             <button class="btn" id="spExport" title="Скачать файл с прогрессом: отметки, ответы и твои разборы">Сохранить в файл</button>
             <button class="btn" id="spLoad" title="Восстановить прогресс из ранее сохранённого файла">Загрузить</button>
             <button class="btn" id="spImport" title="Вставить прогресс кодом, если файла нет">Кодом</button>
+            <button class="btn pri" id="spLink" title="Ссылка, в которую вшит весь прогресс — сохрани её в закладку">Ссылка с прогрессом</button>
             <button class="btn" id="spTest" title="Оставить метку и проверить, переживёт ли она перезапуск браузера">Проверить сохранение</button>
           </div>
           <div class="sp-where" id="spWhere"></div>
@@ -5829,6 +5830,33 @@ CommonSecurityLog
   var LOADED = !!RAW;
   var REPAINT = [];
   var st = (function () { try { return JSON.parse(RAW || '{}'); } catch (e) { return {}; } })();
+
+  /* кодирование состояния для переноса ссылкой и файлом */
+  function b64enc(s) {
+    var bytes = new TextEncoder().encode(s), bin = '';
+    for (var i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
+    return btoa(bin);
+  }
+  function b64dec(c) {
+    var bin = atob(String(c).replace(/\s+/g, '')), arr = new Uint8Array(bin.length);
+    for (var i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+    return new TextDecoder().decode(arr);
+  }
+
+  /* прогресс, переданный в адресе: работает даже когда браузер стирает хранилище */
+  var FROM_URL = false;
+  (function () {
+    try {
+      var m = /[?&]p=([^&#]+)/.exec(location.search);
+      if (!m) return;
+      var data = JSON.parse(b64dec(decodeURIComponent(m[1])));
+      if (data && typeof data === 'object' && (data.done || data.quiz || data.task)) {
+        st = data; FROM_URL = true; LOADED = true;
+        save();
+      }
+      history.replaceState(null, '', location.pathname);
+    } catch (e) {}
+  })();
   st.done = st.done || {}; st.seen = st.seen || {}; st.quiz = st.quiz || {};
   /* миграция: модуль разбора алертов переехал с m8 на m10, между ними вставлены два новых */
   if (st.v !== 4) {
@@ -6361,6 +6389,12 @@ CommonSecurityLog
         'страницу по другому адресу. Сверь строку ниже.';
       try { localStorage.removeItem(TESTKEY); } catch (e) {}
       toTop();
+    } else if (FROM_URL) {
+      statusEl.textContent = 'восстановлен из ссылки';
+      noteEl.innerHTML = '<strong>Прогресс подтянут из адреса ссылки.</strong> ' +
+        'Если браузер стирает данные при закрытии, держи такую ссылку в закладке и обновляй её ' +
+        'кнопкой «Ссылка с прогрессом» в конце каждого занятия — это работает независимо от настроек браузера.';
+      toTop();
     } else if (LOADED) {
       panel.classList.add('slim');
       statusEl.textContent = st.ts
@@ -6377,6 +6411,23 @@ CommonSecurityLog
         'и после перезапуска браузера мы точно узнаем, стирает он данные или нет.';
       toTop();
     }
+
+    document.getElementById('spLink').addEventListener('click', function () {
+      var copy = {};
+      Object.keys(st).forEach(function (k) { if (k !== 'note') copy[k] = st[k]; });
+      var url = location.origin + location.pathname + '?p=' + encodeURIComponent(b64enc(JSON.stringify(copy)));
+      io.classList.add('on');
+      txt.value = url;
+      txt.focus(); txt.select();
+      var hint = 'Ссылка готова — в неё вшиты отметки, ответы и засчитанные пункты. ' +
+        'Сохрани её в закладку: открыв закладку, ты вернёшь прогресс, даже если браузер стёр все данные. ' +
+        'Написанные тобой разборы в ссылку не попадают, они слишком объёмные — для них «Сохранить в файл».';
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(url).then(function () {
+          say('Ссылка скопирована в буфер обмена. ' + hint, 'ok');
+        }, function () { say(hint, ''); });
+      } else { say(hint, ''); }
+    });
 
     document.getElementById('spTest').addEventListener('click', function () {
       try {
