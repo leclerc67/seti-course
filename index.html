@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="color-scheme" content="light dark">
 <meta name="theme-color" content="#14161B">
-<meta name="description" content="Учебник по сетям для аналитика SOC первой линии.">
+<meta name="description" content="Учебник по сетям для аналитика SOC первой линии со словарём терминов.">
 <title>Сети для будущего SOC-аналитика</title>
 </head>
 <body>
@@ -322,10 +322,59 @@
   em { font-style:italic; color:var(--ink-2); }
 
   code {
-    font-family:var(--mono); font-size:.86em; background:var(--card);
-    border:1px solid var(--line); padding:1px 6px; border-radius:var(--r-s);
+    font-family:var(--mono); font-size:.86em; background:var(--card-2);
+    padding:1px 5px; border-radius:5px;
     color:var(--ink); word-break:break-word;
   }
+
+  /* ---- термин со справкой ---- */
+  .term {
+    border-bottom:1.5px dotted var(--gold-ink); cursor:help;
+    text-decoration:none; color:inherit;
+  }
+  .term:hover, .term:focus-visible { background:var(--gold-soft); border-bottom-style:solid; }
+
+  .tip {
+    position:fixed; z-index:400; max-width:360px; width:max-content;
+    background:var(--card); border:1px solid var(--line-2); border-radius:var(--r-m);
+    box-shadow:var(--sh-2); padding:14px 16px; font-size:14.5px; line-height:1.55;
+    color:var(--ink-2); opacity:0; visibility:hidden; transform:translateY(4px);
+    transition:opacity .14s var(--ease), transform .14s var(--ease), visibility .14s;
+    pointer-events:none;
+  }
+  .tip.on { opacity:1; visibility:visible; transform:none; }
+  .tip b { display:block; font-family:var(--serif); font-size:16.5px; color:var(--ink); margin-bottom:5px; letter-spacing:-.01em; }
+  .tip .cat { font-family:var(--mono); font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--gold-ink); display:block; margin-bottom:7px; }
+  .tip .more { display:block; margin-top:9px; font-size:12.5px; color:var(--ink-3); }
+
+  /* ---- словарь ---- */
+  .gloss-head { padding:52px 0 20px; }
+  .gsearch { display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin:22px 0 0; }
+  .gsearch input {
+    flex:1; min-width:220px; font-family:inherit; font-size:16px; padding:12px 16px;
+    border-radius:var(--r-pill); border:1.5px solid var(--line-2);
+    background:var(--card); color:var(--ink);
+  }
+  .gsearch .cnt { font-family:var(--mono); font-size:12.5px; color:var(--ink-3); white-space:nowrap; }
+  .gcats { display:flex; gap:8px; flex-wrap:wrap; margin:16px 0 0; position:sticky; top:0; z-index:20;
+           background:var(--paper); padding:12px 0; }
+  .gcat {
+    font-family:inherit; font-size:13px; font-weight:600; padding:7px 14px; border-radius:var(--r-pill);
+    cursor:pointer; border:1px solid var(--line-2); background:var(--card); color:var(--ink-2);
+    transition:.16s var(--ease);
+  }
+  .gcat:hover { border-color:var(--ink-3); color:var(--ink); }
+  .gcat.on { background:var(--gold); border-color:var(--gold); color:#14161B; }
+  .gsec { padding:26px 0 0; scroll-margin-top:70px; }
+  .gsec h3 { margin:0 0 14px; font-size:21px; }
+  .gitem {
+    background:var(--card); border:1px solid var(--line); border-radius:var(--r-m);
+    padding:16px 20px; margin-bottom:10px; scroll-margin-top:80px;
+  }
+  .gitem.hit { border-color:var(--gold); box-shadow:0 0 0 3px var(--gold-soft); }
+  .gitem b { font-family:var(--serif); font-size:18px; letter-spacing:-.012em; display:block; margin-bottom:4px; }
+  .gitem p { font-size:15.5px; color:var(--ink-2); margin:0; }
+  .gempty { padding:40px 0; color:var(--ink-3); font-size:16px; }
   pre {
     font-family:var(--mono); font-size:13.5px; line-height:1.65;
     background:var(--term); color:var(--term-ink); border:1px solid var(--term-line);
@@ -628,6 +677,11 @@
       <div class="nav-h">Программа курса</div>
     </nav>
 
+    <nav class="nav" id="navExtra">
+      <div class="nav-h">Справочник</div>
+      <button data-go="gloss"><i>АЯ</i><span>Словарь терминов</span><span class="dot" style="visibility:hidden"></span></button>
+    </nav>
+
     <div class="rail-f">Модули опираются друг на друга — проходи по порядку. Состояние прогресса и выгрузка в файл — <button class="lnk" data-go="home">на главной</button>.</div>
   </aside>
 
@@ -772,6 +826,27 @@
           </div>
           <p class="sp-msg" id="spMsg" style="display:none"></p>
         </div>
+      </div>
+    </section>
+
+    <!-- ================= СЛОВАРЬ ================= -->
+    <section class="view" id="v-gloss">
+      <div class="col-w">
+        <div class="gloss-head">
+          <span class="tag">Справочник</span>
+          <h1 style="font-size:clamp(30px,4.6vw,46px)">Словарь терминов</h1>
+          <p class="lede" style="margin-bottom:0">
+            Все понятия, которые встречаются в курсе, — своими словами и в одном месте.
+            В тексте модулей они подчёркнуты точками: наведи мышь, чтобы увидеть определение,
+            не отрываясь от чтения.
+          </p>
+          <div class="gsearch">
+            <input id="gq" type="search" placeholder="Найти термин: siem, arp, рукопожатие…" autocomplete="off" spellcheck="false">
+            <span class="cnt" id="gcnt"></span>
+          </div>
+        </div>
+        <div class="gcats" id="gcats"></div>
+        <div id="glist"></div>
       </div>
     </section>
 
@@ -5977,7 +6052,7 @@ CommonSecurityLog
     document.getElementById('gbar').style.width = pct + '%';
     var g2 = document.getElementById('gbar2'); if (g2) g2.style.width = pct + '%';
     document.getElementById('gtxt').textContent = n + ' / ' + MODS.length;
-    [].forEach.call(nav.querySelectorAll('button'), function (b) {
+    [].forEach.call(document.querySelectorAll('.nav button'), function (b) {
       var id = b.getAttribute('data-go');
       b.classList.toggle('done', !!st.done[id]);
       b.classList.toggle('seen', !st.done[id] && !!st.seen[id]);
@@ -5996,11 +6071,14 @@ CommonSecurityLog
     if (cur) cur.classList.remove('on');
     el.classList.add('on');
     current = id;
-    if (id !== 'home') { st.seen[id] = true; save(); }
+    var isMod = id !== 'home' && id !== 'gloss';
+    if (isMod) { st.seen[id] = true; save(); markTerms(el); }
+    if (id === 'gloss') glossRender(document.getElementById('gq').value);
     window.scrollTo({ top: 0, behavior: 'auto' });
-    lnav.classList.toggle('on', id !== 'home');
+    lnav.classList.toggle('on', isMod);
     var mt = document.getElementById('mtitle');
     if (id === 'home') { mt.textContent = 'Сети для SOC-аналитика'; }
+    else if (id === 'gloss') { mt.textContent = 'Словарь терминов'; }
     else {
       var m = MODS.filter(function (x) { return x.id === id; })[0];
       mt.textContent = m.n + ' · ' + m.t;
@@ -6317,6 +6395,307 @@ CommonSecurityLog
     lbar.style.width = p + '%';
   }
   window.addEventListener('scroll', readProg, { passive: true });
+
+  /* ================= СЛОВАРЬ ТЕРМИНОВ ================= */
+  /* c — категория, m — основы слова для поиска в тексте (без окончаний) */
+  var GCATS = [
+    ['net',  'Основы сетей'],
+    ['tr',   'Транспорт и порты'],
+    ['name', 'Имена и веб'],
+    ['mail', 'Почта'],
+    ['soc',  'Мониторинг и атаки']
+  ];
+
+  var GLOSS = [
+    // ---------- основы сетей ----------
+    ['пакет','net',['пакет'],'Порция данных с приписанными спереди заголовками, которая летит по сети как единое целое. Большой файл режется на тысячи пакетов и собирается обратно на приёме.'],
+    ['кадр','net',['кадр'],'Так называют пакет на самом нижнем уровне, когда к нему уже добавлен заголовок Ethernet с MAC-адресами. По проводу физически уходит именно кадр.'],
+    ['сегмент','net',['сегмент'],'Два разных значения. Порция данных на уровне TCP — раз. Часть сети, отделённая от остальных маршрутизатором, — два. По контексту обычно понятно.'],
+    ['дейтаграмма','net',['дейтаграмм'],'Порция данных в UDP. В отличие от TCP приходит целиком и ровно одна — либо не приходит вовсе.'],
+    ['инкапсуляция','net',['инкапсуляц'],'Обрастание данных заголовками по пути вниз по уровням: приложение отдаёт текст, TCP приписывает порты, IP — адреса, Ethernet — MAC. Как матрёшка.'],
+    ['MTU','net',['MTU'],'Максимальный размер полезной нагрузки в одном кадре, обычно 1500 байт. Всё, что больше, режется на части. Из-за него ломаются файлы через VPN, когда размер согласован неверно.'],
+    ['MAC-адрес','net',['MAC-адрес','MAC'],'Адрес сетевой карты, 48 бит. Работает только внутри одного сегмента и меняется на каждом шаге маршрута. Подделывается одной командой, так что опознавать по нему устройство — лишь предположение.'],
+    ['ARP','net',['ARP'],'Протокол, который узнаёт MAC-адрес по известному IP простым вопросом «у кого этот адрес?» на всю сеть. Проверки подлинности в нём нет, поэтому ответить может кто угодно.'],
+    ['ARP-спуфинг','net',['ARP-спуфинг'],'Атака: злоумышленник отвечает на ARP-запросы вместо шлюза, и трафик жертвы начинает идти через его машину. Работает только внутри одного сегмента.'],
+    ['VLAN','net',['VLAN'],'Логическое деление одного физического коммутатора на несколько независимых сетей. Каждая VLAN — отдельный широковещательный домен, между ними трафик идёт только через маршрутизатор.'],
+    ['802.1Q','net',['802.1Q'],'Стандарт, который добавляет в кадр метку с номером VLAN. Нужен, чтобы несколько VLAN шли по одному кабелю между коммутаторами.'],
+    ['коммутатор','net',['коммутатор'],'Устройство, которое соединяет машины внутри одного сегмента и разбирается только в MAC-адресах. Работает на канальном уровне.'],
+    ['маршрутизатор','net',['маршрутизатор'],'Устройство, которое соединяет разные сети и принимает решения по IP-адресам. На каждом проходе пересобирает канальный заголовок заново.'],
+    ['шлюз','net',['шлюз'],'Маршрутизатор, которому хост отдаёт все пакеты, адресованные за пределы своей подсети. Если маршрута по умолчанию нет, машина не выйдет наружу вообще.'],
+    ['хоп','net',['хоп'],'Один шаг маршрута — передача пакета от одного маршрутизатора к следующему. До сервера в другой стране их обычно десять-двадцать.'],
+    ['TTL','net',['TTL'],'Счётчик в заголовке IP, который уменьшается на каждом хопе. Дошёл до нуля — пакет уничтожается. Защита от вечно кружащих пакетов и основа работы traceroute.'],
+    ['ICMP','net',['ICMP'],'Служебный протокол для сообщений о состоянии сети: «хост недостижим», «время истекло». На нём работает ping. Портов у него нет.'],
+    ['DHCP','net',['DHCP'],'Протокол, по которому машина автоматически получает адрес, маску, шлюз и DNS. Обмен из четырёх шагов. Проверки подлинности нет — верит первому ответившему.'],
+    ['NAT','net',['NAT'],'Подмена внутреннего адреса на публичный при выходе в интернет. Из-за неё внешний мир видит один адрес на всю организацию, и без журналов трансляций событие невозможно привязать к машине.'],
+    ['PAT','net',['PAT'],'Разновидность NAT, где клиентов за одним публичным адресом различают по номеру порта. Именно так работает любой домашний роутер.'],
+    ['CGNAT','net',['CGNAT'],'NAT на стороне провайдера: за одним публичным адресом сидят тысячи абонентов. Сильно осложняет установление виновника при расследовании.'],
+    ['маска','net',['маск'],'Число, которое показывает, где в адресе кончается номер сети и начинается номер хоста. Записывается как 255.255.255.0 или коротко /24.'],
+    ['префикс','net',['префикс'],'Короткая запись маски — число единиц в ней. Чем больше число после слэша, тем меньше сеть: каждая единица делит количество адресов пополам.'],
+    ['CIDR','net',['CIDR'],'Способ записи сети в виде адрес/префикс, например 10.4.19.0/24. Пришёл на смену жёсткому делению адресов на классы.'],
+    ['широковещательный адрес','net',['широковещательн'],'Последний адрес подсети, все биты хоста в единицах. Пакет на него получают все машины сегмента. Для устройства не назначается.'],
+    ['loopback','net',['loopback'],'Петлевой интерфейс 127.0.0.1 — «сам себе». Трафик на него не покидает машину, поэтому служба, слушающая только его, снаружи недоступна.'],
+    ['link-local','net',['link-local'],'Адрес для общения только внутри сегмента. В IPv4 это 169.254.x.x и означает, что DHCP не ответил. В IPv6 это fe80:: и есть всегда.'],
+    ['best effort','net',['best effort'],'Принцип работы сети: «постараюсь доставить». Никаких гарантий доставки, порядка и времени. Потери и дубликаты — штатное поведение, а не поломка.'],
+    ['сквозной принцип','net',['сквозн'],'Архитектурное решение интернета: середина сети тупая и просто пересылает пакеты, а вся сложность — надёжность, порядок, повторы — вынесена на конечные машины.'],
+    ['SLAAC','net',['SLAAC'],'Способ, которым хост в IPv6 сам настраивает себе адрес, услышав объявление маршрутизатора. Проверки подлинности нет, поэтому объявиться шлюзом может посторонний.'],
+    ['Router Advertisement','net',['Router Advertisement'],'Сообщение IPv6, которым маршрутизатор объявляет о себе всем в сегменте. Подложные объявления — рабочая атака внутри сети, часто незаметная для мониторинга под IPv4.'],
+    ['сегментация','net',['сегментац'],'Разделение сети на изолированные части, между которыми трафик обязан проходить через фильтр. Без неё заражённая машина видит всю сеть сразу.'],
+    ['DMZ','net',['DMZ'],'Отдельный сегмент для сервисов, доступных из интернета. Устроен так, что взлом сервиса в нём не даёт хода во внутреннюю сеть.'],
+    ['периметр','net',['периметр'],'Граница между внутренней сетью организации и интернетом. Понятия «снаружи внутрь» и «изнутри наружу» отсчитываются от неё.'],
+    ['DHCP snooping','net',['DHCP snooping'],'Защита на коммутаторе: раздавать адреса разрешено только с доверенных портов. Срабатывание означает, что кто-то поставил свой DHCP-сервер.'],
+    ['Dynamic ARP Inspection','net',['Dynamic ARP Inspection','DAI'],'Защита на коммутаторе: ARP-ответы сверяются с таблицей и несоответствия отбрасываются. Прямо указывает на ARP-спуфинг и на порт, откуда он идёт.'],
+
+    // ---------- транспорт ----------
+    ['порт','tr',['порт'],'Номер от 1 до 65535, который говорит, какой программе на машине отдать данные. Смысл несёт порт назначения; порт источника у клиента случайный и одноразовый.'],
+    ['сокет','tr',['сокет'],'Пара «IP-адрес плюс порт». Соединение однозначно задаётся четвёркой: адрес и порт источника, адрес и порт назначения.'],
+    ['эфемерный порт','tr',['эфемерн'],'Случайный высокий номер, который система выдаёт клиенту на время одного соединения. В логах на него смотреть бесполезно.'],
+    ['TCP','tr',['TCP'],'Протокол с установкой соединения: нумерует байты, требует подтверждений и переспрашивает потерянное. Надёжно, но с задержками. Границ сообщений не хранит — это поток байт.'],
+    ['UDP','tr',['UDP'],'Протокол без соединения: отправил и забыл. Ни подтверждений, ни повторов, ни порядка. Быстро и дёшево; разбираться с потерями должно само приложение.'],
+    ['QUIC','tr',['QUIC'],'Современная замена связке TCP плюс TLS, работает поверх UDP на порту 443. Быстрее устанавливает соединение, но большинством средств анализа не разбирается.'],
+    ['рукопожатие','tr',['рукопожат'],'Обмен тремя пакетами — SYN, SYN+ACK, ACK — которым TCP открывает соединение до передачи данных. На его механике построены и сканирование портов, и SYN-flood.'],
+    ['SYN','tr',['SYN'],'Флаг TCP «хочу открыть соединение». Первый пакет любого соединения. Много SYN без продолжения — признак сканирования.'],
+    ['ACK','tr',['ACK'],'Флаг TCP «подтверждаю приём». Стоит почти во всех пакетах после первого.'],
+    ['RST','tr',['RST'],'Флаг TCP «обрыв немедленно». Приходит в ответ на обращение к закрытому порту, а также при аварийном разрыве. Данные в пути при этом теряются.'],
+    ['FIN','tr',['FIN'],'Флаг TCP «я закончил передавать». Корректное закрытие: обе стороны обмениваются FIN и подтверждают их, ничего не теряя.'],
+    ['контроль потока','tr',['контроль потока'],'Механизм, которым получатель говорит отправителю, сколько байт готов принять. Бережёт буфер получателя. Не путать с контролем перегрузки.'],
+    ['контроль перегрузки','tr',['контроль перегрузки'],'Механизм, которым отправитель сам подбирает скорость по потерям в сети. Бережёт сеть. Отсюда медленный старт любой большой закачки — это норма.'],
+    ['SYN-flood','tr',['SYN-flood'],'Атака отказа в обслуживании: поток запросов на соединение без ответа на них. Забивает очередь ожидающих соединений, и настоящие клиенты подключиться не могут.'],
+    ['TIME-WAIT','tr',['TIME-WAIT'],'Состояние закрытого соединения, которое ещё выдерживает паузу: в Linux ровно 60 секунд. Тысячи таких на нагруженном сервере — норма, а не атака.'],
+    ['ESTABLISHED','tr',['ESTABLISHED'],'Состояние установленного соединения, по которому идёт обмен. Его отсутствие при множестве попыток — признак сканирования.'],
+    ['сканирование портов','tr',['сканирован'],'Перебор портов, чтобы узнать, какие службы доступны. В логах узнаётся по множеству попыток за секунды при нулевом объёме переданных данных.'],
+    ['сетевой порядок байт','tr',['сетевой порядок','big-endian'],'Договорённость записывать многобайтовые числа в заголовках старшим байтом вперёд. Поэтому в шестнадцатеричном дампе числа выглядят «наоборот» относительно памяти процессора.'],
+
+    // ---------- имена и веб ----------
+    ['DNS','name',['DNS'],'Распределённая база, которая переводит доменные имена в адреса. Для мониторинга самый ценный источник: почти любая вредоносная активность начинается с запроса имени.'],
+    ['резолвер','name',['резолвер'],'Сервер, который выполняет всю работу по поиску адреса за клиента: обходит иерархию сверху вниз и кеширует ответы.'],
+    ['авторитативный сервер','name',['авторитативн'],'Сервер, который хранит саму запись домена. Его ответ — истина в последней инстанции, остальные лишь пересказывают.'],
+    ['NXDOMAIN','name',['NXDOMAIN'],'Ответ DNS «такого домена не существует». Шквал таких ответов с одной машины — типичный признак перебора сгенерированных имён.'],
+    ['DGA','name',['DGA'],'Алгоритм, которым вредонос ежедневно генерирует сотни случайных доменных имён и перебирает их в поисках живого сервера управления.'],
+    ['DNS-туннелирование','name',['DNS-туннелирован','туннелирован'],'Передача данных внутри самих доменных имён. Работает там, где закрыт весь остальной интернет. Узнаётся по длинным случайным поддоменам одного домена.'],
+    ['fast flux','name',['fast flux'],'Быстрая смена адресов за одним именем при очень маленьком времени жизни записи. Делает блокировку по адресу бесполезной.'],
+    ['DoH','name',['DoH'],'DNS поверх HTTPS. Для приватности пользователя благо, для мониторинга потеря: запросы растворяются в обычном веб-трафике.'],
+    ['DNSSEC','name',['DNSSEC'],'Криптографическая подпись записей DNS, позволяющая проверить, что ответ не подделан. Внедрён далеко не везде.'],
+    ['HTTP','name',['HTTP'],'Текстовый протокол веба поверх TCP. Запрос состоит из метода, пути, заголовков и тела. В незашифрованном виде читается глазами целиком.'],
+    ['HTTPS','name',['HTTPS'],'Тот же HTTP, но внутри шифрованного туннеля TLS. Скрывает путь, заголовки и содержимое, но не адреса, объём и ритм обмена.'],
+    ['TLS','name',['TLS'],'Протокол шифрования поверх транспорта. Перед обменом данными стороны проверяют сертификат и согласуют ключи.'],
+    ['SNI','name',['SNI'],'Поле в начале TLS-рукопожатия, где клиент открытым текстом называет сайт, к которому обращается. Благодаря ему имя сайта видно даже при шифровании.'],
+    ['ECH','name',['ECH'],'Расширение, которое шифрует в том числе и SNI. Там, где включено, у аналитика остаются только адрес, объём и ритм.'],
+    ['сертификат','name',['сертификат'],'Документ, которым сервер доказывает, что он именно тот, за кого себя выдаёт. Проверяется по цепочке доверия до известного центра.'],
+    ['JA3','name',['JA3','JA4'],'Отпечаток клиента, посчитанный по набору параметров в начале TLS-рукопожатия. Позволяет опознать конкретную программу, не видя содержимого. JA4 — более устойчивый преемник.'],
+    ['cookie','name',['cookie'],'Идентификатор сессии, который браузер прикладывает к каждому запросу после входа. Кто владеет им, тот и есть пользователь — поэтому кража обходит и второй фактор.'],
+    ['beaconing','name',['beaconing','маячок','маячка','маячки'],'Регулярные одинаковые обращения заражённой машины к серверу управления. Выдаёт себя постоянным интервалом и размером, даже когда трафик зашифрован.'],
+
+    // ---------- почта ----------
+    ['SMTP','mail',['SMTP'],'Протокол пересылки почты между серверами, порт 25. Создан в 1982 году без всякой проверки отправителя — отсюда вся проблема подделки писем.'],
+    ['envelope from','mail',['envelope from'],'Адрес отправителя на «конверте», который видят только почтовые серверы. Именно его проверяет SPF, и именно он может не совпадать с тем, что видит человек.'],
+    ['SPF','mail',['SPF'],'Проверка: имел ли право этот сервер отправлять почту от имени домена с конверта. Зелёный SPF сам по себе не доказывает подлинность отправителя.'],
+    ['DKIM','mail',['DKIM'],'Криптографическая подпись письма ключом домена. Подтверждает, что письмо не меняли в пути, но ничего не говорит о том, кто в поле «От».'],
+    ['DMARC','mail',['DMARC'],'Единственная из трёх проверок, которая сверяет видимый пользователю адрес с тем, что подтвердили SPF и DKIM. Именно её вердикт решает судьбу письма.'],
+    ['BEC','mail',['BEC'],'Атака без вложений и ссылок: письмо от имени руководителя с просьбой срочно оплатить по новым реквизитам. Техника здесь бессильна, признаки только смысловые.'],
+    ['фишинг','mail',['фишинг'],'Обманное письмо или страница, вынуждающие раскрыть данные или запустить файл. Способ проникновения номер один, и самый частый тип обращений на первой линии.'],
+
+    // ---------- мониторинг и атаки ----------
+    ['SOC','soc',['SOC'],'Подразделение, которое круглосуточно наблюдает за инфраструктурой и реагирует на инциденты. Настройкой средств защиты занимаются другие — SOC смотрит.'],
+    ['SIEM','soc',['SIEM'],'Система, которая собирает логи со всех устройств в одно место и по правилам ищет в них подозрительные закономерности. Сработало правило — родился алерт.'],
+    ['алерт','soc',['алерт'],'Карточка события, которую SIEM создала по сработавшему правилу. Задача первой линии — разобрать её и решить, инцидент это или шум.'],
+    ['ложное срабатывание','soc',['ложн'],'Алерт, за которым нет инцидента: резервное копирование, сканер безопасности, обновление софта. Составляет подавляющее большинство потока.'],
+    ['триаж','soc',['триаж'],'Первичный разбор алерта и решение о его судьбе: закрыть с обоснованием или передать выше. Основная работа аналитика первой линии.'],
+    ['эскалация','soc',['эскалац'],'Передача разобранного алерта на вторую линию. Хорошая эскалация содержит факты, отброшенные версии и предложение по действиям, а не пересказ заголовка.'],
+    ['IoC','soc',['IoC'],'Конкретный признак заражения, который можно проверить: адрес, домен, хеш файла. Раздаётся коллегам, чтобы искать то же самое в других местах.'],
+    ['C2','soc',['C2'],'Сервер управления, с которым связывается вредонос за командами. Часто прячется за легитимным сервисом или обычным HTTPS.'],
+    ['эксфильтрация','soc',['эксфильтрац'],'Вынос данных из организации наружу. В потоках узнаётся по резкой асимметрии: наружу уходит несоизмеримо больше, чем приходит.'],
+    ['lateral movement','soc',['lateral movement','боков'],'Перемещение злоумышленника вглубь сети с машины на машину после первого проникновения. Внутренний трафик между рабочими станциями — типичный признак.'],
+    ['MITRE ATT&CK','soc',['ATT&CK'],'Каталог тактик и техник злоумышленников. Общий язык отрасли: тактика отвечает на вопрос «зачем», техника — «как именно».'],
+    ['Cyber Kill Chain','soc',['Kill Chain'],'Модель атаки из семи последовательных этапов от разведки до достижения цели. В отличие от ATT&CK линейна.'],
+    ['NetFlow','soc',['NetFlow','поток'],'Сводка об одном сетевом разговоре: адреса, порты, объём, длительность. Содержимого не хранит, зато есть для всего трафика и лежит месяцами.'],
+    ['Zeek','soc',['Zeek'],'Инструмент, превращающий трафик в структурированные журналы по протоколам. Основа большинства разборов в зрелых центрах мониторинга.'],
+    ['Suricata','soc',['Suricata'],'Система обнаружения вторжений, сопоставляющая трафик с базой правил. Читать само правило важнее, чем его название.'],
+    ['Sysmon','soc',['Sysmon'],'Дополнение к журналу Windows, пишущее то, чего там штатно нет. Событие с номером 3 отвечает на главный вопрос сети: какой процесс открыл соединение.'],
+    ['EDR','soc',['EDR','XDR'],'Агент на машине, который видит дерево процессов и действия внутри системы. Показывает то, чего сеть не видит принципиально.'],
+    ['IDS','soc',['IDS','IPS'],'Система обнаружения вторжений следит и сообщает; система предотвращения дополнительно блокирует. Обе ловят только известное.'],
+    ['песочница','soc',['песочниц'],'Изолированная среда, где подозрительный файл запускают и наблюдают за поведением, не рискуя рабочей машиной.'],
+    ['OSINT','soc',['OSINT'],'Сбор сведений из открытых источников: репутация адреса, возраст домена, кто владелец. Обязательный шаг при разборе алерта.'],
+    ['SUID','soc',['SUID'],'Бит прав в Linux, из-за которого программа выполняется от имени владельца файла. Если владелец root, ошибка в такой программе даёт полные права.'],
+    ['привилегии','soc',['привилег'],'Повышение прав в системе с обычного пользователя до администратора. Отдельный этап почти любой атаки.']
+  ];
+
+  /* ---- построение словаря ---- */
+  var GMAP = {};
+  GLOSS.forEach(function (g, i) {
+    g.key = 'g' + i;
+    GMAP[g.key] = g;
+  });
+
+  function glossRender(filter, jump) {
+    var list = document.getElementById('glist');
+    var cats = document.getElementById('gcats');
+    var cnt = document.getElementById('gcnt');
+    if (!list) return;
+    var q = (filter || '').trim().toLowerCase();
+
+    if (!cats.dataset.built) {
+      cats.dataset.built = '1';
+      cats.innerHTML = GCATS.map(function (c) {
+        return '<button class="gcat" data-c="' + c[0] + '">' + c[1] + '</button>';
+      }).join('') + '<button class="gcat on" data-c="all">Все</button>';
+      cats.addEventListener('click', function (e) {
+        var b = e.target.closest('.gcat');
+        if (!b) return;
+        [].forEach.call(cats.querySelectorAll('.gcat'), function (x) { x.classList.remove('on'); });
+        b.classList.add('on');
+        var c = b.getAttribute('data-c');
+        if (c === 'all') { document.getElementById('v-gloss').scrollIntoView({ block: 'start' }); }
+        else {
+          var sec = document.getElementById('gs-' + c);
+          if (sec) sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    }
+
+    var shown = 0, html = '';
+    GCATS.forEach(function (c) {
+      var items = GLOSS.filter(function (g) {
+        if (g[1] !== c[0]) return false;
+        if (!q) return true;
+        return (g[0] + ' ' + g[3] + ' ' + g[2].join(' ')).toLowerCase().indexOf(q) !== -1;
+      });
+      if (!items.length) return;
+      shown += items.length;
+      html += '<div class="gsec" id="gs-' + c[0] + '"><h3>' + c[1] + '</h3>' +
+        items.map(function (g) {
+          return '<div class="gitem" id="' + g.key + '"><b>' + g[0] + '</b><p>' + g[3] + '</p></div>';
+        }).join('') + '</div>';
+    });
+
+    list.innerHTML = html || '<p class="gempty">Ничего не нашлось. Попробуй короче — например «arp» вместо «arp-спуфинг».</p>';
+    cnt.textContent = shown + ' из ' + GLOSS.length;
+
+    if (jump) {
+      var el = document.getElementById(jump);
+      if (el) {
+        el.classList.add('hit');
+        setTimeout(function () { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 60);
+        setTimeout(function () { el.classList.remove('hit'); }, 2600);
+      }
+    }
+  }
+
+  (function () {
+    var q = document.getElementById('gq');
+    if (q) q.addEventListener('input', function () { glossRender(q.value); });
+  })();
+
+  /* ---- подсказки при наведении ---- */
+  var tip = document.createElement('div');
+  tip.className = 'tip';
+  document.body.appendChild(tip);
+  var tipTimer = null;
+
+  function showTip(el) {
+    var g = GMAP[el.getAttribute('data-t')];
+    if (!g) return;
+    var cat = GCATS.filter(function (c) { return c[0] === g[1]; })[0];
+    tip.innerHTML = '<span class="cat">' + (cat ? cat[1] : '') + '</span><b>' + g[0] + '</b>' +
+      g[3] + '<span class="more">Нажми, чтобы открыть в словаре</span>';
+    tip.classList.add('on');
+    var r = el.getBoundingClientRect();
+    var tw = tip.offsetWidth, th = tip.offsetHeight;
+    var left = Math.min(Math.max(10, r.left + r.width / 2 - tw / 2), window.innerWidth - tw - 10);
+    var top = r.top - th - 10;
+    if (top < 10) top = r.bottom + 10;
+    tip.style.left = left + 'px';
+    tip.style.top = top + 'px';
+  }
+  function hideTip() { tip.classList.remove('on'); }
+
+  document.addEventListener('mouseover', function (e) {
+    var el = e.target.closest('.term');
+    if (!el) return;
+    clearTimeout(tipTimer);
+    tipTimer = setTimeout(function () { showTip(el); }, 120);
+  });
+  document.addEventListener('mouseout', function (e) {
+    if (e.target.closest('.term')) { clearTimeout(tipTimer); hideTip(); }
+  });
+  document.addEventListener('focusin', function (e) {
+    if (e.target.closest && e.target.closest('.term')) showTip(e.target.closest('.term'));
+  });
+  document.addEventListener('focusout', hideTip);
+  window.addEventListener('scroll', hideTip, { passive: true });
+  document.addEventListener('click', function (e) {
+    var el = e.target.closest('.term');
+    if (!el) return;
+    e.preventDefault();
+    hideTip();
+    show('gloss');
+    glossRender(document.getElementById('gq').value = '', el.getAttribute('data-t'));
+  });
+
+  /* ---- разметка терминов в тексте модуля ---- */
+  /* окончания русских слов: длинные раньше коротких, иначе поглотятся */
+  var END = '(?:иями|ыми|иях|иям|ией|ями|ами|ого|ому|его|ему|ую|ий|ия|ию|ие|ии|ые|ых|ым|ый|ое|ой|ов|ом|ам|ах|ей|ем|ая|ы|у|е|а|и|я|ю)?';
+  var RX = (function () {
+    var parts = [];
+    GLOSS.forEach(function (g) {
+      g[2].forEach(function (stem) {
+        parts.push({ k: g.key, s: stem });
+      });
+    });
+    parts.sort(function (a, b) { return b.s.length - a.s.length; });
+    var src = parts.map(function (p) {
+      return '(' + p.s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + END + ')';
+    }).join('|');
+    /* флаг i — чтобы слово в начале предложения тоже подхватывалось */
+    return { re: new RegExp('(^|[^A-Za-zА-Яа-яЁё0-9_-])(?:' + src + ')(?![A-Za-zА-Яа-яЁё0-9_-])', 'gi'), keys: parts.map(function (p) { return p.k; }) };
+  })();
+
+  var SKIP = { PRE: 1, CODE: 1, SCRIPT: 1, STYLE: 1, TEXTAREA: 1, BUTTON: 1, A: 1, H1: 1, H2: 1, H3: 1, H4: 1, SVG: 1, TEXT: 1, INPUT: 1, SUMMARY: 1 };
+
+  function markTerms(root) {
+    if (!root || root.dataset.marked) return;
+    root.dataset.marked = '1';
+    var used = {};
+    var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+      acceptNode: function (n) {
+        if (!n.nodeValue || n.nodeValue.length < 3) return NodeFilter.FILTER_REJECT;
+        for (var p = n.parentNode; p && p !== root; p = p.parentNode) {
+          if (SKIP[p.nodeName] || (p.classList && p.classList.contains('term'))) return NodeFilter.FILTER_REJECT;
+        }
+        return NodeFilter.FILTER_ACCEPT;
+      }
+    });
+    var nodes = [], n;
+    while ((n = walker.nextNode())) nodes.push(n);
+
+    nodes.forEach(function (node) {
+      var text = node.nodeValue;
+      RX.re.lastIndex = 0;
+      var m, pieces = null, last = 0;
+      while ((m = RX.re.exec(text))) {
+        /* группа 1 — граница слова, сами термины начинаются со второй */
+        var gi = -1;
+        for (var i = 2; i < m.length; i++) { if (m[i] !== undefined) { gi = i - 2; break; } }
+        if (gi < 0) continue;
+        var key = RX.keys[gi];
+        if (used[key]) continue;
+        used[key] = 1;
+        pieces = pieces || document.createDocumentFragment();
+        var start = m.index + m[1].length;
+        pieces.appendChild(document.createTextNode(text.slice(last, start)));
+        var span = document.createElement('span');
+        span.className = 'term';
+        span.setAttribute('data-t', key);
+        span.setAttribute('tabindex', '0');
+        span.textContent = m[gi + 2];
+        pieces.appendChild(span);
+        last = start + m[gi + 2].length;
+      }
+      if (pieces) {
+        pieces.appendChild(document.createTextNode(text.slice(last)));
+        node.parentNode.replaceChild(pieces, node);
+      }
+    });
+  }
 
   /* ---- полноэкранный режим: убирает заголовок окна целиком ---- */
   (function () {
