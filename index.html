@@ -168,6 +168,17 @@
     background:var(--card); border:1px solid var(--line); border-radius:var(--r-m);
     padding:20px 24px; margin:0 0 44px; box-shadow:var(--sh-1);
   }
+  /* когда хранилище работает — узкая служебная полоска, а не блок на пол-экрана */
+  .save-panel.slim {
+    display:flex; flex-wrap:wrap; align-items:center; gap:12px;
+    padding:13px 20px; box-shadow:none; background:var(--card-2); margin-bottom:80px;
+  }
+  .save-panel.slim .sp-head { margin-bottom:0; }
+  .save-panel.slim .sp-head b { font-family:var(--sans); font-size:14.5px; font-weight:650; letter-spacing:0; }
+  .save-panel.slim #spNote { display:none; }
+  .save-panel.slim .sp-btns { margin-left:auto; }
+  .save-panel.slim .sp-btns .btn { padding:7px 14px; font-size:13px; }
+  .save-panel.slim .sp-io, .save-panel.slim .sp-msg { width:100%; }
   .save-panel.warn { border-color:var(--bad-line); background:var(--bad-soft); }
   .sp-head { display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:8px; }
   .sp-dot { width:9px; height:9px; border-radius:50%; background:var(--ok); flex:none; }
@@ -597,29 +608,6 @@
           </div>
         </div>
 
-        <div class="save-panel" id="savePanel">
-          <div class="sp-head">
-            <span class="sp-dot"></span>
-            <b>Сохранение прогресса</b>
-            <span class="st" id="spStatus"></span>
-          </div>
-          <p id="spNote"></p>
-          <div class="sp-btns">
-            <button class="btn" id="spExport">Сохранить прогресс</button>
-            <button class="btn" id="spLoad">Загрузить из файла</button>
-            <button class="btn" id="spImport">Вставить кодом</button>
-          </div>
-          <input type="file" id="spFile" accept=".json,.txt,application/json,text/plain" style="display:none">
-          <div class="sp-io" id="spIO">
-            <textarea id="spText" spellcheck="false" autocomplete="off"></textarea>
-            <div class="sp-btns">
-              <button class="btn pri" id="spApply">Применить</button>
-              <button class="btn" id="spCancel">Закрыть</button>
-            </div>
-          </div>
-          <p class="sp-msg" id="spMsg" style="display:none"></p>
-        </div>
-
         <div class="sec-h">
           <h2>Программа</h2>
           <span id="homehint">начни с нулевого</span>
@@ -706,6 +694,29 @@
             </p>
             <p class="src-w">Для L1 <strong>не обязательна</strong>: это про написание сетевого кода, а не про его анализ. Пригодится, если решишь писать свои утилиты.</p>
           </div>
+        </div>
+
+        <div class="save-panel" id="savePanel">
+          <div class="sp-head">
+            <span class="sp-dot"></span>
+            <b>Прогресс</b>
+            <span class="st" id="spStatus"></span>
+          </div>
+          <p id="spNote"></p>
+          <div class="sp-btns">
+            <button class="btn" id="spExport" title="Скачать файл с прогрессом: отметки, ответы и твои разборы">Сохранить в файл</button>
+            <button class="btn" id="spLoad" title="Восстановить прогресс из ранее сохранённого файла">Загрузить</button>
+            <button class="btn" id="spImport" title="Вставить прогресс кодом, если файла нет">Кодом</button>
+          </div>
+          <input type="file" id="spFile" accept=".json,.txt,application/json,text/plain" style="display:none">
+          <div class="sp-io" id="spIO">
+            <textarea id="spText" spellcheck="false" autocomplete="off"></textarea>
+            <div class="sp-btns">
+              <button class="btn pri" id="spApply">Применить</button>
+              <button class="btn" id="spCancel">Закрыть</button>
+            </div>
+          </div>
+          <p class="sp-msg" id="spMsg" style="display:none"></p>
         </div>
       </div>
     </section>
@@ -6301,23 +6312,21 @@ CommonSecurityLog
       : '';
 
     if (!PROBE) {
+      /* хранилище сломано — только в этом случае плашка разворачивается и уезжает наверх */
       panel.classList.add('warn');
       statusEl.textContent = 'хранилище недоступно';
       noteEl.innerHTML = '<strong>Браузер не даёт этой странице сохранять данные.</strong> ' +
         'Так бывает, когда страница открыта внутри другой, а в браузере включена изоляция или очистка данных при закрытии. ' +
         'Отметки живут, пока вкладка открыта, и исчезают после её закрытия.' + advice +
         ' Пока так — сохраняй прогресс в конце занятия и загружай в начале следующего.';
-    } else if (LOADED) {
-      statusEl.textContent = st.ts ? ('последнее сохранение ' + when(st.ts)) : 'прогресс загружен';
-      noteEl.innerHTML = 'Прогресс восстановлен — сохранение работает. ' +
-        'Файл нужен на случай смены браузера или очистки его данных: он переносит отметки, ' +
-        'ответы на вопросы и написанные тобой разборы куда угодно.';
+      var hero = document.querySelector('.hero');
+      if (hero && hero.parentNode) hero.parentNode.insertBefore(panel, hero.nextSibling);
     } else {
-      panel.classList.add('neutral');
-      statusEl.textContent = 'новый сеанс';
-      noteEl.innerHTML = 'Сохранённого прогресса нет — либо ты здесь впервые, либо браузер очистил данные. ' +
-        '<strong>Если ты уже отмечал модули и они пропали</strong>, значит хранилище не переживает закрытие вкладки.' +
-        advice + ' Проверить просто: отметь любой модуль, закрой вкладку, вернись — если отметка на месте, всё в порядке.';
+      panel.classList.add('slim');
+      statusEl.textContent = st.ts
+        ? ('сохраняется автоматически · последнее ' + when(st.ts))
+        : 'сохраняется автоматически в этом браузере';
+      noteEl.textContent = '';
     }
 
     /* прямое скачивание — работает в локальной копии, где нет ограничений площадки */
