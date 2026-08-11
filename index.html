@@ -178,7 +178,15 @@
   .save-panel.slim #spNote { display:none; }
   .save-panel.slim .sp-btns { margin-left:auto; }
   .save-panel.slim .sp-btns .btn { padding:7px 14px; font-size:13px; }
-  .save-panel.slim .sp-io, .save-panel.slim .sp-msg { width:100%; }
+  .save-panel.slim .sp-io, .save-panel.slim .sp-msg, .save-panel.slim .sp-where { width:100%; }
+  .save-panel.slim #spTest { display:none; }
+  .sp-where {
+    font-family:var(--mono); font-size:11.5px; color:var(--ink-3); margin-top:12px;
+    padding-top:10px; border-top:1px dashed var(--line); word-break:break-all;
+  }
+  .sp-where b { color:var(--ink); }
+  .sp-where.bad b { color:var(--bad); }
+  .save-panel.slim .sp-where { display:none; }
   .save-panel.warn { border-color:var(--bad-line); background:var(--bad-soft); }
   .sp-head { display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:8px; }
   .sp-dot { width:9px; height:9px; border-radius:50%; background:var(--ok); flex:none; }
@@ -707,7 +715,9 @@
             <button class="btn" id="spExport" title="Скачать файл с прогрессом: отметки, ответы и твои разборы">Сохранить в файл</button>
             <button class="btn" id="spLoad" title="Восстановить прогресс из ранее сохранённого файла">Загрузить</button>
             <button class="btn" id="spImport" title="Вставить прогресс кодом, если файла нет">Кодом</button>
+            <button class="btn" id="spTest" title="Оставить метку и проверить, переживёт ли она перезапуск браузера">Проверить сохранение</button>
           </div>
+          <div class="sp-where" id="spWhere"></div>
           <input type="file" id="spFile" accept=".json,.txt,application/json,text/plain" style="display:none">
           <div class="sp-io" id="spIO">
             <textarea id="spText" spellcheck="false" autocomplete="off"></textarea>
@@ -6311,23 +6321,72 @@ CommonSecurityLog
         'прогресс сохраняется сам, а кнопка сохранения отдаёт обычный файл.'
       : '';
 
+    /* проверка на переживание перезапуска: метка ставится кнопкой и читается при следующей загрузке */
+    var TESTKEY = KEY + '__persist';
+    var mark = null;
+    try { mark = localStorage.getItem(TESTKEY); } catch (e) {}
+
+    function toTop() {
+      var hero = document.querySelector('.hero');
+      if (hero && hero.parentNode) hero.parentNode.insertBefore(panel, hero.nextSibling);
+    }
+
+    var whereEl = document.getElementById('spWhere');
+    function paintWhere() {
+      var host = location.host || 'файл на диске';
+      var wrong = /claude\.ai/i.test(location.hostname);
+      whereEl.className = 'sp-where' + (wrong ? ' bad' : '');
+      whereEl.innerHTML =
+        'Открыто по адресу: <b>' + host + '</b>' +
+        (wrong ? ' — это версия внутри claude.ai, здесь браузер стирает данные при закрытии. Открывай сайт leclerc67.github.io' : '') +
+        '<br>Хранилище: <b>' + (PROBE ? 'доступно' : 'заблокировано') + '</b>' +
+        ' · прогресс при загрузке: <b>' + (LOADED ? 'найден' : 'не найден') + '</b>' +
+        (mark ? ' · метка проверки от <b>' + when(Number(mark)) + '</b> на месте' : '');
+    }
+    paintWhere();
+
     if (!PROBE) {
-      /* хранилище сломано — только в этом случае плашка разворачивается и уезжает наверх */
       panel.classList.add('warn');
       statusEl.textContent = 'хранилище недоступно';
       noteEl.innerHTML = '<strong>Браузер не даёт этой странице сохранять данные.</strong> ' +
         'Так бывает, когда страница открыта внутри другой, а в браузере включена изоляция или очистка данных при закрытии. ' +
         'Отметки живут, пока вкладка открыта, и исчезают после её закрытия.' + advice +
         ' Пока так — сохраняй прогресс в конце занятия и загружай в начале следующего.';
-      var hero = document.querySelector('.hero');
-      if (hero && hero.parentNode) hero.parentNode.insertBefore(panel, hero.nextSibling);
-    } else {
+      toTop();
+    } else if (mark) {
+      /* метка пережила закрытие — хранилище точно исправно */
+      statusEl.textContent = 'проверка пройдена';
+      noteEl.innerHTML = '<strong>Хранилище работает: метка от ' + when(Number(mark)) + ' пережила перезапуск.</strong> ' +
+        'Значит, если отметки всё равно пропадают — дело не в браузере, а в том, что ты открываешь ' +
+        'страницу по другому адресу. Сверь строку ниже.';
+      try { localStorage.removeItem(TESTKEY); } catch (e) {}
+      toTop();
+    } else if (LOADED) {
       panel.classList.add('slim');
       statusEl.textContent = st.ts
         ? ('сохраняется автоматически · последнее ' + when(st.ts))
         : 'сохраняется автоматически в этом браузере';
       noteEl.textContent = '';
+    } else {
+      /* прогресса нет: либо первый заход, либо браузер его стёр — предлагаем восстановиться */
+      panel.classList.add('neutral');
+      statusEl.textContent = 'сохранённого прогресса нет';
+      noteEl.innerHTML = 'Если ты здесь впервые — всё нормально, просто начинай. ' +
+        '<strong>Если ты уже занимался и отметки пропали</strong> — восстанови их кнопкой «Загрузить» ' +
+        'из сохранённого файла, а потом нажми «Проверить сохранение»: она оставит метку, ' +
+        'и после перезапуска браузера мы точно узнаем, стирает он данные или нет.';
+      toTop();
     }
+
+    document.getElementById('spTest').addEventListener('click', function () {
+      try {
+        localStorage.setItem(TESTKEY, String(Date.now()));
+        say('Метка поставлена. Теперь закрой браузер полностью, открой эту страницу снова и посмотри сюда: ' +
+            'если появится «проверка пройдена» — хранилище исправно. Если нет — браузер стирает данные при закрытии.', 'ok');
+      } catch (e) {
+        say('Метку поставить не вышло — хранилище заблокировано.', 'bad');
+      }
+    });
 
     /* прямое скачивание — работает в локальной копии, где нет ограничений площадки */
     function blobSave(name, json) {
