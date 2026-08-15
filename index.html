@@ -598,7 +598,104 @@
   .field.wrong .fix { display:block; }
   .drill-btns { display:flex; gap:9px; flex-wrap:wrap; }
 
-  /* ---- множественный выбор ---- */
+  /* ---- конспект модуля ---- */
+  /* Стоит после теста и перед отметкой «пройден»: сначала непринуждённое припоминание
+     в квизе, потом сжатый список фактов на закрепление — если поставить конспект раньше
+     теста, он подсказывал бы ответы. Группы совпадают с заголовками модуля, чтобы конспект
+     служил указателем «где это было», а не отдельным текстом для запоминания. */
+  .cheat { border:1px solid var(--gold-line); border-radius:var(--r-l); overflow:hidden; margin:34px 0; box-shadow:var(--sh-1); }
+  .cheat-h { display:flex; align-items:center; gap:10px; padding:15px 24px; background:var(--gold-soft); border-bottom:1px solid var(--gold-line); }
+  .cheat-h svg { width:17px; height:17px; color:var(--gold-ink); flex:none; }
+  .cheat-h span { font-family:var(--mono); font-size:11px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--gold-ink); }
+  .cheat-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(230px,1fr)); gap:1px; background:var(--line); }
+  .cheat-g { background:var(--card); padding:18px 22px; }
+  .cheat-g h4 { margin:0 0 10px; font-size:14.5px; font-weight:700; color:var(--ink); letter-spacing:-.005em; }
+  .cheat-g ul { margin:0; padding:0; list-style:none; display:flex; flex-direction:column; gap:8px; }
+  .cheat-g li { font-size:14px; line-height:1.55; color:var(--ink-2); padding-left:14px; position:relative; }
+  .cheat-g li::before { content:''; position:absolute; left:0; top:.62em; width:5px; height:5px; border-radius:50%; background:var(--gold); }
+  .cheat-g code { font-size:12.5px; }
+
+  /* ---- итоговая смена ---- */
+  .fin-lock {
+    background:var(--card); border:1px solid var(--line-2); border-radius:var(--r-m);
+    padding:26px 28px; margin:26px 0; box-shadow:var(--sh-1);
+  }
+  .fin-lock h3 { margin:0 0 10px; font-size:21px; }
+  .fin-lock p { color:var(--ink-2); margin:0 0 14px; }
+  .fin-left { display:flex; flex-wrap:wrap; gap:8px; margin:0; padding:0; list-style:none; }
+  .fin-left button {
+    font-family:inherit; font-size:13.5px; padding:8px 14px; border-radius:var(--r-pill);
+    border:1px solid var(--line-2); background:var(--card-2); color:var(--ink-2); cursor:pointer;
+  }
+  .fin-left button:hover { border-color:var(--ink-3); color:var(--ink); }
+  .fin-step { margin:34px 0 0; }
+  .fin-step > h3 { margin:0 0 6px; font-size:21px; }
+  .fin-step > .lede-s { color:var(--ink-2); margin:0 0 16px; font-size:15.5px; }
+  .aq { display:flex; flex-direction:column; gap:10px; }
+  .aqi {
+    background:var(--card); border:1px solid var(--line); border-radius:var(--r-m);
+    padding:16px 18px; box-shadow:var(--sh-1);
+  }
+  .aqi-h { display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:8px; }
+  .aqi-h .id { font-family:var(--mono); font-size:11px; letter-spacing:.09em; color:var(--gold-ink); }
+  .aqi-h .tm { font-family:var(--mono); font-size:11px; color:var(--ink-3); }
+  .aqi-h .rule { font-weight:600; font-size:15.5px; }
+  /* поля алерта — таблица внутри карточки: рамку и фон даёт сама карточка,
+     а .tbl оставлен ради горизонтальной прокрутки на узком экране */
+  .aqi .tbl { border:0; background:none; box-shadow:none; margin:0; border-radius:0; }
+  .aqi table { width:100%; border-collapse:collapse; font-family:var(--mono); font-size:12.5px; }
+  .aqi td { padding:3px 10px 3px 0; border:0; line-height:1.5; vertical-align:top; color:var(--ink-2); }
+  .aqi td:first-child { color:var(--ink-3); white-space:nowrap; width:1%; }
+  .aqi-c { display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-top:12px; }
+  .aqi-c label { font-size:13.5px; color:var(--ink-3); }
+  .aqi select {
+    font-family:var(--mono); font-size:14px; padding:7px 10px; border-radius:var(--r-s);
+    border:1.5px solid var(--line-2); background:var(--card-2); color:var(--ink);
+  }
+  .vrd { display:flex; gap:6px; flex-wrap:wrap; }
+  .vrd button {
+    font-family:inherit; font-size:13px; padding:7px 12px; border-radius:var(--r-pill);
+    border:1px solid var(--line-2); background:var(--card-2); color:var(--ink-2); cursor:pointer;
+    transition:.16s var(--ease);
+  }
+  .vrd button:hover:not(:disabled) { border-color:var(--ink-3); color:var(--ink); }
+  .vrd button.on { background:var(--ink); border-color:var(--ink); color:var(--paper); }
+  .vrd button:disabled { cursor:default; }
+  .aqi.ok { border-color:var(--ok-line); background:var(--ok-soft); }
+  .aqi.no { border-color:var(--bad-line); background:var(--bad-soft); }
+  .aqi-w { display:none; margin-top:12px; font-size:14.5px; line-height:1.6; color:var(--ink-2); }
+  .aqi.shown .aqi-w { display:block; }
+  .aqi-w b { color:var(--ink); }
+  .calib {
+    background:var(--card-2); border:1px solid var(--line); border-radius:var(--r-m);
+    padding:18px 20px; margin:22px 0 0;
+  }
+  .calib-row { display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+  .calib input {
+    width:74px; font-family:var(--mono); font-size:15px; padding:8px 10px;
+    border-radius:var(--r-s); border:1.5px solid var(--line-2); background:var(--card); color:var(--ink);
+  }
+  .fin-res { display:none; margin:26px 0 0; }
+  .fin-res.on { display:block; animation:vin .3s var(--ease) both; }
+  .score-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:10px; margin:0 0 18px; }
+  .score-cell {
+    background:var(--card); border:1px solid var(--line); border-radius:var(--r-m); padding:14px 16px;
+  }
+  .score-cell .k { font-family:var(--mono); font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3); display:block; margin-bottom:6px; }
+  .score-cell .v { font-family:var(--serif); font-size:26px; letter-spacing:-.02em; }
+  .score-cell .s { display:block; font-size:13px; color:var(--ink-2); margin-top:4px; }
+  .plan-t { width:100%; border-collapse:collapse; font-size:14.5px; }
+  .plan-t th, .plan-t td { text-align:left; padding:9px 12px 9px 0; border-bottom:1px solid var(--line); vertical-align:top; }
+  .plan-t th { font-family:var(--mono); font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3); font-weight:400; }
+  .plan-t td:first-child { font-family:var(--mono); font-size:13px; white-space:nowrap; color:var(--gold-ink); }
+  .gaps { margin:0; padding:0; list-style:none; }
+  .gaps li {
+    background:var(--card); border:1px solid var(--line); border-radius:var(--r-s);
+    padding:12px 16px; margin-bottom:8px; font-size:15px; color:var(--ink-2);
+  }
+  .gaps li b { color:var(--ink); }
+  .gaps .lnk { font-size:14px; }
+
   .quiz.multi .opt .mk { border-radius:6px; }
   .quiz.multi .opt.pick { border-color:var(--ink); background:var(--card); }
   .quiz.multi .opt.pick .mk { background:var(--ink); border-color:var(--ink); color:var(--paper); }
@@ -739,6 +836,7 @@
   <symbol id="i-exit" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"></path></symbol>
   <symbol id="i-pen" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15.5 4.5 19.5 8.5 8.5 19.5 3.6 20.4 4.5 15.5z"></path><path d="M13.4 6.6 17.4 10.6"></path></symbol>
   <symbol id="i-calc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4" y="3" width="16" height="18" rx="2.5"></rect><path d="M8 7.5h8M8 12h.01M12 12h.01M16 12h.01M8 16.3h.01M12 16.3h.01M16 16.3h.01"></path></symbol>
+  <symbol id="i-list" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8.5 6.5h12M8.5 12h12M8.5 17.5h12M3.5 6.5h.01M3.5 12h.01M3.5 17.5h.01"></path></symbol>
 </defs></svg>
 
 <div class="titlebar"></div>
@@ -779,6 +877,8 @@
     </nav>
 
     <nav class="nav" id="navExtra">
+      <div class="nav-h">После курса</div>
+      <button data-go="final" id="navFinal"><i>СМ</i><span>Смена: очередь алертов</span><span class="dot" style="visibility:hidden"></span></button>
       <div class="nav-h">Справочник</div>
       <button data-go="gloss"><i>АЯ</i><span>Словарь терминов</span><span class="dot" style="visibility:hidden"></span></button>
     </nav>
@@ -1160,6 +1260,53 @@ action      allowed</code></pre>
                 <button class="opt" data-why="Сертификат проверяется в самом конце: он не нужен, пока пакет не доходит и соединение не устанавливается."><span class="mk">В</span><span>С проверки сертификата сайта</span></button>
               </div>
               <div class="exp"><b>Верно: Б.</b> Нижний уровень проверяется первым. Пока нет маршрута и связности, разбираться с именами, портами и сертификатами бессмысленно — будешь чинить не то.</div>
+            </div>
+          </div>
+
+          <div class="cheat rv" id="cheat-m0">
+            <div class="cheat-h"><svg><use href="#i-list"></use></svg><span>Конспект модуля</span></div>
+            <div class="cheat-grid">
+              <div class="cheat-g">
+                <h4>Линии SOC</h4>
+                <ul>
+                <li><strong>L1</strong> — триаж потока алертов: инцидент или ложное срабатывание. Работает по плейбукам. Вход в профессию.</li>
+                <li><strong>L2</strong> — расследование эскалированного: как проникли, что успели, куда ушли данные.</li>
+                <li><strong>L3</strong> — threat hunting: ищет то, на что не сработало ни одно правило.</li>
+                <li>Основная часть алертов на L1 — <strong>сетевая</strong>.</li>
+                </ul>
+              </div>
+              <div class="cheat-g">
+                <h4>Источники событий</h4>
+                <ul>
+                <li>Firewall — кто-куда-порт, разрешено или нет. Содержимого не даёт.</li>
+                <li>NetFlow — сводка по потоку: адреса, порты, объём, длительность.</li>
+                <li>Прокси — веб-запросы: URL, домен, код ответа. DNS-сервер — какие имена запрашивались.</li>
+                <li>IDS/IPS — только известные сигнатуры. Логи хостов — входы, процессы, файлы.</li>
+                <li>Правило корреляции в SIEM превращает поток событий в алерт.</li>
+                </ul>
+              </div>
+              <div class="cheat-g">
+                <h4>Ложные срабатывания — норма</h4>
+                <ul>
+                <li>Резервное копирование ночью похоже на выкачивание данных. Сканер уязвимостей — на разведку.</li>
+                <li>Задача L1 — быстро и обоснованно отсеивать шум, не пропуская настоящее.</li>
+                </ul>
+              </div>
+              <div class="cheat-g">
+                <h4>Метод снизу вверх</h4>
+                <ul>
+                <li>Канальный/сетевой (пакет доходит?) → имена (домен → IP?) → транспорт (порт слушает?) → приложение (протокол, сертификат, авторизация).</li>
+                <li>Проверять уровень N бессмысленно, пока не работает N−1.</li>
+                </ul>
+              </div>
+              <div class="cheat-g">
+                <h4>Словарь курса</h4>
+                <ul>
+                <li>Хост, пакет, протокол, клиент/сервер, периметр.</li>
+                <li><strong>Lateral movement</strong> — расползание с машины на машину. <strong>C2</strong> — сервер управления. <strong>Эксфильтрация</strong> — вынос данных.</li>
+                <li><strong>IoC</strong> — конкретный признак заражения. <strong>Триаж</strong> — первичный разбор алерта.</li>
+                </ul>
+              </div>
             </div>
           </div>
 
@@ -1662,6 +1809,72 @@ sudo tcpdump -i any -n arp</code></pre>
                 <button class="opt" data-why="При отказе DNS не открылось бы вообще ничего: имя не превратилось бы в адрес ни для мелкой страницы, ни для крупной."><span class="mk">В</span><span>Отказ DNS</span></button>
               </div>
               <div class="exp"><b>Верно: Б.</b> Мелкие пакеты проходят, крупные — нет: классический признак несогласованного MTU, чаще всего на VPN или туннеле. DNS исключается тем, что часть страниц открывается, блокировка по IP — тем, что пинг идёт.</div>
+            </div>
+          </div>
+
+          <div class="cheat rv" id="cheat-m1">
+            <div class="cheat-h"><svg><use href="#i-list"></use></svg><span>Конспект модуля</span></div>
+            <div class="cheat-grid">
+              <div class="cheat-g">
+                <h4>Пакетная коммутация</h4>
+                <ul>
+                <li>Не канал, а <strong>best effort</strong>: ни доставка, ни порядок, ни время не гарантированы.</li>
+                <li><strong>Сквозной принцип</strong>: сложность на краях (хостах), ядро сети остаётся тупым — только пересылает.</li>
+                <li>Потери и повторы — норма, не инцидент. Пакеты одного разговора идут разными путями → анализ по потокам, не по пакетам.</li>
+                </ul>
+              </div>
+              <div class="cheat-g">
+                <h4>OSI и TCP/IP</h4>
+                <ul>
+                <li>OSI — 7 уровней, язык описания. TCP/IP — 4 уровня, как всё устроено на самом деле. Учить TCP/IP.</li>
+                <li>TLS формально ни на одном уровне не лежит — работает поверх транспорта, обслуживает приложение.</li>
+                <li>«L3-коммутатор» — работает с IP. «Атака второго уровня» — ARP-спуфинг. «L7-файрвол» — разбирает HTTP.</li>
+                </ul>
+              </div>
+              <div class="cheat-g">
+                <h4>Три адреса</h4>
+                <ul>
+                <li><strong>MAC</strong> (канальный) — меняется на каждом хопе, живёт только внутри сегмента, подделывается одной командой.</li>
+                <li><strong>IP</strong> (сетевой) и <strong>порт</strong> (транспортный) — неизменны всю дорогу (кроме NAT).</li>
+                <li>MAC источника в логе = источник в том же сегменте, что записавшее лог устройство.</li>
+                </ul>
+              </div>
+              <div class="cheat-g">
+                <h4>Инкапсуляция</h4>
+                <ul>
+                <li>Заголовок добавляется спереди на каждом уровне сверху вниз, снимается в обратном порядке при приёме.</li>
+                <li>Одна порция данных: сегмент (TCP) → дейтаграмма (UDP) → пакет (IP) → кадр (Ethernet).</li>
+                </ul>
+              </div>
+              <div class="cheat-g">
+                <h4>Коммутатор vs маршрутизатор</h4>
+                <ul>
+                <li>Коммутатор — L2, смотрит на MAC, работает внутри сегмента. Маршрутизатор — L3, смотрит на IP, между сетями.</li>
+                <li>Сегментация — базовая защита: заражённый хост не достучится до другого сегмента без прохода через firewall на маршрутизаторе.</li>
+                </ul>
+              </div>
+              <div class="cheat-g">
+                <h4>VLAN</h4>
+                <ul>
+                <li>Один физический коммутатор делится логически. 802.1Q — метка VLAN ID в кадре. Транковый порт несёт метки, access — снимает.</li>
+                <li>Каждая VLAN — свой широковещательный домен. «Трафик из пользовательского сегмента в серверный» = трафик между VLAN.</li>
+                <li>Контрмеры L2: DHCP snooping, Dynamic ARP Inspection, port security, 802.1X.</li>
+                </ul>
+              </div>
+              <div class="cheat-g">
+                <h4>ARP</h4>
+                <ul>
+                <li>Широковещательный вопрос «у кого этот IP» — без проверки подлинности.</li>
+                <li><strong>ARP-спуфинг</strong> = man-in-the-middle: ответить может кто угодно. Работает только внутри одного сегмента.</li>
+                </ul>
+              </div>
+              <div class="cheat-g">
+                <h4>MTU и фрагментация</h4>
+                <ul>
+                <li>Ethernet — 1500 байт полезной нагрузки. VPN уменьшает эффективный MTU.</li>
+                <li>Симптом: пинг проходит, мелкое открывается, крупное виснет. Фрагментация — способ обхода IDS.</li>
+                </ul>
+              </div>
             </div>
           </div>
 
@@ -2279,6 +2492,68 @@ sudo tcpdump -i any -n port 67 or port 68</code></pre>
             </div>
           </div>
 
+          <div class="cheat rv" id="cheat-m2">
+            <div class="cheat-h"><svg><use href="#i-list"></use></svg><span>Конспект модуля</span></div>
+            <div class="cheat-grid">
+              <div class="cheat-g">
+                <h4>IPv4 и маска</h4>
+                <ul>
+                <li>32 бита = номер сети + номер хоста. Маска: сначала единицы, потом нули. Префикс /N = число единиц.</li>
+                <li>Сеть = обнулить биты хоста. Broadcast = все биты хоста в единицы.</li>
+                <li>Быстрый счёт: шаг блока = 256 − маска байта, где проходит граница.</li>
+                </ul>
+              </div>
+              <div class="cheat-g">
+                <h4>Таблица префиксов наизусть</h4>
+                <ul>
+                <li>/32 — 1 адрес (правило firewall). /30 — 2 хоста (линк). /28 — 14 хостов. /26 — 62. /24 — 254 (офис). /16 — 65 534. /8 — 16,7 млн.</li>
+                </ul>
+              </div>
+              <div class="cheat-g">
+                <h4>Зачем делить сети</h4>
+                <ul>
+                <li>Широковещательный шум, управляемость, и главное — <strong>безопасность</strong>: граница подсети — единственное место для фильтра.</li>
+                </ul>
+              </div>
+              <div class="cheat-g">
+                <h4>Приватные диапазоны наизусть</h4>
+                <ul>
+                <li><strong>10.0.0.0/8</strong>, <strong>172.16.0.0/12</strong>, <strong>192.168.0.0/16</strong> — приватные. <strong>127.0.0.0/8</strong> — loopback.</li>
+                <li><strong>169.254.0.0/16</strong> — link-local, сбой DHCP. <strong>100.64.0.0/10</strong> — CGNAT. <strong>224.0.0.0/4</strong> — multicast.</li>
+                </ul>
+              </div>
+              <div class="cheat-g">
+                <h4>Направление трафика — первое действие</h4>
+                <ul>
+                <li>приватный→публичный (изнутри наружу), публичный→приватный (снаружи внутрь), приватный→приватный (возможен lateral movement), публичный→публичный (обычно ошибка сбора).</li>
+                </ul>
+              </div>
+              <div class="cheat-g">
+                <h4>NAT</h4>
+                <ul>
+                <li>SNAT/PAT подменяют адрес источника на выходе, DNAT — адрес получателя на входе (публикация сервиса).</li>
+                <li>Без <strong>журналов трансляций</strong> событие с публичного адреса организации не привязать к человеку.</li>
+                </ul>
+              </div>
+              <div class="cheat-g">
+                <h4>DHCP</h4>
+                <ul>
+                <li>Discover → Offer → Request → Ack. Отдаёт адрес, маску, шлюз и DNS разом.</li>
+                <li><strong>Rogue DHCP</strong> — без проверки подлинности, кто ответил первым, тот и назначил настройки.</li>
+                </ul>
+              </div>
+              <div class="cheat-g">
+                <h4>IPv6 коротко</h4>
+                <ul>
+                <li>128 бит, :: сворачивает самую длинную цепочку нулей (только раз в адресе).</li>
+                <li>Happy Eyeballs у браузеров сглаживает сбой IPv6, у простых утилит (ping) отката нет.</li>
+                <li><code>fe80::</code> — link-local (сосед по сегменту). <code>ff02::1</code> — все узлы сегмента.</li>
+                <li><strong>Атака через Router Advertisement</strong>: SLAAC без проверки подлинности, злоумышленник объявляет себя шлюзом. Контрмеры — RA Guard, DHCPv6 Guard. Если IPv6 не нужен — выключать явно.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
           <div class="finish"><input type="checkbox" id="f2" data-fin="2"><label for="f2">Модуль 02 пройден</label></div>
         </div>
       </div>
@@ -2602,6 +2877,53 @@ ping -c 1 1.1.1.1 | grep ttl      <span class="c"># прикинь ОС собе
                 <button class="opt" data-why="Маршрут строит маршрутизатор по своей таблице. Аналитику номер AS нужен не для этого, а чтобы понять, чей это адрес."><span class="mk">В</span><span>Чтобы построить маршрут до этого адреса</span></button>
               </div>
               <div class="exp"><b>Верно: Б.</b> Соединение с адресом крупного облака и с адресом дешёвого хостинга с историей вредоносной активности — разный уровень подозрительности при прочих равных. Точное местоположение по AS не определяется.</div>
+            </div>
+          </div>
+
+          <div class="cheat rv" id="cheat-m3">
+            <div class="cheat-h"><svg><use href="#i-list"></use></svg><span>Конспект модуля</span></div>
+            <div class="cheat-grid">
+              <div class="cheat-g">
+                <h4>Развилка перед отправкой</h4>
+                <ul>
+                <li>Своя подсеть — напрямую по ARP. Чужая — на шлюз: IP получателя конечный, MAC получателя — шлюз.</li>
+                </ul>
+              </div>
+              <div class="cheat-g">
+                <h4>Таблица маршрутов</h4>
+                <ul>
+                <li><code>default</code> = 0.0.0.0/0. Правило <strong>самого длинного префикса</strong>: побеждает самый конкретный маршрут.</li>
+                <li>Нет default — машина не выйдет за пределы своей подсети.</li>
+                </ul>
+              </div>
+              <div class="cheat-g">
+                <h4>TTL</h4>
+                <ul>
+                <li>Защита от вечных петель: каждый маршрутизатор −1, дошло до нуля → ICMP Time Exceeded.</li>
+                <li>Стартовые значения: <strong>64</strong> (Linux/macOS/Android/iOS), <strong>128</strong> (Windows), <strong>255</strong> (сетевое оборудование). Пассивное определение ОС.</li>
+                </ul>
+              </div>
+              <div class="cheat-g">
+                <h4>ICMP</h4>
+                <ul>
+                <li>Echo Request/Reply — ping. Destination Unreachable (в т.ч. порт закрыт). Time Exceeded — на нём работает traceroute.</li>
+                <li>Пинг — <strong>плохой индикатор доступности</strong>: ICMP массово блокируют. Проверять портом службы.</li>
+                </ul>
+              </div>
+              <div class="cheat-g">
+                <h4>traceroute</h4>
+                <ul>
+                <li>Растущий TTL: 1, 2, 3… Звёздочки в середине — норма. Звёздочки от хопа и до конца — вот там обрыв.</li>
+                <li>Пути туда и обратно разные. Linux — UDP по умолчанию, Windows tracert — ICMP.</li>
+                </ul>
+              </div>
+              <div class="cheat-g">
+                <h4>Маршруты и AS</h4>
+                <ul>
+                <li>Статическая маршрутизация — вручную. Динамическая: OSPF внутри организации, BGP между провайдерами.</li>
+                <li><strong>Автономная система</strong> — быстрый контекст: облако, хостинг, конкретная компания. Не даёт точного местоположения.</li>
+                </ul>
+              </div>
             </div>
           </div>
 
@@ -2949,6 +3271,66 @@ cat /proc/sys/net/ipv4/ip_local_port_range</code></pre>
                 <button class="opt" data-why="Подключиться нельзя в обоих случаях, но закрытый порт отвечает RST и этим подтверждает: хост существует. Молчание не выдаёт даже этого."><span class="mk">В</span><span>Разницы нет: подключиться нельзя в обоих случаях</span></button>
               </div>
               <div class="exp"><b>Верно: А.</b> Закрытый порт отвечает RST и тем самым сообщает: хост существует. Фильтруемый молчит — сканер ждёт таймаут на каждом порту, и перебор замедляется в десятки раз. Вариант Б звучит правдоподобно, но неверен: сканер порт проверит, просто не получит ответа и пометит как filtered. Вариант В верен для атакующего в моменте, но игнорирует главное — сколько информации о себе отдаёт хост.</div>
+            </div>
+          </div>
+
+          <div class="cheat rv" id="cheat-m4">
+            <div class="cheat-h"><svg><use href="#i-list"></use></svg><span>Конспект модуля</span></div>
+            <div class="cheat-grid">
+              <div class="cheat-g">
+                <h4>Порт и сокет</h4>
+                <ul>
+                <li>IP + порт = сокет. 5-tuple = src_ip, src_port, dst_ip, dst_port, протокол.</li>
+                <li><strong>Смотреть на порт назначения</strong>, порт источника — случайный шум.</li>
+                </ul>
+              </div>
+              <div class="cheat-g">
+                <h4>Три диапазона портов</h4>
+                <ul>
+                <li>Системные 0–1023 (в Linux — только root). Зарегистрированные 1024–49151. Динамические 49152–65535 — клиент.</li>
+                </ul>
+              </div>
+              <div class="cheat-g">
+                <h4>Порты наизусть</h4>
+                <ul>
+                <li>FTP 20/21, SSH 22, Telnet 23, SMTP 25, DNS 53, DHCP 67/68, HTTP 80, Kerberos 88, POP3/IMAP 110/143.</li>
+                <li>NTP 123, RPC/NetBIOS 135/139, LDAP(S) 389/636, HTTPS 443, <strong>SMB 445</strong>, MSSQL 1433, MySQL 3306, RDP 3389, PostgreSQL 5432, WinRM 5985/5986, Redis 6379.</li>
+                </ul>
+              </div>
+              <div class="cheat-g">
+                <h4>Мгновенные выводы</h4>
+                <ul>
+                <li><strong>3389 из интернета</strong> — цель для брутфорса и шифровальщиков. <strong>3306/5432 снаружи</strong> — критично.</li>
+                <li><strong>445 между рабочими станциями</strong> — почерк распространения вредоноса.</li>
+                </ul>
+              </div>
+              <div class="cheat-g">
+                <h4>Состояния соединений</h4>
+                <ul>
+                <li>LISTEN — норма для сервера. SYN-RECV много — SYN-flood или скан. CLOSE-WAIT много — утечка сокетов.</li>
+                <li>TIME-WAIT — норма после закрытия: 60 сек в Linux (жёстко), 120 в Windows.</li>
+                </ul>
+              </div>
+              <div class="cheat-g">
+                <h4>Локальный просмотр</h4>
+                <ul>
+                <li>Linux: <code>ss -tulnp</code>. Windows: <code>netstat -ano</code>, <code>Get-NetTCPConnection</code>.</li>
+                <li><code>127.0.0.1</code> — только локально. <code>0.0.0.0</code> — доступно из сети. Базы данных и панели должны быть на 127.0.0.1.</li>
+                </ul>
+              </div>
+              <div class="cheat-g">
+                <h4>Три состояния порта</h4>
+                <ul>
+                <li>Открыт — ответ мгновенный. Закрыт — RST мгновенно, хост подтверждает своё существование.</li>
+                <li>Фильтруется — тишина и таймаут. Для защиты лучше: не подтверждает хост и замедляет сканирование.</li>
+                </ul>
+              </div>
+              <div class="cheat-g">
+                <h4>Баннеры служб</h4>
+                <ul>
+                <li>Служба сама называет версию при подключении. Много коротких соединений подряд — banner grabbing, разведка.</li>
+                </ul>
+              </div>
             </div>
           </div>
 
@@ -3433,6 +3815,47 @@ nc -zv 127.0.0.1 9999</code></pre>
             </div>
           </div>
 
+          <div class="cheat rv" id="cheat-m5">
+            <div class="cheat-h"><svg><use href="#i-list"></use></svg><span>Конспект модуля</span></div>
+            <div class="cheat-grid">
+              <div class="cheat-g">
+                <h4>TCP vs UDP</h4>
+                <ul>
+                <li>TCP — соединение, гарантия, порядок, поток байт <strong>без границ сообщений</strong>. UDP — без соединения и гарантий, дейтаграмма целиком или не приходит.</li>
+                <li>Потеря куска ломает смысл → TCP. Важнее не отставать от реального времени → UDP.</li>
+                </ul>
+              </div>
+              <div class="cheat-g">
+                <h4>Флаги и рукопожатие</h4>
+                <ul>
+                <li>SYN, ACK, FIN (согласованное закрытие), RST (аварийный обрыв), PSH, URG.</li>
+                <li>Тройное рукопожатие: SYN → SYN+ACK → ACK. Только после него идут данные.</li>
+                </ul>
+              </div>
+              <div class="cheat-g">
+                <h4>Поток vs перегрузка</h4>
+                <ul>
+                <li>Контроль потока бережёт получателя (поле «окно»). Контроль перегрузки бережёт сеть (slow start, реагирует на потери).</li>
+                </ul>
+              </div>
+              <div class="cheat-g">
+                <h4>Сканирование портов</h4>
+                <ul>
+                <li>TCP Connect — заметно (в логах приложений). SYN scan — средне. FIN/NULL/Xmas — по RFC 793, но Windows отвечает RST на всё → такие сканы против неё бесполезны.</li>
+                <li>Признаки: много SYN без ACK, bytes=0, один источник → много адресов на один порт = скан сети.</li>
+                </ul>
+              </div>
+              <div class="cheat-g">
+                <h4>SYN-flood и QUIC</h4>
+                <ul>
+                <li>SYN-flood переполняет backlog-очередь полуоткрытыми соединениями. Защита — SYN cookies.</li>
+                <li><strong>QUIC</strong> = TCP+TLS переизобретены поверх UDP/443. Один круг вместо двух (ноль при повторном подключении).</li>
+                <li>Блокировка UDP/443 не мешает пользователю — браузер откатывается на TCP, а видимость для мониторинга возвращается.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
           <div class="finish"><input type="checkbox" id="f5" data-fin="5"><label for="f5">Модуль 05 пройден</label></div>
         </div>
       </div>
@@ -3913,6 +4336,59 @@ sudo tcpdump -i any -n port 53</code></pre>
             </div>
           </div>
 
+          <div class="cheat rv" id="cheat-m6">
+            <div class="cheat-h"><svg><use href="#i-list"></use></svg><span>Конспект модуля</span></div>
+            <div class="cheat-grid">
+              <div class="cheat-g">
+                <h4>Иерархия DNS</h4>
+                <ul>
+                <li>Зоны, у каждой свой владелец. Читать имя справа налево: TLD → домен 2-го уровня → поддомен → хост.</li>
+                <li>Владелец домена создаёт любые поддомены сам — ключ к пониманию туннелирования.</li>
+                </ul>
+              </div>
+              <div class="cheat-g">
+                <h4>Участники разрешения</h4>
+                <ul>
+                <li>Stub resolver (в ОС, без логики) → рекурсивный резолвер (провайдера/1.1.1.1, кеширует) → корневые → TLD → авторитативный.</li>
+                </ul>
+              </div>
+              <div class="cheat-g">
+                <h4>Типы записей</h4>
+                <ul>
+                <li>A/AAAA — адрес. CNAME — псевдоним. MX — почтовые серверы. NS — кто управляет зоной.</li>
+                <li><strong>TXT</strong> — произвольный текст, канал для туннелирования. PTR — обратный запрос. SOA — параметры зоны.</li>
+                </ul>
+              </div>
+              <div class="cheat-g">
+                <h4>TTL и кеш</h4>
+                <ul>
+                <li>TTL записи — секунды жизни в кеше (не путать с TTL пакета). Аномально низкий TTL (≤60с) — признак <strong>fast flux</strong>.</li>
+                </ul>
+              </div>
+              <div class="cheat-g">
+                <h4>Порядок на хосте</h4>
+                <ul>
+                <li>/etc/hosts → локальный кеш → DNS-сервер. Подмена hosts не даёт DNS-запроса в сети — ловится только на хосте.</li>
+                </ul>
+              </div>
+              <div class="cheat-g">
+                <h4>Пять способов злоупотребить</h4>
+                <ul>
+                <li><strong>Туннелирование</strong> — много уникальных поддоменов одного домена, TXT, NOERROR.</li>
+                <li><strong>DGA</strong> — сгенерированные имена, шквал NXDOMAIN.</li>
+                <li>Спуфинг/отравление кеша — защита DNSSEC. Обход корпоративного DNS — запросы напрямую наружу.</li>
+                <li>Молодые домены — проверка по WHOIS.</li>
+                </ul>
+              </div>
+              <div class="cheat-g">
+                <h4>DoH и DoT</h4>
+                <ul>
+                <li>Шифруют DNS-запросы. Для пользователя — благо, для SOC — <strong>потеря самого ценного источника</strong>, поэтому DoH блокируют.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
           <div class="finish"><input type="checkbox" id="f6" data-fin="6"><label for="f6">Модуль 06 пройден</label></div>
         </div>
       </div>
@@ -4265,6 +4741,67 @@ curl -A 'python-requests/2.31' -I https://example.com</code></pre>
                 <button class="opt" data-why="Автоматика ловит не всё, и слово «всегда» здесь ничем не подтверждено. Чем кончилось, показывает только ответ сервера."><span class="mk">В</span><span>Игнорировать: такие запросы всегда блокируются автоматически</span></button>
               </div>
               <div class="exp"><b>Верно: Б.</b> Это попытка обхода каталога. Если пришёл 403 или 404 — атака не удалась, таких попыток тысячи в сутки. Если 200 с непустым телом — вот это инцидент.</div>
+            </div>
+          </div>
+
+          <div class="cheat rv" id="cheat-m7">
+            <div class="cheat-h"><svg><use href="#i-list"></use></svg><span>Конспект модуля</span></div>
+            <div class="cheat-grid">
+              <div class="cheat-g">
+                <h4>Анатомия HTTP</h4>
+                <ul>
+                <li>Запрос: метод, путь, заголовки Host/User-Agent/Cookie/Referer. Ответ: код, заголовки, тело.</li>
+                </ul>
+              </div>
+              <div class="cheat-g">
+                <h4>Ключевые заголовки</h4>
+                <ul>
+                <li>Host — какой из сотен сайтов на IP. User-Agent — скрипт или браузер. X-Forwarded-For — исходный адрес за прокси.</li>
+                </ul>
+              </div>
+              <div class="cheat-g">
+                <h4>Методы и коды</h4>
+                <ul>
+                <li>GET — параметры в URL и в <strong>логах</strong>. POST — тело обычно не логируется.</li>
+                <li>200 после серии 401 — подбор пароля удался. Сотни 404 подряд — перебор путей. 500 — возможен эксплойт.</li>
+                </ul>
+              </div>
+              <div class="cheat-g">
+                <h4>Cookie и сессии</h4>
+                <ul>
+                <li>HTTP не помнит запросов. Владеешь cookie — ты пользователь. Кража cookie <strong>обходит двухфакторную аутентификацию</strong>.</li>
+                <li>Флаги защиты: HttpOnly, Secure, SameSite.</li>
+                </ul>
+              </div>
+              <div class="cheat-g">
+                <h4>TLS-рукопожатие</h4>
+                <ul>
+                <li>ClientHello (SNI открытым текстом) → ServerHello+сертификат → проверка → согласование ключей → шифрованный обмен.</li>
+                <li>ECH шифрует и SNI — тенденция к сокращению видимости по метаданным.</li>
+                </ul>
+              </div>
+              <div class="cheat-g">
+                <h4>Что видно при HTTPS</h4>
+                <ul>
+                <li>Видно: IP, порт, SNI (имя сайта), объём, время и ритм, отпечаток JA3/JA4.</li>
+                <li>Скрыто: путь, параметры, заголовки, cookie, тело.</li>
+                </ul>
+              </div>
+              <div class="cheat-g">
+                <h4>C2 на легитимных сервисах</h4>
+                <ul>
+                <li>Telegram Bot API, Discord/Slack, GitHub/Pastebin, облачные диски, CDN — репутационные признаки не работают.</li>
+                <li>Остаётся <strong>поведение</strong>: ритм, кто именно ходит, кто раньше не ходил, асимметрия объёма, отпечаток клиента.</li>
+                <li>Сеть говорит «что произошло», хост говорит «кто это сделал».</li>
+                </ul>
+              </div>
+              <div class="cheat-g">
+                <h4>Веб-атаки в логах</h4>
+                <ul>
+                <li>SQL-инъекция, обход каталога (../../), XSS, перебор путей, подбор пароля (401×N → 200).</li>
+                <li>Попытка в логе ≠ успех — решает код ответа.</li>
+                </ul>
+              </div>
             </div>
           </div>
 
@@ -4976,6 +5513,64 @@ cG93ZXJzaGVsbCAtZW5jIFVoQmxZM1Z5...</code></pre>
             </div>
           </div>
 
+          <div class="cheat rv" id="cheat-m8">
+            <div class="cheat-h"><svg><use href="#i-list"></use></svg><span>Конспект модуля</span></div>
+            <div class="cheat-grid">
+              <div class="cheat-g">
+                <h4>Роль дампа</h4>
+                <ul>
+                <li>Каждый байт, прошедший по проводу. Последний источник правды, когда алерт неоднозначен.</li>
+                </ul>
+              </div>
+              <div class="cheat-g">
+                <h4>Два языка фильтров</h4>
+                <ul>
+                <li><strong>Захвата</strong> (BPF, во время записи, отброшенное не восстановить) и <strong>отображения</strong> (свой синтаксис, после записи, данные остаются).</li>
+                <li>Фильтр захвата ставить только при реальной нехватке места.</li>
+                </ul>
+              </div>
+              <div class="cheat-g">
+                <h4>Три инструмента</h4>
+                <ul>
+                <li>Follow Stream — собрать поток обратно. Statistics → Protocol Hierarchy / Conversations / Endpoints.</li>
+                <li>Export Objects — достать файл: считать хеш, не запускать. На VirusTotal — хеш, не сам файл.</li>
+                </ul>
+              </div>
+              <div class="cheat-g">
+                <h4>Методика разбора</h4>
+                <ul>
+                <li>Properties → Protocol Hierarchy → Conversations по байтам → DNS-запросы и SNI (оглавление) → раскрутить подозрительное → хронология.</li>
+                </ul>
+              </div>
+              <div class="cheat-g">
+                <h4>Универсальный признак разведки</h4>
+                <ul>
+                <li>«bytes 0» зависит от источника подсчёта. Надёжнее — <strong>средний размер пакета</strong>: 40–60 байт = только заголовки.</li>
+                </ul>
+              </div>
+              <div class="cheat-g">
+                <h4>Suricata</h4>
+                <ul>
+                <li>Сигнатуры: alert/drop/pass, content, offset/depth, threshold, <strong>sid</strong> — самое важное поле для L1.</li>
+                <li>Читать само правило, а не только его название — оно часто шире реальности.</li>
+                </ul>
+              </div>
+              <div class="cheat-g">
+                <h4>Zeek</h4>
+                <ul>
+                <li>Превращает трафик в логи: conn.log, dns.log, http.log, ssl.log (JA3!), files.log, notice.log.</li>
+                <li>Работает как текст — grep/awk/sort поверх сетевых данных, масштабируется там, где Wireshark — нет.</li>
+                </ul>
+              </div>
+              <div class="cheat-g">
+                <h4>Разделение труда</h4>
+                <ul>
+                <li>Wireshark — точечный разбор конкретного дампа. Suricata — известное в реальном времени. Zeek — протоколирование для поиска неизвестного.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
           <div class="finish"><input type="checkbox" id="f8" data-fin="8"><label for="f8">Модуль 08 пройден</label></div>
         </div>
       </div>
@@ -5465,6 +6060,67 @@ Received: from mail.company.ru (внутренний сервер)
                 <button class="opt" data-why="Где-то запрещены, где-то нет — от политики признак не зависит. Работает он потому, что защита внутрь заглянуть не может, а человек может."><span class="mk">В</span><span>Шифрованные архивы запрещены политиками большинства организаций</span></button>
               </div>
               <div class="exp"><b>Верно: Б.</b> Смысл приёма в асимметрии: защита не видит содержимое, а человек спокойно открывает по паролю из письма. Если бы отправитель заботился о безопасности, он передал бы пароль другим каналом — иначе шифрование бессмысленно.</div>
+            </div>
+          </div>
+
+          <div class="cheat rv" id="cheat-m9">
+            <div class="cheat-h"><svg><use href="#i-list"></use></svg><span>Конспект модуля</span></div>
+            <div class="cheat-grid">
+              <div class="cheat-g">
+                <h4>Путь письма</h4>
+                <ul>
+                <li>MUA → MSA (587, с аутентификацией) → MTA (25, по MX-записи) → MDA → клиент получателя.</li>
+                <li>SMTP из 1982 года — <strong>проверки отправителя нет и не было</strong>.</li>
+                </ul>
+              </div>
+              <div class="cheat-g">
+                <h4>Два отправителя</h4>
+                <ul>
+                <li><strong>Envelope From</strong> — в MAIL FROM, видят серверы, → Return-Path. <strong>Header From</strong> — видит пользователь.</li>
+                <li>Независимы друг от друга — подделать Header From тривиально.</li>
+                </ul>
+              </div>
+              <div class="cheat-g">
+                <h4>Заголовки</h4>
+                <ul>
+                <li>Received читается <strong>снизу вверх</strong>: нижние написал отправитель, им нельзя верить.</li>
+                <li>Authentication-Results — вердикт SPF/DKIM/DMARC разом.</li>
+                </ul>
+              </div>
+              <div class="cheat-g">
+                <h4>SPF, DKIM, DMARC</h4>
+                <ul>
+                <li>SPF — имел ли IP право слать от домена <em>конверта</em>. DKIM — подпись и целостность.</li>
+                <li><strong>DMARC</strong> — совпадает ли From с проверенным доменом. Решающая проверка. Политика p=none / quarantine / reject.</li>
+                <li>spf=pass не значит легитимность: он мог пройти для домена атакующего.</li>
+                </ul>
+              </div>
+              <div class="cheat-g">
+                <h4>Как ловить подделку</h4>
+                <ul>
+                <li>dmarc=fail — почти приговор. Расхождение From / Return-Path / Reply-To. Первый Received — дешёвый хостинг. Двойное расширение .pdf.exe.</li>
+                </ul>
+              </div>
+              <div class="cheat-g">
+                <h4>Вложения</h4>
+                <ul>
+                <li>Исполняемые блокируются на шлюзе. Архив с паролем в письме — мешает антивирусу, не мешает человеку.</li>
+                <li>Не открывать. Хеш на VirusTotal, ссылку — через urlscan.io, вложение — в песочницу.</li>
+                </ul>
+              </div>
+              <div class="cheat-g">
+                <h4>BEC</h4>
+                <ul>
+                <li>Без вложений и ссылок — только текст. Смысловые признаки: срочность, смена реквизитов, запрет звонить.</li>
+                <li>Все технические проверки зелёные ≠ письмо безопасно — учётная запись могла быть скомпрометирована.</li>
+                </ul>
+              </div>
+              <div class="cheat-g">
+                <h4>Процедура L1</h4>
+                <ul>
+                <li>Не открывать → Authentication-Results → сверить адреса → нижний Received → WHOIS → песочница/хеш → все получатели → <strong>кто уже кликнул</strong> → вердикт и IoC.</li>
+                </ul>
+              </div>
             </div>
           </div>
 
@@ -6001,7 +6657,400 @@ CommonSecurityLog
             </div>
           </div>
 
+          <div class="cheat rv" id="cheat-m10">
+            <div class="cheat-h"><svg><use href="#i-list"></use></svg><span>Конспект модуля</span></div>
+            <div class="cheat-grid">
+              <div class="cheat-g">
+                <h4>NetFlow</h4>
+                <ul>
+                <li>Агрегированная запись потока: адреса, порты, bytes/packets, duration, flags, action. Содержимого нет — зато хранится всегда.</li>
+                <li>Первое поле для разбора — <code>action</code>: заблокировано = защита сработала.</li>
+                </ul>
+              </div>
+              <div class="cheat-g">
+                <h4>Байты считаются по-разному</h4>
+                <ul>
+                <li>Не заучивать «0 = скан». Универсальный признак — <strong>средний размер пакета</strong> (40–60 байт).</li>
+                </ul>
+              </div>
+              <div class="cheat-g">
+                <h4>Три образа в алертах</h4>
+                <ul>
+                <li>Сканирование — внутренний трафик, эфемерные порты подряд, типовой набор портов, bytes 0.</li>
+                <li>Эксфильтрация — асимметрия наружу, ночь, часы длительности, порт 443, молодой домен.</li>
+                <li>Beaconing — строгая периодичность, почти неизменный размер, совпадение JA3.</li>
+                </ul>
+              </div>
+              <div class="cheat-g">
+                <h4>Главный навык</h4>
+                <ul>
+                <li>Связывать события <strong>одного хоста</strong> в цепочку: разведка → доступ → вынос данных. История хоста за сутки — первый запрос.</li>
+                </ul>
+              </div>
+              <div class="cheat-g">
+                <h4>Кто это сделал — Sysmon</h4>
+                <ul>
+                <li><strong>Event ID 3</strong> — сетевое соединение с Image/ProcessGuid/User. 1 — запуск процесса, 11 — файл, 22 — DNS от процесса.</li>
+                <li>Сеть говорит «что произошло», хост говорит «кто это сделал».</li>
+                </ul>
+              </div>
+              <div class="cheat-g">
+                <h4>Windows Event ID</h4>
+                <ul>
+                <li>4624/4625 — вход успех/провал (Logon Type). 4672 — вход с привилегиями. 4688 — запуск процесса. 4768/4769 — Kerberos. 7045 — новая служба.</li>
+                </ul>
+              </div>
+              <div class="cheat-g">
+                <h4>Порядок триажа</h4>
+                <ul>
+                <li>action → направление → порт назначения → объём и длительность → тип хостов → <strong>история за сутки</strong> → штатное объяснение → вердикт.</li>
+                </ul>
+              </div>
+              <div class="cheat-g">
+                <h4>Эскалация</h4>
+                <ul>
+                <li>Что · когда · почему важно · что проверено · связанные события · что предлагается. Не пересказ заголовка алерта.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
           <div class="finish"><input type="checkbox" id="f10" data-fin="10"><label for="f10">Модуль 10 пройден</label></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= ИТОГОВАЯ СМЕНА ================= -->
+    <section class="view" id="v-final">
+      <div class="col">
+        <div class="lesson">
+          <div class="crumb"><b>После курса</b> · 60–90 минут · один заход</div>
+          <h2>Смена: очередь из шести алертов</h2>
+
+          <div class="fin-lock" id="finLock">
+            <h3>Закрыто до конца курса</h3>
+            <p>
+              Смена собрана из всех одиннадцати модулей вперемешку, и подглядывать в них по ходу
+              нельзя — иначе она проверяет не тебя, а оглавление. Осталось закрыть:
+            </p>
+            <ul class="fin-left" id="finLeft"></ul>
+          </div>
+
+          <div id="finBody">
+            <p class="lede">
+              Экзамен в модуле 10 проверял навыки поштучно: посчитай маску, поймай рукопожатие,
+              покажи путь. Здесь другое. Шесть срабатываний лежат в очереди одновременно, темы
+              перемешаны, и работа начинается не с разбора, а с выбора — что брать первым.
+              Именно это и есть смена первой линии.
+            </p>
+
+            <div class="goal rv">
+              <p style="margin:0">
+                <b>Один заход, без пересдач по ходу.</b> В модулях неверный ответ ничего не стоит:
+                там ты учишься. Здесь ты себя <em>измеряешь</em>, поэтому вердикты проверяются
+                разом и только после того, как ты сам предскажешь результат. Пересдать можно —
+                кнопка внизу, — но лучше не в тот же день.
+              </p>
+            </div>
+
+            <div class="fin-step">
+              <h3>Шаг 1. Расставь очередь</h3>
+              <p class="lede-s">
+                Поставь каждому алерту место с 1 по 6, где 1 — берёшь первым. Ориентир не severity
+                из правила: его назначил автор правила заранее и вслепую. Смотри на стадию атаки,
+                критичность актива, охват и достоверность сигнала.
+              </p>
+
+              <div class="aq" id="aq">
+                <div class="aqi" data-a="a1" data-prio="2" data-verd="inc" data-mod="m6">
+                  <div class="aqi-h"><span class="id">ALERT-01</span><span class="tm">03:12</span><span class="rule">DNS: много запросов к поддоменам одного домена</span></div>
+                  <div class="tbl"><table><tbody>
+                    <tr><td>src_ip</td><td>10.4.19.66 · WKS-BUH-014 · рабочая станция бухгалтерии</td></tr>
+                    <tr><td>домен</td><td>onedrv-sync[.]top · зарегистрирован 11 дней назад</td></tr>
+                    <tr><td>count</td><td>4 218 запросов за 40 минут, имена длинные и каждый раз новые</td></tr>
+                    <tr><td>ответы</td><td>NOERROR, преимущественно TXT</td></tr>
+                    <tr><td>action</td><td>allowed · severity medium</td></tr>
+                  </tbody></table></div>
+                  <div class="aqi-c">
+                    <label>Место в очереди</label>
+                    <select class="prio"><option value="">—</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option></select>
+                    <div class="vrd">
+                      <button data-v="inc">инцидент</button><button data-v="fp">ложное</button><button data-v="ctx">нужен контекст</button>
+                    </div>
+                  </div>
+                  <div class="aqi-w">
+                    <b>Инцидент.</b> Тысячи запросов к поддоменам одного домена, каждое имя своё,
+                    ответы TXT и все успешные — это не перебор доменов, а канал: данные уложены
+                    в имена. От DGA отличается тем, что домен один и ответы не NXDOMAIN.
+                    Домен зарегистрирован 11 дней назад — отдельный довод. Место в очереди высокое:
+                    выгрузка идёт прямо сейчас, каждая минута — это ещё данные наружу.
+                  </div>
+                </div>
+
+                <div class="aqi" data-a="a2" data-prio="3" data-verd="ctx" data-mod="m7">
+                  <div class="aqi-h"><span class="id">ALERT-02</span><span class="tm">03:20</span><span class="rule">Периодические соединения с одинаковым объёмом</span></div>
+                  <div class="tbl"><table><tbody>
+                    <tr><td>src_ip</td><td>10.4.31.20 · WKS-DEV-021 · машина разработчика</td></tr>
+                    <tr><td>dst</td><td>cdn-assets[.]xyz:443 · домен живёт 4 года</td></tr>
+                    <tr><td>ритм</td><td>каждые 60 секунд ± 2, размер запроса неизменен</td></tr>
+                    <tr><td>JA3</td><td>отпечаток в базе известных не найден</td></tr>
+                    <tr><td>action</td><td>allowed · severity high</td></tr>
+                  </tbody></table></div>
+                  <div class="aqi-c">
+                    <label>Место в очереди</label>
+                    <select class="prio"><option value="">—</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option></select>
+                    <div class="vrd">
+                      <button data-v="inc">инцидент</button><button data-v="fp">ложное</button><button data-v="ctx">нужен контекст</button>
+                    </div>
+                  </div>
+                  <div class="aqi-w">
+                    <b>Нужен контекст.</b> Ритм и постоянный размер — честные признаки автоматики,
+                    но автоматика бывает и легальной: на машине разработчика в таком ритме ходят
+                    агент сборки, обновление зависимостей, телеметрия среды. Домену четыре года,
+                    отпечаток не совпал ни с чем известным. Вердикт «инцидент» здесь поспешен,
+                    «ложное» — тем более: одного взгляда на трафик мало, нужен процесс, который
+                    эти соединения открывает. Severity high в правиле на вердикт не влияет.
+                  </div>
+                </div>
+
+                <div class="aqi" data-a="a3" data-prio="1" data-verd="inc" data-mod="m4">
+                  <div class="aqi-h"><span class="id">ALERT-03</span><span class="tm">03:26</span><span class="rule">SMB между рабочими станциями</span></div>
+                  <div class="tbl"><table><tbody>
+                    <tr><td>src_ip</td><td>10.4.19.66 · WKS-BUH-014</td></tr>
+                    <tr><td>dst_ip</td><td>10.4.20.7 → 10.4.20.9 → 10.4.20.11 · порт 445</td></tr>
+                    <tr><td>count</td><td>34 попытки за 6 минут, часть с отказом аутентификации</td></tr>
+                    <tr><td>учётная запись</td><td>buh_ivanova, вход в 03:26 — вне графика</td></tr>
+                    <tr><td>action</td><td>allowed · severity low</td></tr>
+                  </tbody></table></div>
+                  <div class="aqi-c">
+                    <label>Место в очереди</label>
+                    <select class="prio"><option value="">—</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option></select>
+                    <div class="vrd">
+                      <button data-v="inc">инцидент</button><button data-v="fp">ложное</button><button data-v="ctx">нужен контекст</button>
+                    </div>
+                  </div>
+                  <div class="aqi-w">
+                    <b>Инцидент, и первый в очереди.</b> Приватный адрес обращается к приватным,
+                    рабочая станция стучится к трём другим на 445 — это боковое перемещение,
+                    а не работа с файловым сервером: сервер один и он не в пользовательском
+                    сегменте. Отказы аутентификации означают подбор. Ночное время под учётной
+                    записью бухгалтера довершает картину. Severity low здесь обманывает:
+                    правило про SMB шумит днём, но не в 03:26 и не веером по трём хостам.
+                    <b>Главное:</b> источник тот же, что в ALERT-01, — это один инцидент,
+                    а не два, и охват растёт прямо сейчас.
+                  </div>
+                </div>
+
+                <div class="aqi" data-a="a4" data-prio="5" data-verd="fp" data-mod="m5">
+                  <div class="aqi-h"><span class="id">ALERT-04</span><span class="tm">03:31</span><span class="rule">Сканирование портов извне</span></div>
+                  <div class="tbl"><table><tbody>
+                    <tr><td>src_ip</td><td>203.0.113.77 · хостинг, замечен в сканировании</td></tr>
+                    <tr><td>dst</td><td>512 адресов внешнего диапазона организации, порт 443</td></tr>
+                    <tr><td>count / bytes</td><td>512 / 0</td></tr>
+                    <tr><td>action</td><td>denied на периметре · severity high</td></tr>
+                  </tbody></table></div>
+                  <div class="aqi-c">
+                    <label>Место в очереди</label>
+                    <select class="prio"><option value="">—</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option></select>
+                    <div class="vrd">
+                      <button data-v="inc">инцидент</button><button data-v="fp">ложное</button><button data-v="ctx">нужен контекст</button>
+                    </div>
+                  </div>
+                  <div class="aqi-w">
+                    <b>Ложное срабатывание — точнее, фоновый шум.</b> Разбор начинается с поля
+                    action: заблокировано, значит защита сработала и угроза не реализовалась.
+                    Нулевой объём подтверждает, что до передачи данных не дошло. Периметр
+                    сканируют круглосуточно и всех подряд; севериту high тут грош цена.
+                    Закрывать с пометкой и идти дальше — но если позже с этого же адреса
+                    появится успешное соединение, алерт оживёт.
+                  </div>
+                </div>
+
+                <div class="aqi" data-a="a5" data-prio="4" data-verd="inc" data-mod="m9">
+                  <div class="aqi-h"><span class="id">ALERT-05</span><span class="tm">02:58</span><span class="rule">Почта: подозрительная рассылка</span></div>
+                  <div class="tbl"><table><tbody>
+                    <tr><td>тема</td><td>Срок действия пароля истекает сегодня</td></tr>
+                    <tr><td>From</td><td>it-support@company-portal[.]ru · домену 3 дня</td></tr>
+                    <tr><td>проверки</td><td>spf=pass, dkim=pass, dmarc=pass — для домена отправителя</td></tr>
+                    <tr><td>получатели</td><td>12 сотрудников, один переход по ссылке в 03:04</td></tr>
+                    <tr><td>action</td><td>доставлено · severity medium</td></tr>
+                  </tbody></table></div>
+                  <div class="aqi-c">
+                    <label>Место в очереди</label>
+                    <select class="prio"><option value="">—</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option></select>
+                    <div class="vrd">
+                      <button data-v="inc">инцидент</button><button data-v="fp">ложное</button><button data-v="ctx">нужен контекст</button>
+                    </div>
+                  </div>
+                  <div class="aqi-w">
+                    <b>Инцидент.</b> Зелёные SPF, DKIM и DMARC здесь ничего не оправдывают:
+                    они подтверждают, что письмо честно отправлено с домена
+                    <code>company-portal[.]ru</code>, — а домен чужой и создан три дня назад.
+                    Проверки говорят о происхождении, а не о безопасности. Переход уже
+                    состоялся, значит вопрос не «фишинг ли это», а «кто успел попасться»:
+                    сначала список всех получателей и всех, кто кликнул, потом блокировка.
+                  </div>
+                </div>
+
+                <div class="aqi" data-a="a6" data-prio="6" data-verd="fp" data-mod="m10">
+                  <div class="aqi-h"><span class="id">ALERT-06</span><span class="tm">03:05</span><span class="rule">Крупная выгрузка данных наружу</span></div>
+                  <div class="tbl"><table><tbody>
+                    <tr><td>src_ip</td><td>10.4.8.12 · BKP-01 · сервер резервного копирования</td></tr>
+                    <tr><td>dst</td><td>тот же адрес облачного хранилища, что и в прошлые ночи</td></tr>
+                    <tr><td>bytes</td><td>48 ГБ · как и каждую ночь, отклонение в пределах 4%</td></tr>
+                    <tr><td>расписание</td><td>ежедневно 03:00–04:30, семь ночей подряд в истории</td></tr>
+                    <tr><td>action</td><td>allowed · severity critical</td></tr>
+                  </tbody></table></div>
+                  <div class="aqi-c">
+                    <label>Место в очереди</label>
+                    <select class="prio"><option value="">—</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option></select>
+                    <div class="vrd">
+                      <button data-v="inc">инцидент</button><button data-v="fp">ложное</button><button data-v="ctx">нужен контекст</button>
+                    </div>
+                  </div>
+                  <div class="aqi-w">
+                    <b>Ложное срабатывание.</b> Самый громкий алерт в очереди и самый пустой.
+                    Резервное копирование неотличимо от выкачивания данных по объёму — отличается
+                    оно историей: тот же источник, тот же адрес назначения, то же время, тот же
+                    объём семь ночей подряд. Именно поэтому историю хоста смотрят всегда.
+                    Severity critical назначено за объём, а не за смысл. Полезное действие —
+                    не эскалация, а предложение доработать правило исключением для BKP-01.
+                  </div>
+                </div>
+              </div>
+
+              <div class="calib">
+                <p style="margin:0 0 12px">
+                  <b>Прежде чем проверять — предскажи.</b> Сколько из шести вердиктов, по-твоему,
+                  верны? Это не формальность: привычка путать лёгкость узнавания со знанием —
+                  главная ловушка самообучения, и лечится она сверкой прогноза с фактом.
+                </p>
+                <div class="calib-row">
+                  <label for="finConf">Верных вердиктов будет</label>
+                  <input id="finConf" type="number" min="0" max="6" step="1" inputmode="numeric">
+                  <span style="color:var(--ink-3)">из 6</span>
+                  <button class="btn pri" id="finCheck">Сдать смену</button>
+                </div>
+                <p class="self-hint" id="finWarn" style="margin:10px 0 0"></p>
+              </div>
+            </div>
+
+            <div class="fin-res" id="finRes">
+              <div class="fin-step">
+                <h3>Итог смены</h3>
+                <div class="score-grid" id="finScore"></div>
+                <div id="finCalib"></div>
+                <p style="color:var(--ink-2)">
+                  Разбор каждого алерта раскрыт выше, прямо под ним. Читай подряд — и те,
+                  где попал, тоже: совпавший вердикт при неверном обосновании засчитывать нельзя.
+                </p>
+              </div>
+
+              <div class="fin-step">
+                <h3>Порядок очереди</h3>
+                <div id="finOrder"></div>
+              </div>
+
+              <div class="fin-step">
+                <h3>Шаг 2. Что проверишь первым</h3>
+                <p class="lede-s">
+                  По алерту, который ты поставил первым, напиши: что запросишь, в каком порядке
+                  и какое штатное объяснение проверишь прежде, чем назвать это атакой.
+                </p>
+                <div class="task rv" data-task="fin-next">
+                  <div class="task-h"><svg><use href="#i-pen"></use></svg><span>Первые шаги · разбор</span><span class="verdict"></span></div>
+                  <p class="task-q">Пиши до того, как откроешь разбор. Ответ на три-четыре предложения.</p>
+                  <textarea placeholder="Что проверю, в каком порядке и что должно эту гипотезу опровергнуть"></textarea>
+                  <button class="reveal">Показать разбор</button>
+                  <div class="task-a">
+                    <span class="lbl">В ответе должно быть</span>
+                    <ul class="rubric">
+                      <li>Первым взят ALERT-03 или ALERT-01 — и сказано, что это один инцидент на хосте WKS-BUH-014, а не два разных.</li>
+                      <li>Названа история хоста: что ещё делал 10.4.19.66 за сутки, с каких пор, был ли такой трафик раньше.</li>
+                      <li>Названа проверка процесса на хосте: какая программа держит соединения и кто её запустил.</li>
+                      <li>Проверено штатное объяснение: не резервное копирование, не сканер уязвимостей, не работы администратора по заявке.</li>
+                      <li>Назван охват: к каким ещё хостам обращались с 10.4.19.66 и не появился ли такой же трафик у соседей.</li>
+                      <li>Сказано, что делать с учётной записью buh_ivanova: ночной вход вне графика проверяется отдельно, вплоть до блокировки сессии.</li>
+                    </ul>
+                    <p>
+                      <b>Разбор.</b> Порядок здесь важнее полноты. Сначала связываешь два алерта
+                      в один инцидент — иначе будешь дважды разбирать одно и то же и дважды
+                      придёшь к половине картины. Дальше история хоста: она отвечает на вопрос,
+                      новое это поведение или так было всегда. Потом процесс: сетевой алерт без
+                      имени процесса — половина улики. Штатные объяснения отбрасываются явно
+                      и называются в эскалации: «проверил, это не бэкап и не сканер» стоит дороже,
+                      чем уверенный тон.
+                    </p>
+                    <p>
+                      Чего делать <em>не</em> надо — сразу изолировать машину. Это решение L2
+                      и владельца системы: ночная изоляция станции бухгалтерии без подтверждения
+                      обойдётся дороже, чем сорок минут разбора.
+                    </p>
+                  </div>
+                  <div class="self"></div>
+                </div>
+              </div>
+
+              <div class="fin-step">
+                <h3>Шаг 3. Эскалация</h3>
+                <p class="lede-s">
+                  Напиши эскалацию на L2 по этому инциденту — так, как отправил бы её в тикет.
+                  Шаблон из модуля 10: что произошло, когда и в каком объёме, почему это важно
+                  именно для этих хостов, какие штатные объяснения отброшены, что предлагается.
+                </p>
+                <div class="task rv" data-task="fin-esc">
+                  <div class="task-h"><svg><use href="#i-pen"></use></svg><span>Эскалация · разбор</span><span class="verdict"></span></div>
+                  <p class="task-q">Пять-восемь предложений. Пересказ заголовка алерта не считается.</p>
+                  <textarea placeholder="Эскалация на L2"></textarea>
+                  <button class="reveal">Показать разбор</button>
+                  <div class="task-a">
+                    <span class="lbl">В ответе должно быть</span>
+                    <ul class="rubric">
+                      <li>Что произошло, в фактах и с цифрами: 4 218 DNS-запросов к одному домену за 40 минут и 34 обращения на 445 к трём хостам за 6 минут.</li>
+                      <li>Когда и с чего началось: время первого события, а не только время алерта.</li>
+                      <li>Кто затронут: WKS-BUH-014 как источник, три станции сегмента 10.4.20.x как цели, учётная запись buh_ivanova.</li>
+                      <li>Почему это важно именно здесь: рабочая станция не должна обращаться к соседним станциям по 445, а домен назначения зарегистрирован 11 дней назад.</li>
+                      <li>Какие штатные объяснения уже отброшены и как именно.</li>
+                      <li>Что предлагается сделать и что нужно от L2: проверка процесса на хосте, решение об изоляции, блокировка домена на резолвере.</li>
+                      <li>Ссылка на исходные события, а не их пересказ целиком.</li>
+                    </ul>
+                    <p>
+                      <b>Разбор.</b> Эскалация — это передача проделанной работы, а не сигнал
+                      «посмотрите». Хорошая проверяется на одном вопросе: сможет ли L2 принять
+                      решение, не переспрашивая? Если в тексте нет времени начала, охвата
+                      и отброшенных версий, переспрашивать придётся, и вся экономия времени
+                      пропадает.
+                    </p>
+                    <p>
+                      Отдельно про тон: гипотезу называют гипотезой. «Похоже на выгрузку данных
+                      через DNS, подтверждено объёмом и характером имён; не подтверждено, что
+                      именно выгружено» — это точная формулировка. «Нас взломали» — нет.
+                    </p>
+                  </div>
+                  <div class="self"></div>
+                </div>
+              </div>
+
+              <div class="fin-step">
+                <h3>План повторения</h3>
+                <p class="lede-s">
+                  Один тест в конце курса — это то самое массированное повторение, после которого
+                  через месяц остаётся половина. Материал держится, если возвращаться к нему
+                  с растущими промежутками, и каждый возврат — это короткий опрос себя,
+                  а не перечитывание.
+                </p>
+                <div class="tbl"><table class="plan-t" id="finPlan"></table></div>
+              </div>
+
+              <div class="fin-step">
+                <h3>Что повторить в первую очередь</h3>
+                <ul class="gaps" id="finGaps"></ul>
+                <p style="margin-top:16px">
+                  <button class="btn" id="finReset">Пройти смену заново</button>
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -6182,9 +7231,10 @@ CommonSecurityLog
 
     current = id;
     st.last = id;
-    var isMod = id !== 'home' && id !== 'gloss';
+    var isMod = id !== 'home' && id !== 'gloss' && id !== 'final';
     if (isMod) { st.seen[id] = true; markTerms(el); }
     if (id === 'gloss') glossRender(document.getElementById('gq').value);
+    if (id === 'final') { markTerms(el); paintFinal(); }
     save();
 
     /* и возвращаемся туда же, когда сюда вернулись */
@@ -6199,6 +7249,7 @@ CommonSecurityLog
     var mt = document.getElementById('mtitle');
     if (id === 'home') { mt.textContent = 'Сети для SOC-аналитика'; }
     else if (id === 'gloss') { mt.textContent = 'Словарь терминов'; }
+    else if (id === 'final') { mt.textContent = 'Смена: очередь алертов'; }
     else {
       var m = MODS.filter(function (x) { return x.id === id; })[0];
       mt.textContent = m.n + ' · ' + m.t;
@@ -6499,6 +7550,257 @@ CommonSecurityLog
       st.task[id] = st.task[id] || 0; save();
     });
   });
+
+  /* ---- итоговая смена ---- */
+  /* Капстоун после всего курса. Устроен намеренно не так, как тесты в модулях: там неверный
+     ответ ничего не стоит и вопрос остаётся открытым, потому что человек учится. Здесь он себя
+     измеряет — вердикты проверяются разом и только после того, как он предскажет результат.
+     Сверка прогноза с фактом лечит главную ошибку самообучения: лёгкость узнавания принимают
+     за знание. Пересдача есть, но отдельной кнопкой и после разбора. */
+  var FIN_PLAN = [
+    [1,  'Пробеги конспекты всех модулей подряд — минут семь, — потом шесть алертов заново по памяти.'],
+    [3,  'Конспекты модулей, где ошибся в очереди или вердикте. Словарь по категориям: определение вслух до того, как откроешь статью.'],
+    [7,  'Тренажёр подсетей и открытые задания модулей 08 и 10 — с чистого листа.'],
+    [14, 'Экзамен модуля 10 целиком, все двенадцать заданий, по таймеру.'],
+    [30, 'Смена ещё раз. Сходятся вердикты и очередь без напряжения — материал держится.']
+  ];
+  var finCards = [].slice.call(document.querySelectorAll('#aq .aqi'));
+
+  function finState() {
+    st.final = st.final || {};
+    st.final.prio = st.final.prio || {};
+    st.final.verd = st.final.verd || {};
+    return st.final;
+  }
+  function finDate(ms) {
+    var d = new Date(ms);
+    return ('0' + d.getDate()).slice(-2) + '.' + ('0' + (d.getMonth() + 1)).slice(-2) + '.' + d.getFullYear();
+  }
+  function finPlural(n, one, few, many) {
+    var t = n % 10, h = n % 100;
+    return (t === 1 && h !== 11) ? one : (t >= 2 && t <= 4 && (h < 12 || h > 14)) ? few : many;
+  }
+
+  function finHideRes() {
+    var res = document.getElementById('finRes');
+    if (res) res.classList.remove('on');
+    finCards.forEach(function (c) {
+      c.classList.remove('shown', 'ok', 'no');
+      c.querySelector('.prio').disabled = false;
+      [].forEach.call(c.querySelectorAll('.vrd button'), function (b) { b.disabled = false; });
+    });
+    var conf = document.getElementById('finConf'), btn = document.getElementById('finCheck');
+    if (conf) conf.disabled = false;
+    if (btn) btn.disabled = false;
+  }
+
+  function finReveal(scroll) {
+    var s = finState(), right = 0, exact = 0, gross = 0;
+    finCards.forEach(function (c) {
+      var a = c.getAttribute('data-a');
+      var ok = s.verd[a] === c.getAttribute('data-verd');
+      if (ok) right++;
+      var d = Math.abs((+s.prio[a] || 0) - +c.getAttribute('data-prio'));
+      if (d === 0) exact++;
+      if (d >= 3) gross++;
+      c.classList.add('shown');
+      c.classList.toggle('ok', ok);
+      c.classList.toggle('no', !ok);
+      c.querySelector('.prio').disabled = true;
+      [].forEach.call(c.querySelectorAll('.vrd button'), function (b) { b.disabled = true; });
+    });
+    document.getElementById('finConf').disabled = true;
+    document.getElementById('finCheck').disabled = true;
+
+    var verdict = right === 6 && gross === 0 ? 'смена сдана'
+                : right >= 4 && gross <= 1 ? 'почти'
+                : 'вернись к модулям';
+    document.getElementById('finScore').innerHTML =
+      '<div class="score-cell"><span class="k">Вердикты</span><span class="v">' + right + ' / 6</span>' +
+        '<span class="s">инцидент, ложное или нужен контекст</span></div>' +
+      '<div class="score-cell"><span class="k">Очередь</span><span class="v">' + exact + ' / 6</span>' +
+        '<span class="s">точных попаданий' + (gross ? ', грубых промахов ' + gross : ', грубых промахов нет') + '</span></div>' +
+      '<div class="score-cell"><span class="k">Итог</span><span class="v" style="font-size:20px">' + verdict + '</span>' +
+        '<span class="s">' + finDate(s.ts) + '</span></div>';
+
+    var diff = s.conf - right;
+    var cal = diff === 0 ? 'Прогноз сошёлся с фактом. Это и есть калибровка: ты знаешь, что знаешь, — на смене от этого зависит, когда звать старшего.'
+      : diff > 0 ? 'Ты обещал себе на ' + diff + ' ' + finPlural(diff, 'вердикт', 'вердикта', 'вердиктов') +
+          ' больше, чем вышло. Переоценка — самая дорогая ошибка первой линии: она превращается в закрытый алерт, который стоило эскалировать.'
+      : 'Ты занизил прогноз на ' + (-diff) + ' ' + finPlural(-diff, 'вердикт', 'вердикта', 'вердиктов') +
+          '. Знаешь больше, чем думаешь, — но недооценка тоже мешает: с ней тянут с решением и заваливают очередь.';
+    document.getElementById('finCalib').innerHTML =
+      '<p style="color:var(--ink-2)"><b>Калибровка.</b> Предсказал ' + s.conf + ', верно ' + right + '. ' + cal + '</p>';
+
+    var rows = finCards.map(function (c) {
+      var a = c.getAttribute('data-a');
+      return { mine: +s.prio[a] || 0, ref: +c.getAttribute('data-prio'),
+               id: c.querySelector('.id').textContent, rule: c.querySelector('.rule').textContent };
+    }).sort(function (x, y) { return x.ref - y.ref; });
+    document.getElementById('finOrder').innerHTML =
+      '<div class="tbl"><table class="plan-t"><thead><tr><th>Эталон</th><th>У тебя</th><th>Алерт</th></tr></thead><tbody>' +
+      rows.map(function (r) {
+        return '<tr><td>' + r.ref + '</td><td>' + (r.mine || '—') + '</td><td>' + r.id + ' · ' + r.rule + '</td></tr>';
+      }).join('') + '</tbody></table></div>' +
+      '<p style="color:var(--ink-2)"><b>Как читать.</b> Точный порядок — не догма: ALERT-03 и ALERT-01 идут с одного хоста ' +
+      'и являются одним инцидентом, поменять их местами ошибкой не будет. Ошибка — это когда алерт уехал на три позиции ' +
+      'и дальше: значит, решение принималось по полю severity, а не по стадии атаки, критичности актива и охвату. ' +
+      'Обрати внимание, что самый громкий алерт очереди (severity critical) стоит последним, а самый тихий (severity low) — первым.</p>';
+
+    document.getElementById('finPlan').innerHTML =
+      '<thead><tr><th>Когда</th><th>Дата</th><th>Что делать</th></tr></thead><tbody>' +
+      FIN_PLAN.map(function (p) {
+        return '<tr><td>+' + p[0] + ' ' + finPlural(p[0], 'день', 'дня', 'дней') + '</td><td>' +
+               finDate(s.ts + p[0] * 86400000) + '</td><td>' + p[1] + '</td></tr>';
+      }).join('') + '</tbody>';
+
+    /* карта пробелов: считаем по этой смене и по самооценкам открытых заданий */
+    var weak = {};
+    function bump(mod, w, why) {
+      if (!mod) return;
+      weak[mod] = weak[mod] || { w: 0, why: [] };
+      weak[mod].w += w;
+      if (weak[mod].why.indexOf(why) === -1) weak[mod].why.push(why);
+    }
+    finCards.forEach(function (c) {
+      var a = c.getAttribute('data-a');
+      if (s.verd[a] !== c.getAttribute('data-verd')) {
+        bump(c.getAttribute('data-mod'), 3, 'неверный вердикт по ' + c.querySelector('.id').textContent);
+      }
+      if (Math.abs((+s.prio[a] || 0) - +c.getAttribute('data-prio')) >= 3) {
+        bump(c.getAttribute('data-mod'), 1, 'место в очереди мимо на три позиции и больше');
+      }
+    });
+    /* Ноль в st.task стоит у всех заданий с первой загрузки — он значит «не разбирал»,
+       а не «разобрал плохо». Слабым считаем только то, где человек действительно работал:
+       оценка 1 либо написанный ответ без засчитанных пунктов. Нетронутые задания идут
+       отдельной строкой, потому что это другой разговор. */
+    var untouched = 0, tasksTotal = 0;
+    [].forEach.call(document.querySelectorAll('[data-task]'), function (t) {
+      var id = t.getAttribute('data-task');
+      if (id.indexOf('fin-') === 0) return;
+      tasksTotal++;
+      var score = st.task[id];
+      var wrote = !!(st.note[id] && st.note[id].trim());
+      if (score === 1 || (score === 0 && wrote)) {
+        var view = t.closest('.view');
+        bump(view ? view.id.replace('v-', '') : null, 2, 'открытое задание разобрано слабо');
+      } else if (!score && !wrote) untouched++;
+    });
+
+    var list = Object.keys(weak).sort(function (a, b) { return weak[b].w - weak[a].w; }).slice(0, 4);
+    var html = list.map(function (id) {
+      var m = MODS.filter(function (x) { return x.id === id; })[0];
+      if (!m) return '';
+      return '<li><b>' + m.n + ' · ' + m.t + '</b> — ' + weak[id].why.join('; ') +
+             '. <button class="lnk" data-go="' + id + '">открыть модуль</button></li>';
+    }).join('');
+    if (!html) {
+      html = '<li>По этой смене пробелов не видно: вердикты сошлись, очередь собрана осмысленно. ' +
+             'Тогда план повторения выше — единственное, что осталось; без него через месяц ' +
+             'придётся вспоминать всё это заново.</li>';
+    }
+    if (untouched) {
+      html += '<li><b>Открытые задания курса</b> — не разбирались ' + untouched + ' из ' + tasksTotal +
+              '. Они дают больше тестов: там ответ надо сформулировать, а не узнать среди трёх вариантов. ' +
+              'Начни с модуля 08 — разбор дампа ближе всего к тому, что делают на смене. ' +
+              '<button class="lnk" data-go="m8">открыть модуль 08</button></li>';
+    }
+    if ((st.drill && st.drill.solved || 0) < 20) {
+      html += '<li><b>Тренажёр подсетей</b> — решено ' + ((st.drill && st.drill.solved) || 0) +
+              ' задач. Маски считают на собеседовании и в первый же рабочий день; двадцати решённых ' +
+              'хватает, чтобы перестать думать. <button class="lnk" data-go="m2">открыть модуль 02</button></li>';
+    }
+    document.getElementById('finGaps').innerHTML = html;
+
+    var res = document.getElementById('finRes');
+    res.classList.add('on');
+    [].forEach.call(res.querySelectorAll('.rv'), function (el) { el.classList.add('in'); });
+    arm();
+    if (scroll) setTimeout(function () { res.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 60);
+  }
+
+  function paintFinal() {
+    var lock = document.getElementById('finLock'), body = document.getElementById('finBody');
+    if (!lock || !body) return;
+    var s = finState();
+    var left = MODS.filter(function (m) { return !st.done[m.id]; });
+    lock.style.display = left.length ? '' : 'none';
+    body.style.display = left.length ? 'none' : '';
+    document.getElementById('finLeft').innerHTML = left.map(function (m) {
+      return '<li><button data-go="' + m.id + '">' + m.n + ' · ' + m.t + '</button></li>';
+    }).join('');
+
+    finCards.forEach(function (c) {
+      var a = c.getAttribute('data-a');
+      c.querySelector('.prio').value = s.prio[a] || '';
+      [].forEach.call(c.querySelectorAll('.vrd button'), function (b) {
+        b.classList.toggle('on', s.verd[a] === b.getAttribute('data-v'));
+      });
+    });
+    var conf = document.getElementById('finConf');
+    conf.value = (s.conf === 0 || s.conf) ? s.conf : '';
+    var nb = document.getElementById('navFinal');
+    if (nb) nb.classList.toggle('done', !!s.done);
+    if (s.done && s.ts) finReveal(false); else finHideRes();
+  }
+
+  finCards.forEach(function (c) {
+    var a = c.getAttribute('data-a');
+    c.querySelector('.prio').addEventListener('change', function () {
+      if (finState().done) return;
+      st.final.prio[a] = this.value; save();
+    });
+    [].forEach.call(c.querySelectorAll('.vrd button'), function (b) {
+      b.addEventListener('click', function () {
+        if (finState().done) return;
+        st.final.verd[a] = b.getAttribute('data-v');
+        [].forEach.call(c.querySelectorAll('.vrd button'), function (x) { x.classList.remove('on'); });
+        b.classList.add('on');
+        save();
+      });
+    });
+  });
+
+  (function () {
+    var btn = document.getElementById('finCheck');
+    if (!btn) return;
+    btn.addEventListener('click', function () {
+      var s = finState(), warn = document.getElementById('finWarn');
+      var missing = finCards.filter(function (c) {
+        var a = c.getAttribute('data-a');
+        return !s.prio[a] || !s.verd[a];
+      }).length;
+      if (missing) {
+        warn.textContent = 'Место и вердикт нужны у всех шести алертов: не заполнено ' + missing + '.';
+        return;
+      }
+      var places = finCards.map(function (c) { return s.prio[c.getAttribute('data-a')]; });
+      var uniq = places.filter(function (p, i) { return places.indexOf(p) === i; });
+      if (uniq.length !== 6) {
+        warn.textContent = 'Места повторяются. В очереди одно место занимает один алерт — решай, что вперёд.';
+        return;
+      }
+      var conf = document.getElementById('finConf').value;
+      if (conf === '' || isNaN(+conf) || +conf < 0 || +conf > 6) {
+        warn.textContent = 'Впиши прогноз: сколько вердиктов из шести окажутся верными.';
+        return;
+      }
+      warn.textContent = '';
+      s.conf = +conf; s.done = true; s.ts = Date.now();
+      save(); finReveal(true);
+      var nb = document.getElementById('navFinal');
+      if (nb) nb.classList.add('done');
+    });
+
+    document.getElementById('finReset').addEventListener('click', function () {
+      st.final = { prio: {}, verd: {}, conf: null, done: false, ts: 0 };
+      save(); finHideRes(); paintFinal();
+      document.getElementById('v-final').scrollIntoView({ block: 'start' });
+    });
+  })();
+
+  REPAINT.push(paintFinal);
 
   function repaintAll() {
     st.done = st.done || {}; st.seen = st.seen || {}; st.quiz = st.quiz || {};
