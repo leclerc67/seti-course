@@ -4,7 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="color-scheme" content="light dark">
-<meta name="description" content="Учебник по сетям для аналитика SOC первой линии: 11 модулей и словарь на 305 терминов.">
+<meta name="theme-color" content="#F5F4F0">
+<meta name="description" content="Учебник по сетям для аналитика SOC первой линии: 11 модулей и словарь на 343 термина.">
 <title>Сети для будущего SOC-аналитика</title>
 </head>
 <body>
@@ -28,7 +29,11 @@
     --orange:#C2540A;
     --ok:#0C6B45; --ok-soft:#E6F3EC; --ok-line:#B6DCC6;
     --bad:#B23125; --bad-soft:#FBEBE8; --bad-line:#EFC7C0;
-    --term:#201D18; --term-ink:#E9E4DA; --term-line:#3A342B;
+    /* Блок кода в светлой теме — светлый. Тёмная плита на светлой странице даёт перепад
+       яркости примерно 1:14 в пределах одной строки чтения; глаз перестраивается на каждый
+       блок, и от этого устаёт. Порог AAA (7:1) держим внутри блока, а не между блоком и фоном. */
+    --term:#EFEAE0; --term-ink:#2A2620; --term-line:#DED7C7;
+    --term-c:#5F6875; --term-k:#8A5200; --term-g:#0C6B45; --term-r:#A82D22;
     --r-s:8px; --r-m:16px; --r-l:24px; --r-pill:999px;
     --sh-1:0 1px 2px rgba(35,32,27,.04), 0 3px 10px -5px rgba(35,32,27,.10);
     --sh-2:0 2px 5px rgba(35,32,27,.05), 0 16px 32px -14px rgba(35,32,27,.20);
@@ -58,7 +63,9 @@
     --orange:#EE9455;
     --ok:#5CBF92; --ok-soft:#14261E; --ok-line:#27473A;
     --bad:#E88779; --bad-soft:#2C1A17; --bad-line:#4A2A25;
+    /* В тёмной теме блок кода наоборот темнее страницы — перепад маленький, это работает. */
     --term:#121110; --term-ink:#DCD7CE; --term-line:#2A2724;
+    --term-c:#79808D; --term-k:#F2C300; --term-g:#5FCB9E; --term-r:#EF8377;
     /* в темноте тени не читаются — структуру держат границы */
     --sh-1:0 1px 2px rgba(0,0,0,.35);
     --sh-2:0 4px 14px -6px rgba(0,0,0,.6);
@@ -120,6 +127,42 @@
   }
   .iconbtn svg { width:17px; height:17px; }
   .iconbtn:hover { color:var(--ink); border-color:var(--line-2); background:var(--card); }
+
+  /* ---------- свои кнопки окна ----------
+     Приложение открывается сразу в полный экран, системной рамки там нет, поэтому три
+     кнопки рисует сама страница. Средняя переключает полный экран своими силами.
+     Крайние есть только в режиме приложения: свернуть и закрыть умеет лишь Windows,
+     их выполняет winctl.exe, которого зовёт локальный сервер. */
+  .winbar {
+    position:fixed; top:0; right:0; z-index:600; display:flex; background:var(--paper);
+    border-left:1px solid var(--line); border-bottom:1px solid var(--line);
+    border-bottom-left-radius:var(--r-s); overflow:hidden;
+  }
+  .wb {
+    width:44px; height:30px; padding:0; border:0; background:none; color:var(--ink-3);
+    border-radius:8px;                 /* прямоугольная заливка при наведении выглядела грубо */
+    display:grid; place-items:center; cursor:pointer; transition:.14s var(--ease);
+  }
+  .wb svg { width:11px; height:11px; }
+  /* Подсветка нейтральным полупрозрачным, а не цветом темы: кнопка лежит поверх полосы
+     заголовка, и она одинаково уместна и на светлом, и на тёмном фоне. */
+  .wb:hover { background:rgba(127,127,127,.18); color:var(--ink); }
+  .wb:active { background:rgba(127,127,127,.28); }
+  .wb-x:hover { background:#C42B1C; color:#fff; }   /* тот же красный, что у системной рамки */
+  .winbar[hidden], .wb[hidden] { display:none; }
+
+  /* У установленного приложения системные кнопки лежат поверх страницы в правом углу,
+     и наша панель на них налезала. Область заголовка кончается там, где они начинаются, —
+     туда и прижимаемся. Свою подложку убираем: полоса заголовка и так наша. */
+  @media (display-mode: window-controls-overlay) {
+    .winbar {
+      right:calc(100% - env(titlebar-area-x, 0px) - env(titlebar-area-width, 100%));
+      height:env(titlebar-area-height, 34px);
+      background:transparent; border:0; border-radius:0;
+      align-items:center; padding-right:6px;   /* отступ от системных кнопок */
+    }
+    .wb { height:calc(env(titlebar-area-height, 34px) - 8px); }
+  }
   .brand .mk {
     width:38px; height:38px; border-radius:var(--r-s); background:var(--gold);
     display:grid; place-items:center; flex:none; color:#14161B;
@@ -368,6 +411,11 @@
   .gitem.hit { border-color:var(--gold); box-shadow:0 0 0 3px var(--gold-soft); }
   .gitem b { font-family:var(--serif); font-size:18px; letter-spacing:-.012em; display:block; margin-bottom:4px; }
   .gitem p { font-size:15.5px; color:var(--ink-2); margin:0; }
+  /* в режиме поиска список идёт одним рядом по убыванию совпадения, без разбивки на категории,
+     поэтому категория подписывается у каждой статьи */
+  .gitem .gtag { font-family:var(--mono); font-style:normal; font-size:10px; letter-spacing:.1em;
+                 text-transform:uppercase; color:var(--gold-ink); display:block; margin-bottom:6px; }
+  .gitem mark { background:var(--gold-soft); color:var(--ink); border-radius:3px; padding:0 1px; }
   .gempty { padding:40px 0; color:var(--ink-3); font-size:16px; }
   pre {
     font-family:var(--mono); font-size:13.5px; line-height:1.65;
@@ -375,10 +423,12 @@
     border-radius:var(--r-m); padding:20px 22px; overflow-x:auto; margin:0 0 22px;
   }
   pre code { background:none; border:0; padding:0; color:inherit; font-size:13.5px; }
-  pre .c { color:#79808D; }
-  pre .k { color:#F2C300; }
-  pre .g { color:#5FCB9E; }
-  pre .r { color:#EF8377; }
+  /* Подсветка синтаксиса берётся из токенов: на светлом фоне жёлтый и салатовый
+     нечитаемы, там нужны затемнённые оттенки тех же цветов. */
+  pre .c { color:var(--term-c); }
+  pre .k { color:var(--term-k); }
+  pre .g { color:var(--term-g); }
+  pre .r { color:var(--term-r); }
 
   .tbl { overflow-x:auto; margin:0 0 24px; border:1px solid var(--line); border-radius:var(--r-m); background:var(--card); box-shadow:var(--sh-1); }
   table { border-collapse:collapse; width:100%; font-size:15px; }
@@ -467,6 +517,16 @@
   }
   .quiz.answered .exp { display:block; animation:vin .3s var(--ease) both; }
   .exp b { color:var(--ink); }
+  /* почему неверен именно выбранный вариант — появляется по клику, накапливается по мере попыток */
+  .whys {
+    display:none; margin-top:12px; padding:13px 16px; border-radius:var(--r-s);
+    background:var(--bad-soft); border:1px solid var(--bad-line);
+    font-size:14.5px; line-height:1.6; color:var(--ink-2);
+  }
+  .whys.on { display:block; animation:vin .3s var(--ease) both; }
+  .whys p { margin:0 0 9px; }
+  .whys p:last-child { margin-bottom:0; }
+  .whys b { font-family:var(--mono); font-size:12.5px; color:var(--bad); margin-right:6px; }
 
   /* ---- открытое задание ---- */
   .task { border:1px solid var(--line-2); border-radius:var(--r-m); padding:22px 24px; margin:26px 0; background:var(--card); box-shadow:var(--sh-1); }
@@ -546,11 +606,17 @@
 
   /* ---- завершение урока ---- */
   .finish {
-    display:flex; align-items:center; gap:14px; margin:36px 0 0;
+    display:flex; align-items:center; gap:14px; flex-wrap:wrap; margin:36px 0 0;
     background:var(--card); border:1px solid var(--line); border-radius:var(--r-m); padding:18px 22px; box-shadow:var(--sh-1);
   }
   .finish input { width:19px; height:19px; accent-color:var(--gold); cursor:pointer; flex:none; }
   .finish label { font-size:15.5px; font-weight:600; color:var(--ink-2); cursor:pointer; }
+  /* заблокированную подпись гасим цветом, а не прозрачностью: opacity .6 роняет её
+     до 2.9:1, а приглушённый текст в учебнике везде держит 4.5:1 и выше */
+  .finish.locked input, .finish.locked label { cursor:default; }
+  .finish.locked label { color:var(--ink-3); font-weight:500; }
+  .finish .fin-hint { font-family:var(--mono); font-size:12.5px; color:var(--ink-3); margin-left:auto; }
+  .finish .fin-hint:empty { display:none; }
 
   /* ---- нижняя навигация ---- */
   .lnav {
@@ -639,6 +705,19 @@
     var h = new Date().getHours();
     var t = mode === 'auto' ? ((h >= 19 || h < 9) ? 'dark' : 'light') : mode;
     document.documentElement.setAttribute('data-theme', t);
+
+    /* Полосу с кнопками окна Edge красит не страница, а theme-color. Без этого она
+       оставалась тёмной из манифеста и висела чёрным прямоугольником над светлой страницей.
+       Следим за сменой темы наблюдателем, чтобы не дублировать вызов в переключателе. */
+    var mt = document.querySelector('meta[name="theme-color"]');
+    function paint() {
+      if (!mt) return;
+      mt.setAttribute('content',
+        document.documentElement.getAttribute('data-theme') === 'dark' ? '#191817' : '#F5F4F0');
+    }
+    paint();
+    new MutationObserver(paint).observe(document.documentElement,
+      { attributes: true, attributeFilter: ['data-theme'] });
   } catch (e) {}
 })();
 </script>
@@ -664,6 +743,18 @@
 
 <div class="titlebar"></div>
 
+<div class="winbar" id="winbar" hidden>
+  <button class="wb" id="wbMin" title="Свернуть" aria-label="Свернуть окно" hidden>
+    <svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1"><path d="M0 5h10"></path></svg>
+  </button>
+  <button class="wb" id="wbFs" title="Во весь экран (F11)" aria-label="Во весь экран">
+    <svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"><path id="wbFsPath" d="M1 3.6V1h2.6M6.4 1H9v2.6M9 6.4V9H6.4M3.6 9H1V6.4"></path></svg>
+  </button>
+  <button class="wb wb-x" id="wbClose" title="Закрыть" aria-label="Закрыть окно" hidden>
+    <svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1"><path d="M.6.6l8.8 8.8M9.4.6L.6 9.4"></path></svg>
+  </button>
+</div>
+
 <div class="app">
   <div class="scrim" id="scrim"></div>
 
@@ -675,9 +766,6 @@
       </button>
       <button class="iconbtn" id="thBtn" title="Тема" aria-label="Переключить тему">
         <svg><use href="#i-auto"></use></svg>
-      </button>
-      <button class="iconbtn" id="fsBtn" title="Во весь экран (F11)" aria-label="Во весь экран">
-        <svg><use href="#i-full" id="fsIcon"></use></svg>
       </button>
     </div>
 
@@ -1045,9 +1133,9 @@ action      allowed</code></pre>
               <span class="qn">Вопрос 1</span>
               <p class="qt">Чем в первую очередь занимается аналитик первой линии?</p>
               <div class="opts">
-                <button class="opt"><span class="mk">А</span><span>Настраивает межсетевые экраны и антивирусы</span></button>
+                <button class="opt" data-why="Настройка средств защиты — работа администраторов и инженеров ИБ. Первая линия смотрит на то, о чём эти средства уже сообщили."><span class="mk">А</span><span>Настраивает межсетевые экраны и антивирусы</span></button>
                 <button class="opt" data-ok="1"><span class="mk">Б</span><span>Разбирает поток алертов и решает, инцидент это или ложное срабатывание</span></button>
-                <button class="opt"><span class="mk">В</span><span>Пишет правила детектирования и ищет неизвестные угрозы</span></button>
+                <button class="opt" data-why="Написание правил и охота за неизвестным — уровень L3. У первой линии другой предмет: поток уже сработавших правил."><span class="mk">В</span><span>Пишет правила детектирования и ищет неизвестные угрозы</span></button>
               </div>
               <div class="exp"><b>Верно: Б.</b> Настройка средств защиты — задача других подразделений, написание правил и охота за неизвестным — уровень L3. L1 занимается триажем: быстро отсеивает шум, не пропуская настоящее.</div>
             </div>
@@ -1056,9 +1144,9 @@ action      allowed</code></pre>
               <span class="qn">Вопрос 2</span>
               <p class="qt">Правило SIEM за смену дало 300 срабатываний, инцидентом оказалось одно. Что это означает?</p>
               <div class="opts">
-                <button class="opt"><span class="mk">А</span><span>Правило неисправно и его надо немедленно отключить</span></button>
+                <button class="opt" data-why="Отключать правило до разбора нельзя: 300 срабатываний бывают и шумом настройки, и реальной активностью, которую в организации просто считают штатной."><span class="mk">А</span><span>Правило неисправно и его надо немедленно отключить</span></button>
                 <button class="opt" data-ok="1"><span class="mk">Б</span><span>Это штатная картина: ложных срабатываний всегда несоизмеримо больше, задача L1 — отсеивать их обоснованно</span></button>
-                <button class="opt"><span class="mk">В</span><span>Аналитик работает плохо: при верном разборе доля инцидентов должна быть около половины</span></button>
+                <button class="opt" data-why="Доли в половину не бывает ни в одном SOC: поводов посмотреть всегда на порядки больше, чем инцидентов. Это свойство мониторинга, а не признак плохой работы."><span class="mk">В</span><span>Аналитик работает плохо: при верном разборе доля инцидентов должна быть около половины</span></button>
               </div>
               <div class="exp"><b>Верно: Б.</b> Настоящих инцидентов всегда сильно меньше, чем поводов посмотреть: резервное копирование похоже на выкачивание данных, сканер уязвимостей — на разведку. Конкретная доля в каждой организации своя, запоминать её бессмысленно. Вариант А поспешен — отключать правило можно только разобравшись, шумит оно или ловит реальную активность, которую просто разрешили. Вариант В описывает ситуацию, которой в мониторинге не бывает.</div>
             </div>
@@ -1067,9 +1155,9 @@ action      allowed</code></pre>
               <span class="qn">Вопрос 3</span>
               <p class="qt">Сайт не открывается. С чего начинать проверку по методу «снизу вверх»?</p>
               <div class="opts">
-                <button class="opt"><span class="mk">А</span><span>С настроек браузера и очистки кеша</span></button>
+                <button class="opt" data-why="Это самый верхний уровень. Начинать с него — значит чистить кеш, когда до сервера может вообще не быть маршрута."><span class="mk">А</span><span>С настроек браузера и очистки кеша</span></button>
                 <button class="opt" data-ok="1"><span class="mk">Б</span><span>С проверки связности: доходит ли пакет до IP-адреса</span></button>
-                <button class="opt"><span class="mk">В</span><span>С проверки сертификата сайта</span></button>
+                <button class="opt" data-why="Сертификат проверяется в самом конце: он не нужен, пока пакет не доходит и соединение не устанавливается."><span class="mk">В</span><span>С проверки сертификата сайта</span></button>
               </div>
               <div class="exp"><b>Верно: Б.</b> Нижний уровень проверяется первым. Пока нет маршрута и связности, разбираться с именами, портами и сертификатами бессмысленно — будешь чинить не то.</div>
             </div>
@@ -1525,9 +1613,9 @@ sudo tcpdump -i any -n arp</code></pre>
               <span class="qn">Вопрос 1</span>
               <p class="qt">Пакет прошёл через пять маршрутизаторов. Что менялось по дороге?</p>
               <div class="opts">
-                <button class="opt"><span class="mk">А</span><span>IP получателя — на каждом хопе, MAC — ни разу</span></button>
+                <button class="opt" data-why="Всё наоборот. Менять IP получателя по дороге — значит потерять адресата: именно по нему каждый маршрутизатор выбирает направление."><span class="mk">А</span><span>IP получателя — на каждом хопе, MAC — ни разу</span></button>
                 <button class="opt" data-ok="1"><span class="mk">Б</span><span>MAC получателя — на каждом хопе, IP получателя — ни разу</span></button>
-                <button class="opt"><span class="mk">В</span><span>Оба адреса менялись на каждом хопе</span></button>
+                <button class="opt" data-why="IP получателя неизменен от отправителя до адресата — иначе пакет было бы некуда доставлять."><span class="mk">В</span><span>Оба адреса менялись на каждом хопе</span></button>
               </div>
               <div class="exp"><b>Верно: Б.</b> IP получателя — конечная точка маршрута, он неизменен. Канальный заголовок пересобирается заново на каждом участке, потому что MAC адресует только следующее устройство в текущем сегменте.</div>
             </div>
@@ -1536,9 +1624,9 @@ sudo tcpdump -i any -n arp</code></pre>
               <span class="qn">Вопрос 2</span>
               <p class="qt">В логе межсетевого экрана записан MAC-адрес источника. Что это говорит?</p>
               <div class="opts">
-                <button class="opt"><span class="mk">А</span><span>Ничего особенного, MAC пишется для любого трафика</span></button>
+                <button class="opt" data-why="MAC есть в каждом кадре, но записать чужой MAC устройство может, только если кадр пришёл к нему напрямую: MAC не переживает ни одного маршрутизатора."><span class="mk">А</span><span>Ничего особенного, MAC пишется для любого трафика</span></button>
                 <button class="opt" data-ok="1"><span class="mk">Б</span><span>Источник находится в том же сегменте, что и устройство, записавшее лог</span></button>
-                <button class="opt"><span class="mk">В</span><span>Источник точно находится в интернете</span></button>
+                <button class="opt" data-why="Из интернета настоящий MAC отправителя не доходит — в поле оказался бы адрес пограничного маршрутизатора."><span class="mk">В</span><span>Источник точно находится в интернете</span></button>
               </div>
               <div class="exp"><b>Верно: Б.</b> MAC не выходит за пределы сегмента. Будь трафик из интернета, в поле стоял бы MAC пограничного маршрутизатора, а не настоящего отправителя.</div>
             </div>
@@ -1547,8 +1635,8 @@ sudo tcpdump -i any -n arp</code></pre>
               <span class="qn">Вопрос 3</span>
               <p class="qt">Почему заголовки добавляются в начало пакета, а не в конец?</p>
               <div class="opts">
-                <button class="opt"><span class="mk">А</span><span>Так исторически сложилось, технической причины нет</span></button>
-                <button class="opt"><span class="mk">Б</span><span>Чтобы данные было проще шифровать</span></button>
+                <button class="opt" data-why="Причина как раз техническая: порядок полей определяет, сколько байт надо прочитать, прежде чем принимать решение."><span class="mk">А</span><span>Так исторически сложилось, технической причины нет</span></button>
+                <button class="opt" data-why="От порядка полей шифрование не зависит. Скорее наоборот: заголовки часто остаются открытыми, а шифруются данные."><span class="mk">Б</span><span>Чтобы данные было проще шифровать</span></button>
                 <button class="opt" data-ok="1"><span class="mk">В</span><span>Чтобы устройство могло принять решение, прочитав только первые байты</span></button>
               </div>
               <div class="exp"><b>Верно: В.</b> Маршрутизатору достаточно IP-заголовка, чтобы понять, куда переслать пакет. Ждать весь пакет целиком не нужно — это принципиально для скорости.</div>
@@ -1559,8 +1647,8 @@ sudo tcpdump -i any -n arp</code></pre>
               <p class="qt">Почему ARP-спуфинг опаснее в плоской сети, чем в сегментированной?</p>
               <div class="opts">
                 <button class="opt" data-ok="1"><span class="mk">А</span><span>ARP работает в пределах сегмента: в плоской сети это все машины сразу</span></button>
-                <button class="opt"><span class="mk">Б</span><span>В сегментированной сети ARP вообще не используется</span></button>
-                <button class="opt"><span class="mk">В</span><span>Разницы нет, атака одинаково работает в любой сети</span></button>
+                <button class="opt" data-why="ARP работает в любом сегменте, иначе машины не нашли бы друг друга. Сегментация не отменяет его, а ограничивает область, где подделку вообще слышно."><span class="mk">Б</span><span>В сегментированной сети ARP вообще не используется</span></button>
+                <button class="opt" data-why="Разница в размере области поражения: подделка ARP не выходит за пределы своего широковещательного домена."><span class="mk">В</span><span>Разницы нет, атака одинаково работает в любой сети</span></button>
               </div>
               <div class="exp"><b>Верно: А.</b> Широковещательный домен ограничивает область атаки. В плоской сети атакующий может встать между любыми двумя машинами; в сегментированной он заперт в своём сегменте, а трафик наружу идёт через маршрутизатор, которому его подделки недоступны.</div>
             </div>
@@ -1569,9 +1657,9 @@ sudo tcpdump -i any -n arp</code></pre>
               <span class="qn">Вопрос 5</span>
               <p class="qt">Пинг проходит, мелкие страницы открываются, крупные файлы виснут. На что подумать первым делом?</p>
               <div class="opts">
-                <button class="opt"><span class="mk">А</span><span>Блокировка по IP на межсетевом экране</span></button>
+                <button class="opt" data-why="Блокировка по адресу убила бы и пинг, и мелкие страницы: правило не разбирает, крупный пакет или мелкий."><span class="mk">А</span><span>Блокировка по IP на межсетевом экране</span></button>
                 <button class="opt" data-ok="1"><span class="mk">Б</span><span>Проблема с MTU: крупные пакеты где-то не проходят</span></button>
-                <button class="opt"><span class="mk">В</span><span>Отказ DNS</span></button>
+                <button class="opt" data-why="При отказе DNS не открылось бы вообще ничего: имя не превратилось бы в адрес ни для мелкой страницы, ни для крупной."><span class="mk">В</span><span>Отказ DNS</span></button>
               </div>
               <div class="exp"><b>Верно: Б.</b> Мелкие пакеты проходят, крупные — нет: классический признак несогласованного MTU, чаще всего на VPN или туннеле. DNS исключается тем, что часть страниц открывается, блокировка по IP — тем, что пинг идёт.</div>
             </div>
@@ -2139,9 +2227,9 @@ sudo tcpdump -i any -n port 67 or port 68</code></pre>
               <span class="qn">Вопрос 1</span>
               <p class="qt">Хост 10.4.19.66/24 отправляет пакет на 10.4.7.15. Это его подсеть?</p>
               <div class="opts">
-                <button class="opt"><span class="mk">А</span><span>Да, оба адреса начинаются с 10.4</span></button>
+                <button class="opt" data-why="Совпадение первых двух байт задаёт общую сеть только при маске /16. При /24 сравнивают три байта, а третий здесь разный: 19 и 7."><span class="mk">А</span><span>Да, оба адреса начинаются с 10.4</span></button>
                 <button class="opt" data-ok="1"><span class="mk">Б</span><span>Нет — при /24 сеть задают первые три байта, они различаются</span></button>
-                <button class="opt"><span class="mk">В</span><span>Определить нельзя, нужен адрес шлюза</span></button>
+                <button class="opt" data-why="Шлюз тут ни при чём: свою сеть хост считает по адресу и маске, и обоих данных достаточно."><span class="mk">В</span><span>Определить нельзя, нужен адрес шлюза</span></button>
               </div>
               <div class="exp"><b>Верно: Б.</b> <code>10.4.19.x</code> и <code>10.4.7.x</code> при маске /24 — разные сети, пакет уйдёт на шлюз. Обрати внимание: при маске <code>/16</code> это была бы одна сеть и хост отправил бы напрямую. Маска важна не меньше адреса.</div>
             </div>
@@ -2150,9 +2238,9 @@ sudo tcpdump -i any -n port 67 or port 68</code></pre>
               <span class="qn">Вопрос 2</span>
               <p class="qt">Сколько устройств помещается в сеть /28?</p>
               <div class="opts">
-                <button class="opt"><span class="mk">А</span><span>16</span></button>
+                <button class="opt" data-why="16 — это все адреса блока. Два из них служебные: адрес самой сети и широковещательный, устройству их не назначить."><span class="mk">А</span><span>16</span></button>
                 <button class="opt" data-ok="1"><span class="mk">Б</span><span>14</span></button>
-                <button class="opt"><span class="mk">В</span><span>28</span></button>
+                <button class="opt" data-why="28 — длина префикса в битах, а не число адресов. Под хосты остаётся то, что префиксом не занято: 32 − 28 = 4 бита."><span class="mk">В</span><span>28</span></button>
               </div>
               <div class="exp"><b>Верно: Б.</b> 32 − 28 = 4 бита на хост, 2⁴ = 16 адресов, минус адрес сети и широковещательный = 14 устройств.</div>
             </div>
@@ -2161,9 +2249,9 @@ sudo tcpdump -i any -n port 67 or port 68</code></pre>
               <span class="qn">Вопрос 3</span>
               <p class="qt">Какой широковещательный адрес у сети 192.168.10.0/28?</p>
               <div class="opts">
-                <button class="opt"><span class="mk">А</span><span>192.168.10.255</span></button>
+                <button class="opt" data-why="Адрес .255 — широковещательный для /24. При /28 блок кончается гораздо раньше: в нём всего 16 адресов."><span class="mk">А</span><span>192.168.10.255</span></button>
                 <button class="opt" data-ok="1"><span class="mk">Б</span><span>192.168.10.15</span></button>
-                <button class="opt"><span class="mk">В</span><span>192.168.10.16</span></button>
+                <button class="opt" data-why="Адрес .16 — первый адрес следующего блока, то есть адрес сети, а не broadcast предыдущей."><span class="mk">В</span><span>192.168.10.16</span></button>
               </div>
               <div class="exp"><b>Верно: Б.</b> Префикс /28 нарезает пространство блоками по 16 адресов: .0, .16, .32… Сеть .0 занимает адреса с 0 по 15, последний из них и есть broadcast. Адрес .16 — уже начало следующей сети.</div>
             </div>
@@ -2172,9 +2260,9 @@ sudo tcpdump -i any -n port 67 or port 68</code></pre>
               <span class="qn">Вопрос 4</span>
               <p class="qt">В алерте видишь src_ip 169.254.11.8. Что это означает?</p>
               <div class="opts">
-                <button class="opt"><span class="mk">А</span><span>Адрес из интернета, публичный диапазон</span></button>
+                <button class="opt" data-why="Диапазон 169.254.0.0/16 зарезервирован под link-local и в интернете не маршрутизируется — извне такой источник прийти не мог."><span class="mk">А</span><span>Адрес из интернета, публичный диапазон</span></button>
                 <button class="opt" data-ok="1"><span class="mk">Б</span><span>Машина не получила адрес по DHCP и назначила его сама</span></button>
-                <button class="opt"><span class="mk">В</span><span>Трафик не покидал машину, это loopback</span></button>
+                <button class="opt" data-why="Loopback — это 127.0.0.0/8. Трафик с link-local адресом машину покидает, просто не уходит дальше своего сегмента."><span class="mk">В</span><span>Трафик не покидал машину, это loopback</span></button>
               </div>
               <div class="exp"><b>Верно: Б.</b> <code>169.254.0.0/16</code> — link-local, признак того, что DHCP не ответил. Обычно неисправность, но если сервер замолчал внезапно, стоит проверить, не атака ли это на него. Loopback — это <code>127.0.0.0/8</code>.</div>
             </div>
@@ -2183,9 +2271,9 @@ sudo tcpdump -i any -n port 67 or port 68</code></pre>
               <span class="qn">Вопрос 5</span>
               <p class="qt">Почему один публичный IP светится в тысячах событий от разных пользователей?</p>
               <div class="opts">
-                <button class="opt"><span class="mk">А</span><span>Ошибка в настройке SIEM, события дублируются</span></button>
+                <button class="opt" data-why="События разные, а не задублированные: у них различаются внутренние источники, порты и время. Дубликаты выглядели бы одинаково."><span class="mk">А</span><span>Ошибка в настройке SIEM, события дублируются</span></button>
                 <button class="opt" data-ok="1"><span class="mk">Б</span><span>За ним NAT: целая организация выходит наружу через один адрес</span></button>
-                <button class="opt"><span class="mk">В</span><span>Так работает балансировка нагрузки на стороне сервера</span></button>
+                <button class="opt" data-why="Балансировка распределяет запросы между серверами, то есть влияет на адрес назначения. Один и тот же адрес источника она не создаёт."><span class="mk">В</span><span>Так работает балансировка нагрузки на стороне сервера</span></button>
               </div>
               <div class="exp"><b>Верно: Б.</b> Сопоставить событие с конкретным человеком можно только по журналам трансляций, где записано, какой внутренний хост занимал какой внешний порт в конкретную секунду. Без них атрибуция невозможна.</div>
             </div>
@@ -2465,9 +2553,9 @@ ping -c 1 1.1.1.1 | grep ttl      <span class="c"># прикинь ОС собе
               <span class="qn">Вопрос 1</span>
               <p class="qt">Пинг до 8.8.8.8 проходит, до google.com — нет. Где проблема?</p>
               <div class="opts">
-                <button class="opt"><span class="mk">А</span><span>Нет маршрута по умолчанию</span></button>
+                <button class="opt" data-why="Без маршрута по умолчанию не прошёл бы и пинг до 8.8.8.8: это адрес за пределами локальной сети."><span class="mk">А</span><span>Нет маршрута по умолчанию</span></button>
                 <button class="opt" data-ok="1"><span class="mk">Б</span><span>Отказал DNS — имя не переводится в адрес</span></button>
-                <button class="opt"><span class="mk">В</span><span>Сайт google.com заблокирован межсетевым экраном</span></button>
+                <button class="opt" data-why="Блокировка проявилась бы при соединении с сайтом. Здесь имя вообще не превращается в адрес — до соединения дело не доходит."><span class="mk">В</span><span>Сайт google.com заблокирован межсетевым экраном</span></button>
               </div>
               <div class="exp"><b>Верно: Б.</b> Раз пинг по адресу проходит, связность и маршрутизация работают — значит нижние уровни в порядке. Отказал перевод имени в адрес. Ровно твой случай с Bandit.</div>
             </div>
@@ -2477,8 +2565,8 @@ ping -c 1 1.1.1.1 | grep ttl      <span class="c"># прикинь ОС собе
               <p class="qt">В traceroute на 4-м хопе звёздочки, а 5-й и 6-й отвечают. Есть проблема?</p>
               <div class="opts">
                 <button class="opt" data-ok="1"><span class="mk">А</span><span>Нет: раз следующие ответили, пакеты через 4-й хоп проходят</span></button>
-                <button class="opt"><span class="mk">Б</span><span>Да, на 4-м хопе обрыв связи</span></button>
-                <button class="opt"><span class="mk">В</span><span>Да, 4-й маршрутизатор перегружен и теряет пакеты</span></button>
+                <button class="opt" data-why="Обрыв обрубил бы и всё, что за ним. Раз пятый и шестой ответили, пакеты через четвёртый проходят."><span class="mk">Б</span><span>Да, на 4-м хопе обрыв связи</span></button>
+                <button class="opt" data-why="Потери были бы видны и дальше: следующие хопы отвечают на пакеты, прошедшие через тот же четвёртый."><span class="mk">В</span><span>Да, 4-й маршрутизатор перегружен и теряет пакеты</span></button>
               </div>
               <div class="exp"><b>Верно: А.</b> Маршрутизатор просто настроен не отвечать на служебные пакеты, но транзит пропускает. Тревожно, когда звёздочки идут от какого-то хопа и до самого конца — вот там и обрыв.</div>
             </div>
@@ -2487,9 +2575,9 @@ ping -c 1 1.1.1.1 | grep ttl      <span class="c"># прикинь ОС собе
               <span class="qn">Вопрос 3</span>
               <p class="qt">Хост не отвечает на ping. Что можно утверждать?</p>
               <div class="opts">
-                <button class="opt"><span class="mk">А</span><span>Хост выключен или недоступен</span></button>
+                <button class="opt" data-why="Вывод шире, чем данные. Хост может работать и отдавать сайт, просто ICMP на нём или по пути запрещён."><span class="mk">А</span><span>Хост выключен или недоступен</span></button>
                 <button class="opt" data-ok="1"><span class="mk">Б</span><span>Только то, что не проходит ICMP</span></button>
-                <button class="opt"><span class="mk">В</span><span>На хосте не запущено ни одной службы</span></button>
+                <button class="opt" data-why="Ответ на ping со службами не связан: его формирует ядро системы, а не какая-то программа на порту."><span class="mk">В</span><span>На хосте не запущено ни одной службы</span></button>
               </div>
               <div class="exp"><b>Верно: Б.</b> ICMP массово блокируют на межсетевых экранах. Сервер может прекрасно отдавать сайт и при этом молчать на пинг. Проверять надо портом нужной службы: <code>nc -zv хост 443</code>.</div>
             </div>
@@ -2498,9 +2586,9 @@ ping -c 1 1.1.1.1 | grep ttl      <span class="c"># прикинь ОС собе
               <span class="qn">Вопрос 4</span>
               <p class="qt">Из сегмента с рабочими станциями пришёл пакет с TTL 249. О чём это говорит?</p>
               <div class="opts">
-                <button class="opt"><span class="mk">А</span><span>Пакет прошёл 249 маршрутизаторов</span></button>
+                <button class="opt" data-why="TTL не считает пройденное, а уменьшается от стартового значения. Стартовые — 64, 128, 255; 249 означает 6 хопов от 255."><span class="mk">А</span><span>Пакет прошёл 249 маршрутизаторов</span></button>
                 <button class="opt" data-ok="1"><span class="mk">Б</span><span>Стартовый TTL был 255 — похоже на сетевое оборудование, и это в таком сегменте странно</span></button>
-                <button class="opt"><span class="mk">В</span><span>Это Windows-машина, у неё стартовый TTL 255</span></button>
+                <button class="opt" data-why="У Windows стартовый TTL 128, у Linux — 64. Значение 255 характерно для сетевого оборудования."><span class="mk">В</span><span>Это Windows-машина, у неё стартовый TTL 255</span></button>
               </div>
               <div class="exp"><b>Верно: Б.</b> Округляем вверх до стандартного значения: 255 − 249 = 6 хопов. Стартовое 255 характерно для сетевого оборудования, а не для пользовательских ОС (Windows — 128, Linux — 64). В пользовательском сегменте такой источник инороден.</div>
             </div>
@@ -2509,9 +2597,9 @@ ping -c 1 1.1.1.1 | grep ttl      <span class="c"># прикинь ОС собе
               <span class="qn">Вопрос 5</span>
               <p class="qt">Зачем аналитику знать, какой автономной системе принадлежит IP?</p>
               <div class="opts">
-                <button class="opt"><span class="mk">А</span><span>Чтобы вычислить точное физическое местоположение атакующего</span></button>
+                <button class="opt" data-why="Автономная система — это владелец блока адресов, а не точка на карте: её адреса могут обслуживать пол-континента."><span class="mk">А</span><span>Чтобы вычислить точное физическое местоположение атакующего</span></button>
                 <button class="opt" data-ok="1"><span class="mk">Б</span><span>Это быстрый контекст: облако, мобильный оператор, хостинг или конкретная компания</span></button>
-                <button class="opt"><span class="mk">В</span><span>Чтобы построить маршрут до этого адреса</span></button>
+                <button class="opt" data-why="Маршрут строит маршрутизатор по своей таблице. Аналитику номер AS нужен не для этого, а чтобы понять, чей это адрес."><span class="mk">В</span><span>Чтобы построить маршрут до этого адреса</span></button>
               </div>
               <div class="exp"><b>Верно: Б.</b> Соединение с адресом крупного облака и с адресом дешёвого хостинга с историей вредоносной активности — разный уровень подозрительности при прочих равных. Точное местоположение по AS не определяется.</div>
             </div>
@@ -2813,8 +2901,8 @@ cat /proc/sys/net/ipv4/ip_local_port_range</code></pre>
               <p class="qt">В логе: 10.4.19.66:51022 → 10.4.7.15:445. Кто здесь клиент?</p>
               <div class="opts">
                 <button class="opt" data-ok="1"><span class="mk">А</span><span>10.4.19.66 — у него эфемерный порт 51022</span></button>
-                <button class="opt"><span class="mk">Б</span><span>10.4.7.15 — у него меньший номер порта</span></button>
-                <button class="opt"><span class="mk">В</span><span>Определить по этой строке невозможно</span></button>
+                <button class="opt" data-why="Меньший номер как раз выдаёт сервер: 445 — известный порт SMB, занятый службой заранее. Клиента выдаёт случайный высокий порт."><span class="mk">Б</span><span>10.4.7.15 — у него меньший номер порта</span></button>
+                <button class="opt" data-why="Данных достаточно: пара «случайный высокий порт → известный низкий» однозначно показывает, кто обратился, а кто слушал."><span class="mk">В</span><span>Определить по этой строке невозможно</span></button>
               </div>
               <div class="exp"><b>Верно: А.</b> Клиент получает случайный высокий порт, сервер слушает известный. Здесь идёт обращение к SMB (445). Нормально, если 10.4.7.15 — файловый сервер; тревожно, если обе машины — рабочие станции.</div>
             </div>
@@ -2823,9 +2911,9 @@ cat /proc/sys/net/ipv4/ip_local_port_range</code></pre>
               <span class="qn">Вопрос 2</span>
               <p class="qt">Чем <code>0.0.0.0:5432</code> хуже, чем <code>127.0.0.1:5432</code>?</p>
               <div class="opts">
-                <button class="opt"><span class="mk">А</span><span>На 0.0.0.0 служба доступна только из своей подсети, а на 127.0.0.1 — из любой</span></button>
+                <button class="opt" data-why="Всё наоборот: на 127.0.0.1 достучатся только процессы самой машины, а 0.0.0.0 — это все интерфейсы, включая внешний."><span class="mk">А</span><span>На 0.0.0.0 служба доступна только из своей подсети, а на 127.0.0.1 — из любой</span></button>
                 <button class="opt" data-ok="1"><span class="mk">Б</span><span>Служба слушает на всех интерфейсах и доступна из сети, а не только локально</span></button>
-                <button class="opt"><span class="mk">В</span><span>0.0.0.0 означает приём только по IPv4, а 127.0.0.1 — по обоим протоколам</span></button>
+                <button class="opt" data-why="Адрес привязки и версия протокола — разные вещи. За приём по IPv6 отвечает отдельная запись [::], а не 127.0.0.1."><span class="mk">В</span><span>0.0.0.0 означает приём только по IPv4, а 127.0.0.1 — по обоим протоколам</span></button>
               </div>
               <div class="exp"><b>Верно: Б.</b> 5432 — PostgreSQL. <code>127.0.0.1</code> — петлевой интерфейс, туда дотянутся только процессы самой машины. <code>0.0.0.0</code> — «все интерфейсы», то есть служба видна из сети; вариант А переворачивает это с ног на голову. Вариант В путает адрес привязки с версией протокола: за IPv6 отвечает отдельная запись <code>[::]</code>, а не 127.0.0.1.</div>
             </div>
@@ -2834,9 +2922,9 @@ cat /proc/sys/net/ipv4/ip_local_port_range</code></pre>
               <span class="qn">Вопрос 3</span>
               <p class="qt">Почему нельзя утверждать «трафик на порт 443 — это точно HTTPS»?</p>
               <div class="opts">
-                <button class="opt"><span class="mk">А</span><span>Можно: номера портов закреплены стандартом жёстко</span></button>
+                <button class="opt" data-why="Соответствие номера и протокола — договорённость, а не правило, соблюдение которого кто-то принуждает. Служба вправе занять любой свободный порт."><span class="mk">А</span><span>Можно: номера портов закреплены стандартом жёстко</span></button>
                 <button class="opt" data-ok="1"><span class="mk">Б</span><span>Номер порта — соглашение; на него можно посадить что угодно, чем вредоносы и пользуются</span></button>
-                <button class="opt"><span class="mk">В</span><span>Потому что HTTPS всегда работает на 80-м порту</span></button>
+                <button class="opt" data-why="Порт 80 — это обычный HTTP. HTTPS по договорённости слушает 443, но и это не гарантия того, что внутри именно он."><span class="mk">В</span><span>Потому что HTTPS всегда работает на 80-м порту</span></button>
               </div>
               <div class="exp"><b>Верно: Б.</b> Вредоносное ПО специально использует 443: этот порт открыт наружу практически везде и не вызывает вопросов. Определять протокол надо по содержимому, а не по номеру.</div>
             </div>
@@ -2845,9 +2933,9 @@ cat /proc/sys/net/ipv4/ip_local_port_range</code></pre>
               <span class="qn">Вопрос 4</span>
               <p class="qt">На сервере тысячи соединений в состоянии TIME-WAIT. Это атака?</p>
               <div class="opts">
-                <button class="opt"><span class="mk">А</span><span>Да, признак SYN-flood</span></button>
+                <button class="opt" data-why="При SYN-flood копятся SYN-RECV — незавершённые рукопожатия. TIME-WAIT, наоборот, остаётся от нормально закрытых соединений."><span class="mk">А</span><span>Да, признак SYN-flood</span></button>
                 <button class="opt" data-ok="1"><span class="mk">Б</span><span>Обычно нет — это нормальное состояние после закрытия соединений</span></button>
-                <button class="opt"><span class="mk">В</span><span>Да, сервер не справляется и теряет пакеты</span></button>
+                <button class="opt" data-why="TIME-WAIT не про перегрузку: это обязательное ожидание после закрытия, чтобы опоздавшие пакеты не попали в новое соединение."><span class="mk">В</span><span>Да, сервер не справляется и теряет пакеты</span></button>
               </div>
               <div class="exp"><b>Верно: Б.</b> TIME-WAIT — штатное «дожитие» закрытого сокета. Настораживать должны массовые <code>SYN-RECV</code>: вот это незавершённые рукопожатия, то есть сканирование или SYN-flood.</div>
             </div>
@@ -2857,8 +2945,8 @@ cat /proc/sys/net/ipv4/ip_local_port_range</code></pre>
               <p class="qt">Чем «фильтруется» лучше «закрыт» с точки зрения защиты?</p>
               <div class="opts">
                 <button class="opt" data-ok="1"><span class="mk">А</span><span>Молчание не подтверждает существование хоста и замедляет сканирование таймаутами</span></button>
-                <button class="opt"><span class="mk">Б</span><span>Фильтруемый порт сканер вообще не обнаружит и пропустит при переборе</span></button>
-                <button class="opt"><span class="mk">В</span><span>Разницы нет: подключиться нельзя в обоих случаях</span></button>
+                <button class="opt" data-why="Сканер проверит порт в любом случае — он просто не дождётся ответа и пометит его filtered. Пропустить порт при переборе он не может."><span class="mk">Б</span><span>Фильтруемый порт сканер вообще не обнаружит и пропустит при переборе</span></button>
+                <button class="opt" data-why="Подключиться нельзя в обоих случаях, но закрытый порт отвечает RST и этим подтверждает: хост существует. Молчание не выдаёт даже этого."><span class="mk">В</span><span>Разницы нет: подключиться нельзя в обоих случаях</span></button>
               </div>
               <div class="exp"><b>Верно: А.</b> Закрытый порт отвечает RST и тем самым сообщает: хост существует. Фильтруемый молчит — сканер ждёт таймаут на каждом порту, и перебор замедляется в десятки раз. Вариант Б звучит правдоподобно, но неверен: сканер порт проверит, просто не получит ответа и пометит как filtered. Вариант В верен для атакующего в моменте, но игнорирует главное — сколько информации о себе отдаёт хост.</div>
             </div>
@@ -3282,9 +3370,9 @@ nc -zv 127.0.0.1 9999</code></pre>
               <span class="qn">Вопрос 1</span>
               <p class="qt">Почему DNS работает поверх UDP, а скачивание файла — поверх TCP?</p>
               <div class="opts">
-                <button class="opt"><span class="mk">А</span><span>Порт 53 закреплён за UDP, по TCP DNS работать не может</span></button>
+                <button class="opt" data-why="DNS работает и по TCP на том же 53-м порту — так передают большие ответы и зоны. Транспорт диктует размер, а не номер порта."><span class="mk">А</span><span>Порт 53 закреплён за UDP, по TCP DNS работать не может</span></button>
                 <button class="opt" data-ok="1"><span class="mk">Б</span><span>Запрос DNS умещается в один пакет: переспросить целиком дешевле, чем устанавливать соединение</span></button>
-                <button class="opt"><span class="mk">В</span><span>У UDP нет контрольной суммы, поэтому он быстрее — для коротких запросов это выгодно</span></button>
+                <button class="opt" data-why="Контрольная сумма у UDP есть. Выигрыш даёт отсутствие соединения и подтверждений, а не отказ от проверки целостности."><span class="mk">В</span><span>У UDP нет контрольной суммы, поэтому он быстрее — для коротких запросов это выгодно</span></button>
               </div>
               <div class="exp"><b>Верно: Б.</b> Три пакета на установку соединения ради одного маленького запроса — расточительно; потерялся ответ, переспросил целиком. Вариант А неверен: DNS <em>использует</em> TCP на том же 53-м порту для больших ответов и переноса зон. Вариант В неверен фактически: контрольная сумма в UDP есть, выигрыш даёт отсутствие соединения и подтверждений, а не её отсутствие.</div>
             </div>
@@ -3294,8 +3382,8 @@ nc -zv 127.0.0.1 9999</code></pre>
               <p class="qt">В ответ на SYN пришёл RST. Что можно сказать о хосте?</p>
               <div class="opts">
                 <button class="opt" data-ok="1"><span class="mk">А</span><span>Хост жив, но на этом порту никто не слушает</span></button>
-                <button class="opt"><span class="mk">Б</span><span>Хост недоступен или выключен</span></button>
-                <button class="opt"><span class="mk">В</span><span>Порт открыт, но соединение отклонено по правилу</span></button>
+                <button class="opt" data-why="Выключенный хост не ответил бы ничем. RST — это ответ, значит на том конце кто-то есть."><span class="mk">Б</span><span>Хост недоступен или выключен</span></button>
+                <button class="opt" data-why="Правило чаще молча отбрасывает пакет. RST означает обратное: слушающей службы на порту нет."><span class="mk">В</span><span>Порт открыт, но соединение отклонено по правилу</span></button>
               </div>
               <div class="exp"><b>Верно: А.</b> Он ведь ответил — значит жив. RST означает «службы на этом порту нет». Полная тишина означала бы фильтрацию или отсутствие хоста.</div>
             </div>
@@ -3304,9 +3392,9 @@ nc -zv 127.0.0.1 9999</code></pre>
               <span class="qn">Вопрос 3</span>
               <p class="qt">Чем FIN отличается от RST?</p>
               <div class="opts">
-                <button class="opt"><span class="mk">А</span><span>Ничем, оба закрывают соединение одинаково</span></button>
+                <button class="opt" data-why="Разница принципиальная: FIN — договорённое завершение, RST — обрыв. В логах они означают разное состояние соединения."><span class="mk">А</span><span>Ничем, оба закрывают соединение одинаково</span></button>
                 <button class="opt" data-ok="1"><span class="mk">Б</span><span>FIN — согласованное закрытие с подтверждением, RST — аварийный обрыв без согласования</span></button>
-                <button class="opt"><span class="mk">В</span><span>FIN отправляет сервер, RST — всегда клиент</span></button>
+                <button class="opt" data-why="Оба флага может послать любая сторона. Роль в соединении тут ни при чём."><span class="mk">В</span><span>FIN отправляет сервер, RST — всегда клиент</span></button>
               </div>
               <div class="exp"><b>Верно: Б.</b> При FIN каждая сторона объявляет об окончании передачи и получает подтверждение, данные в пути не теряются. RST рвёт всё немедленно. Массовые RST в логах — признак того, что соединения завершаются ненормально.</div>
             </div>
@@ -3315,9 +3403,9 @@ nc -zv 127.0.0.1 9999</code></pre>
               <span class="qn">Вопрос 4</span>
               <p class="qt">Алерт: 8000 соединений за 30 секунд, bytes = 0. Что произошло?</p>
               <div class="opts">
-                <button class="opt"><span class="mk">А</span><span>Массовая выгрузка данных</span></button>
+                <button class="opt" data-why="Выгрузка — это байты. Здесь их ноль: до передачи данных соединения не дошли."><span class="mk">А</span><span>Массовая выгрузка данных</span></button>
                 <button class="opt" data-ok="1"><span class="mk">Б</span><span>Сканирование: соединения не доходили до передачи данных</span></button>
-                <button class="opt"><span class="mk">В</span><span>Обычная работа веб-приложения с большим числом пользователей</span></button>
+                <button class="opt" data-why="Пользователи что-то получают, то есть объём был бы ненулевым. Восемь тысяч пустых соединений за полминуты на живое приложение не похожи."><span class="mk">В</span><span>Обычная работа веб-приложения с большим числом пользователей</span></button>
               </div>
               <div class="exp"><b>Верно: Б.</b> Нулевой объём означает, что полезной работы не выполнялось: рукопожатия обрывались. Это сканирование портов, а если цель одна и та же — возможно SYN-flood.</div>
             </div>
@@ -3326,9 +3414,9 @@ nc -zv 127.0.0.1 9999</code></pre>
               <span class="qn">Вопрос 5</span>
               <p class="qt">Один источник обращается к 500 разным адресам на порт 445. Это сканирование портов?</p>
               <div class="opts">
-                <button class="opt"><span class="mk">А</span><span>Да, классический скан портов</span></button>
+                <button class="opt" data-why="При скане портов перебирают порты на одном адресе. Здесь один и тот же порт на 500 адресах — перебирают машины, а не порты."><span class="mk">А</span><span>Да, классический скан портов</span></button>
                 <button class="opt" data-ok="1"><span class="mk">Б</span><span>Нет, это сканирование сети: ищут все машины с открытым SMB</span></button>
-                <button class="opt"><span class="mk">В</span><span>Нет, это нормальная работа файлового сервера</span></button>
+                <button class="opt" data-why="К файловому серверу обращаются клиенты, а не он к 500 адресам подряд. Направление обратное."><span class="mk">В</span><span>Нет, это нормальная работа файлового сервера</span></button>
               </div>
               <div class="exp"><b>Верно: Б.</b> При скане портов много портов на одном адресе, здесь наоборот — один порт на многих адресах. Для распространения шифровальщика это типовой первый шаг, и потому опаснее обычного скана: цель уже выбрана.</div>
             </div>
@@ -3337,9 +3425,9 @@ nc -zv 127.0.0.1 9999</code></pre>
               <span class="qn">Вопрос 6</span>
               <p class="qt">Почему организации блокируют UDP на порту 443?</p>
               <div class="opts">
-                <button class="opt"><span class="mk">А</span><span>Чтобы запретить сотрудникам доступ к HTTPS-сайтам</span></button>
+                <button class="opt" data-why="Доступ к сайтам остаётся: заблокирован только UDP, и браузер молча переходит на HTTPS поверх TCP."><span class="mk">А</span><span>Чтобы запретить сотрудникам доступ к HTTPS-сайтам</span></button>
                 <button class="opt" data-ok="1"><span class="mk">Б</span><span>Это QUIC: средства анализа его не разбирают, а при блокировке браузер откатится на TCP</span></button>
-                <button class="opt"><span class="mk">В</span><span>UDP на 443 используется только вредоносным ПО</span></button>
+                <button class="opt" data-why="Это штатный транспорт QUIC, на нём работает половина крупных сайтов. Блокируют его не за вредоносность, а из-за потери видимости."><span class="mk">В</span><span>UDP на 443 используется только вредоносным ПО</span></button>
               </div>
               <div class="exp"><b>Верно: Б.</b> Блокировка не мешает пользователю — браузер автоматически переходит на HTTPS поверх TCP и разницы не видно. Зато трафик снова становится разбираемым для мониторинга.</div>
             </div>
@@ -3762,9 +3850,9 @@ sudo tcpdump -i any -n port 53</code></pre>
               <span class="qn">Вопрос 1</span>
               <p class="qt">Почему <code>dig @1.1.1.1 домен</code> может ответить, когда обычный <code>dig домен</code> — нет?</p>
               <div class="opts">
-                <button class="opt"><span class="mk">А</span><span>Cloudflare хранит больше доменов, чем другие серверы</span></button>
+                <button class="opt" data-why="Публичные резолверы не хранят домены, а спрашивают у тех, кто за них отвечает. Полнота в итоге у всех одинаковая."><span class="mk">А</span><span>Cloudflare хранит больше доменов, чем другие серверы</span></button>
                 <button class="opt" data-ok="1"><span class="mk">Б</span><span>Запрос уходит напрямую другому серверу в обход системного, который может быть сломан или фильтровать</span></button>
-                <button class="opt"><span class="mk">В</span><span>Ключ @ включает рекурсивный режим, которого иначе нет</span></button>
+                <button class="opt" data-why="Ключ @ выбирает, кого спрашивать. Рекурсию выполняет сам сервер, и обычный запрос тоже рекурсивный."><span class="mk">В</span><span>Ключ @ включает рекурсивный режим, которого иначе нет</span></button>
               </div>
               <div class="exp"><b>Верно: Б.</b> Обычный запрос идёт к системному резолверу, как правило к DNS провайдера. Именно этим мы диагностировали твою проблему с Bandit: сравнили ответ системного DNS и внешнего.</div>
             </div>
@@ -3773,9 +3861,9 @@ sudo tcpdump -i any -n port 53</code></pre>
               <span class="qn">Вопрос 2</span>
               <p class="qt">За час с машины ушло 4000 запросов к поддоменам одного домена, имена длинные и случайные. Что это?</p>
               <div class="opts">
-                <button class="opt"><span class="mk">А</span><span>DGA — перебор сгенерированных доменов</span></button>
+                <button class="opt" data-why="При DGA перебирают разные домены, и большинство ответов — NXDOMAIN. Здесь все запросы к одному домену и успешны."><span class="mk">А</span><span>DGA — перебор сгенерированных доменов</span></button>
                 <button class="opt" data-ok="1"><span class="mk">Б</span><span>DNS-туннелирование: данные закодированы в именах поддоменов</span></button>
-                <button class="opt"><span class="mk">В</span><span>Обычная работа CDN с большим числом поддоменов</span></button>
+                <button class="opt" data-why="У CDN имена поддоменов осмысленные и повторяются. Случайные длинные имена, каждое своё, — это способ уложить данные в само имя."><span class="mk">В</span><span>Обычная работа CDN с большим числом поддоменов</span></button>
               </div>
               <div class="exp"><b>Верно: Б.</b> Ключевое отличие от DGA — все запросы идут <em>к одному домену</em>, и они успешны. При DGA перебираются разные домены и большинство ответов — NXDOMAIN.</div>
             </div>
@@ -3785,8 +3873,8 @@ sudo tcpdump -i any -n port 53</code></pre>
               <p class="qt">Массовые ответы NXDOMAIN с одной машины — о чём говорят?</p>
               <div class="opts">
                 <button class="opt" data-ok="1"><span class="mk">А</span><span>Вероятно DGA: хост перебирает сгенерированные имена в поисках живого C2</span></button>
-                <button class="opt"><span class="mk">Б</span><span>DNS-сервер организации вышел из строя</span></button>
-                <button class="opt"><span class="mk">В</span><span>Кеш резолвера переполнен</span></button>
+                <button class="opt" data-why="Сломанный сервер не отвечал бы вовсе или отдавал бы ошибку. NXDOMAIN — внятный ответ: имя спрашивали, и его действительно нет."><span class="mk">Б</span><span>DNS-сервер организации вышел из строя</span></button>
+                <button class="opt" data-why="Переполнение кеша приводит к лишним запросам наружу, а не к ответам «домена не существует»."><span class="mk">В</span><span>Кеш резолвера переполнен</span></button>
               </div>
               <div class="exp"><b>Верно: А.</b> Большинство сгенерированных имён не зарегистрировано — отсюда шквал «домен не существует». При отказе сервера ответов не было бы вообще, а не отрицательных.</div>
             </div>
@@ -3795,9 +3883,9 @@ sudo tcpdump -i any -n port 53</code></pre>
               <span class="qn">Вопрос 4</span>
               <p class="qt">Домен переехал на новый IP, но половина пользователей идёт на старый. Почему?</p>
               <div class="opts">
-                <button class="opt"><span class="mk">А</span><span>Часть пользователей использует IPv6</span></button>
+                <button class="opt" data-why="IPv6 дал бы другой адрес того же сервера, а не старый. Здесь пользователи идут по устаревшей записи."><span class="mk">А</span><span>Часть пользователей использует IPv6</span></button>
                 <button class="opt" data-ok="1"><span class="mk">Б</span><span>Резолверы отдают запись из кеша, пока не истечёт её TTL</span></button>
-                <button class="opt"><span class="mk">В</span><span>Старый сервер продолжает отвечать на запросы</span></button>
+                <button class="opt" data-why="Старый сервер отвечает потому, что к нему до сих пор приходят. Вопрос в том, откуда клиенты берут его адрес."><span class="mk">В</span><span>Старый сервер продолжает отвечать на запросы</span></button>
               </div>
               <div class="exp"><b>Верно: Б.</b> Поэтому перед плановым переездом TTL заранее снижают до нескольких минут, а после возвращают обратно.</div>
             </div>
@@ -3806,9 +3894,9 @@ sudo tcpdump -i any -n port 53</code></pre>
               <span class="qn">Вопрос 5</span>
               <p class="qt">Вредонос подменил файл hosts. Увидит ли это сетевой мониторинг?</p>
               <div class="opts">
-                <button class="opt"><span class="mk">А</span><span>Да, появится подозрительный DNS-запрос</span></button>
+                <button class="opt" data-why="Запись в hosts как раз избавляет от запроса: имя разрешается локально, в сеть ничего не уходит."><span class="mk">А</span><span>Да, появится подозрительный DNS-запрос</span></button>
                 <button class="opt" data-ok="1"><span class="mk">Б</span><span>Нет: имя разрешается локально, запрос в сеть не уходит</span></button>
-                <button class="opt"><span class="mk">В</span><span>Да, если включено логирование DoH</span></button>
+                <button class="opt" data-why="DoH здесь ни при чём: до любого DNS дело не доходит, ответ берётся из файла на самой машине."><span class="mk">В</span><span>Да, если включено логирование DoH</span></button>
               </div>
               <div class="exp"><b>Верно: Б.</b> В сети будет видно только соединение с «непонятным» адресом без предшествующего запроса — косвенный признак. Прямо ловится контролем целостности файла на самом хосте.</div>
             </div>
@@ -3817,9 +3905,9 @@ sudo tcpdump -i any -n port 53</code></pre>
               <span class="qn">Вопрос 6</span>
               <p class="qt">Почему организации блокируют DNS over HTTPS?</p>
               <div class="opts">
-                <button class="opt"><span class="mk">А</span><span>DoH работает медленнее обычного DNS</span></button>
+                <button class="opt" data-why="Скорость у DoH сопоставимая, а во многих сетях он даже быстрее. Дело не в ней."><span class="mk">А</span><span>DoH работает медленнее обычного DNS</span></button>
                 <button class="opt" data-ok="1"><span class="mk">Б</span><span>Запросы растворяются в HTTPS, и SOC теряет самый ценный источник данных</span></button>
-                <button class="opt"><span class="mk">В</span><span>DoH несовместим с корпоративными доменами</span></button>
+                <button class="opt" data-why="Технической несовместимости нет, внутренние имена настраиваются. Мешает не совместимость, а невидимость запросов для мониторинга."><span class="mk">В</span><span>DoH несовместим с корпоративными доменами</span></button>
               </div>
               <div class="exp"><b>Верно: Б.</b> Для пользователя в публичной сети DoH — благо, для мониторинга — потеря видимости. Вредонос может использовать его специально, чтобы уйти от логирования.</div>
             </div>
@@ -4117,9 +4205,9 @@ curl -A 'python-requests/2.31' -I https://example.com</code></pre>
               <span class="qn">Вопрос 1</span>
               <p class="qt">Трафик зашифрован. Узнает ли аналитик, на какой сайт ходил сотрудник?</p>
               <div class="opts">
-                <button class="opt"><span class="mk">А</span><span>Нет, HTTPS полностью скрывает всё, включая адрес</span></button>
+                <button class="opt" data-why="Имя сайта уходит открытым в первом же сообщении: сервер должен понять, чей сертификат предъявлять."><span class="mk">А</span><span>Нет, HTTPS полностью скрывает всё, включая адрес</span></button>
                 <button class="opt" data-ok="1"><span class="mk">Б</span><span>Как правило да — по SNI в ClientHello, который идёт открытым текстом</span></button>
-                <button class="opt"><span class="mk">В</span><span>Только если расшифровать трафик на прокси</span></button>
+                <button class="opt" data-why="Расшифровка нужна для содержимого. Имя запрошенного сайта видно и без неё."><span class="mk">В</span><span>Только если расшифровать трафик на прокси</span></button>
               </div>
               <div class="exp"><b>Верно: Б.</b> SNI передаётся до начала шифрования, потому что сервер должен понять, чей сертификат предъявлять. Скрыты путь, параметры и содержимое, но факт обращения к домену виден.</div>
             </div>
@@ -4128,9 +4216,9 @@ curl -A 'python-requests/2.31' -I https://example.com</code></pre>
               <span class="qn">Вопрос 2</span>
               <p class="qt">800 ответов 404 с одного адреса за минуту. Инцидент?</p>
               <div class="opts">
-                <button class="opt"><span class="mk">А</span><span>Да: 800 запросов в минуту — это отказ в обслуживании, надо блокировать адрес</span></button>
+                <button class="opt" data-why="800 запросов в минуту сервер не заметит: для отказа нужны объёмы на порядки больше. Это разведка, а не давление на ресурс."><span class="mk">А</span><span>Да: 800 запросов в минуту — это отказ в обслуживании, надо блокировать адрес</span></button>
                 <button class="opt" data-ok="1"><span class="mk">Б</span><span>Это перебор путей — разведка. Смотреть надо, не появился ли следом 200</span></button>
-                <button class="opt"><span class="mk">В</span><span>Нет: раз все ответы 404, ни один путь не найден и уязвимость не сработала</span></button>
+                <button class="opt" data-why="Вывод обрывается на полпути: серия 404 говорит лишь, что в этот раз не нашли. Смотреть надо, не появился ли дальше 200 и не вернулся ли тот же адрес позже."><span class="mk">В</span><span>Нет: раз все ответы 404, ни один путь не найден и уязвимость не сработала</span></button>
               </div>
               <div class="exp"><b>Верно: Б.</b> Ищут админки, бэкапы, забытые файлы; сканеры делают это по всему интернету круглосуточно. Вариант А путает разведку с DoS: 800 запросов в минуту сервер не заметит, объём для отказа нужен на порядки больше. Вариант В звучит логично, но обрывает вывод на полпути: серия 404 действительно означает, что <em>в этот раз</em> не нашли, — а проверять надо, не появился ли 200 дальше по логу и не вернулся ли тот же адрес позже.</div>
             </div>
@@ -4139,9 +4227,9 @@ curl -A 'python-requests/2.31' -I https://example.com</code></pre>
               <span class="qn">Вопрос 3</span>
               <p class="qt">Станция каждые 60 секунд шлёт одинаковый по объёму запрос на 443 к незнакомому домену. Диагноз?</p>
               <div class="opts">
-                <button class="opt"><span class="mk">А</span><span>Проверка обновлений операционной системы</span></button>
+                <button class="opt" data-why="Обновления проверяются заметно реже и у известных доменов производителя. Минутный интервал с точным постоянством на них не похож."><span class="mk">А</span><span>Проверка обновлений операционной системы</span></button>
                 <button class="opt" data-ok="1"><span class="mk">Б</span><span>Beaconing — хост опрашивает сервер управления</span></button>
-                <button class="opt"><span class="mk">В</span><span>Ничего сказать нельзя, трафик зашифрован</span></button>
+                <button class="opt" data-why="Вывод делается не по содержимому, а по ритму и размеру — их шифрование не скрывает."><span class="mk">В</span><span>Ничего сказать нельзя, трафик зашифрован</span></button>
               </div>
               <div class="exp"><b>Верно: Б.</b> Подозрительна не расшифровка, а сама периодичность и постоянный размер: человек так себя не ведёт. Обновления проверяются реже и к известным доменам.</div>
             </div>
@@ -4151,8 +4239,8 @@ curl -A 'python-requests/2.31' -I https://example.com</code></pre>
               <p class="qt">User-Agent «python-requests/2.31» с рабочей станции бухгалтера. О чём это?</p>
               <div class="opts">
                 <button class="opt" data-ok="1"><span class="mk">А</span><span>Запрос сделан скриптом, а не браузером — для такой машины аномалия</span></button>
-                <button class="opt"><span class="mk">Б</span><span>Пользователь установил новый браузер</span></button>
-                <button class="opt"><span class="mk">В</span><span>Это признак того, что заголовок подделан вручную</span></button>
+                <button class="opt" data-why="Браузеры так не представляются: python-requests — библиотека для скриптов."><span class="mk">Б</span><span>Пользователь установил новый браузер</span></button>
+                <button class="opt" data-why="Заголовок подделывают обычно наоборот, чтобы выглядеть браузером. Здесь он честно называет библиотеку."><span class="mk">В</span><span>Это признак того, что заголовок подделан вручную</span></button>
               </div>
               <div class="exp"><b>Верно: А.</b> Может быть легальная автоматизация, но на машине бухгалтера — повод проверить, что за процесс и кто его запустил. Заголовок действительно легко подделать, но само по себе это ничего не доказывает.</div>
             </div>
@@ -4161,9 +4249,9 @@ curl -A 'python-requests/2.31' -I https://example.com</code></pre>
               <span class="qn">Вопрос 5</span>
               <p class="qt">Почему кража cookie обходит двухфакторную аутентификацию?</p>
               <div class="opts">
-                <button class="opt"><span class="mk">А</span><span>Одноразовый код действует несколько минут, и его успевают переиспользовать</span></button>
+                <button class="opt" data-why="Это другая атака — перехват самого кода. Она не объясняет, почему доступ сохраняется днями после кражи."><span class="mk">А</span><span>Одноразовый код действует несколько минут, и его успевают переиспользовать</span></button>
                 <button class="opt" data-ok="1"><span class="mk">Б</span><span>Второй фактор проверяется один раз при входе, дальше сервер узнаёт пользователя по сессии</span></button>
-                <button class="opt"><span class="mk">В</span><span>Cookie можно расшифровать и достать из неё логин с паролем</span></button>
+                <button class="opt" data-why="В cookie обычно случайный идентификатор сессии, пароля внутри нет. Расшифровывать нечего — ценность в самом идентификаторе."><span class="mk">В</span><span>Cookie можно расшифровать и достать из неё логин с паролем</span></button>
               </div>
               <div class="exp"><b>Верно: Б.</b> Украв идентификатор сессии, атакующий получает уже аутентифицированное состояние — ни пароль, ни код ему не нужны. Вариант А описывает другую атаку (перехват самого кода) и не объясняет, почему доступ сохраняется днями. Вариант В неверен: в cookie обычно случайный идентификатор, никакого пароля внутри нет — и именно поэтому кража работает, расшифровывать нечего.</div>
             </div>
@@ -4172,9 +4260,9 @@ curl -A 'python-requests/2.31' -I https://example.com</code></pre>
               <span class="qn">Вопрос 6</span>
               <p class="qt">В логе прокси видишь <code>GET /download?file=../../../../etc/passwd</code>. Что делать?</p>
               <div class="opts">
-                <button class="opt"><span class="mk">А</span><span>Немедленно объявлять инцидент: сервер взломан</span></button>
+                <button class="opt" data-why="Попытка ещё не результат. Таких запросов сканеры делают тысячи в сутки, и почти все упираются в 403 или 404."><span class="mk">А</span><span>Немедленно объявлять инцидент: сервер взломан</span></button>
                 <button class="opt" data-ok="1"><span class="mk">Б</span><span>Посмотреть код ответа: попытка ещё не означает успех</span></button>
-                <button class="opt"><span class="mk">В</span><span>Игнорировать: такие запросы всегда блокируются автоматически</span></button>
+                <button class="opt" data-why="Автоматика ловит не всё, и слово «всегда» здесь ничем не подтверждено. Чем кончилось, показывает только ответ сервера."><span class="mk">В</span><span>Игнорировать: такие запросы всегда блокируются автоматически</span></button>
               </div>
               <div class="exp"><b>Верно: Б.</b> Это попытка обхода каталога. Если пришёл 403 или 404 — атака не удалась, таких попыток тысячи в сутки. Если 200 с непустым телом — вот это инцидент.</div>
             </div>
@@ -4854,10 +4942,10 @@ cG93ZXJzaGVsbCAtZW5jIFVoQmxZM1Z5...</code></pre>
               <p class="qt">Какие из этих наблюдений можно сделать по дампу с полностью зашифрованным TLS-трафиком?</p>
               <div class="opts">
                 <button class="opt" data-ok="1"><span class="mk">А</span><span>Имя запрошенного сайта</span></button>
-                <button class="opt"><span class="mk">Б</span><span>Путь и параметры URL</span></button>
+                <button class="opt" data-why="Путь и параметры — часть запроса, а он целиком внутри шифрованного канала. Открытым идёт только имя сайта."><span class="mk">Б</span><span>Путь и параметры URL</span></button>
                 <button class="opt" data-ok="1"><span class="mk">В</span><span>Объём переданного в каждую сторону</span></button>
                 <button class="opt" data-ok="1"><span class="mk">Г</span><span>Периодичность соединений</span></button>
-                <button class="opt"><span class="mk">Д</span><span>Содержимое отправленного POST-запроса</span></button>
+                <button class="opt" data-why="Тело запроса шифруется вместе со всем содержимым. Видно, что что-то отправлено и сколько, но не что именно."><span class="mk">Д</span><span>Содержимое отправленного POST-запроса</span></button>
               </div>
               <button class="btn qcheck">Проверить</button>
               <div class="exp"><b>Верно: А, В, Г.</b> Имя сайта видно в SNI, который передаётся открыто в ClientHello (если не включён ECH). Объём и ритм — это метаданные, их шифрование не скрывает. Путь, параметры и тело запроса лежат внутри шифрованного канала и недоступны.</div>
@@ -4867,9 +4955,9 @@ cG93ZXJzaGVsbCAtZW5jIFVoQmxZM1Z5...</code></pre>
               <span class="qn">Вопрос 2</span>
               <p class="qt">Ты снимал дамп с фильтром захвата <code>port 443</code>, а теперь нужно посмотреть DNS-запросы этого хоста. Что делать?</p>
               <div class="opts">
-                <button class="opt"><span class="mk">А</span><span>Применить фильтр отображения <code>dns</code> — данные в файле есть</span></button>
+                <button class="opt" data-why="Фильтр отображения работает по тому, что уже записано. DNS отсеялся фильтром захвата до записи — в файле его нет."><span class="mk">А</span><span>Применить фильтр отображения <code>dns</code> — данные в файле есть</span></button>
                 <button class="opt" data-ok="1"><span class="mk">Б</span><span>Ничего не сделать: DNS не попал в файл, нужен новый захват</span></button>
-                <button class="opt"><span class="mk">В</span><span>Использовать Follow UDP Stream для восстановления запросов</span></button>
+                <button class="opt" data-why="Follow собирает поток из пакетов файла. Если пакеты в файл не попали, собирать нечего."><span class="mk">В</span><span>Использовать Follow UDP Stream для восстановления запросов</span></button>
               </div>
               <div class="exp"><b>Верно: Б.</b> Фильтр захвата отбрасывает пакеты <em>до записи</em> — DNS работает на порту 53 и в файл не попал. Восстановить нечего. Именно поэтому фильтр захвата ставят только при реальной нехватке места.</div>
             </div>
@@ -4879,7 +4967,7 @@ cG93ZXJzaGVsbCAtZW5jIFVoQmxZM1Z5...</code></pre>
               <p class="qt">В HTTP-запросе из дампа видно <code>User-Agent: python-requests/2.28.1</code>. Какие выводы обоснованы?</p>
               <div class="opts">
                 <button class="opt" data-ok="1"><span class="mk">А</span><span>Запрос сформирован программой, а не браузером</span></button>
-                <button class="opt"><span class="mk">Б</span><span>Хост заражён — это доказано</span></button>
+                <button class="opt" data-why="Заголовок задаёт сам клиент: и вредонос прикинется браузером, и легальный скрипт выглядит так же. Это повод проверить процесс, а не доказательство."><span class="mk">Б</span><span>Хост заражён — это доказано</span></button>
                 <button class="opt" data-ok="1"><span class="mk">В</span><span>Заголовок мог быть подделан и сам по себе ничего не доказывает</span></button>
                 <button class="opt" data-ok="1"><span class="mk">Г</span><span>Для рабочей станции бухгалтерии это аномалия, требующая проверки процесса</span></button>
               </div>
@@ -5336,9 +5424,9 @@ Received: from mail.company.ru (внутренний сервер)
               <span class="qn">Вопрос 1</span>
               <p class="qt">Письмо с <code>spf=pass</code> и <code>dmarc=fail</code>. Что произошло?</p>
               <div class="opts">
-                <button class="opt"><span class="mk">А</span><span>Сбой на принимающем сервере: при spf=pass DMARC не может дать fail</span></button>
+                <button class="opt" data-why="Может: SPF проверяет адрес из конверта, а DMARC дополнительно требует, чтобы он совпадал с видимым From. Это самая частая картина подделки."><span class="mk">А</span><span>Сбой на принимающем сервере: при spf=pass DMARC не может дать fail</span></button>
                 <button class="opt" data-ok="1"><span class="mk">Б</span><span>SPF прошёл для домена из Return-Path, но он не совпадает с доменом в From</span></button>
-                <button class="opt"><span class="mk">В</span><span>Письмо изменили в пути, поэтому подпись не сошлась</span></button>
+                <button class="opt" data-why="Изменение в пути сломало бы DKIM — подпись по содержимому. На SPF оно не влияет."><span class="mk">В</span><span>Письмо изменили в пути, поэтому подпись не сошлась</span></button>
               </div>
               <div class="exp"><b>Верно: Б.</b> SPF проверяет envelope-адрес, DMARC дополнительно требует его совпадения с видимым <code>From</code>. Классическая картина подделки: у атакующего свой домен с корректным SPF, а в заголовке чужое имя. Изменение письма в пути ломало бы DKIM, а не SPF.</div>
             </div>
@@ -5348,10 +5436,10 @@ Received: from mail.company.ru (внутренний сервер)
               <p class="qt">Письмо прошло SPF, DKIM и DMARC. Какие утверждения корректны?</p>
               <div class="opts">
                 <button class="opt" data-ok="1"><span class="mk">А</span><span>Письмо действительно отправлено из инфраструктуры указанного домена</span></button>
-                <button class="opt"><span class="mk">Б</span><span>Содержимое письма безопасно</span></button>
+                <button class="opt" data-why="Проверки говорят о происхождении письма, а не о том, что внутри. Вложение и ссылка остаются непроверенными."><span class="mk">Б</span><span>Содержимое письма безопасно</span></button>
                 <button class="opt" data-ok="1"><span class="mk">В</span><span>Учётная запись отправителя могла быть скомпрометирована</span></button>
                 <button class="opt" data-ok="1"><span class="mk">Г</span><span>Письмо не изменялось в пути</span></button>
-                <button class="opt"><span class="mk">Д</span><span>Отправитель — тот человек, чьё имя стоит в поле From</span></button>
+                <button class="opt" data-why="Подтверждены домен и целостность, но не человек за клавиатурой: с угнанного ящика письмо уйдёт со всеми зелёными проверками."><span class="mk">Д</span><span>Отправитель — тот человек, чьё имя стоит в поле From</span></button>
               </div>
               <button class="btn qcheck">Проверить</button>
               <div class="exp"><b>Верно: А, В, Г.</b> Проверки подтверждают происхождение и целостность письма, но ничего не говорят ни о содержимом, ни о том, кто сидел за клавиатурой. При угоне ящика все три проверки будут зелёными — письмо ведь отправлено по-настоящему.</div>
@@ -5361,9 +5449,9 @@ Received: from mail.company.ru (внутренний сервер)
               <span class="qn">Вопрос 3</span>
               <p class="qt">Как правильно читать цепочку заголовков <code>Received</code>?</p>
               <div class="opts">
-                <button class="opt"><span class="mk">А</span><span>Сверху вниз: верхний добавил отправитель</span></button>
+                <button class="opt" data-why="Порядок обратный: каждый сервер дописывает свою строку сверху, поэтому верхняя — самая поздняя и ближняя к тебе."><span class="mk">А</span><span>Сверху вниз: верхний добавил отправитель</span></button>
                 <button class="opt" data-ok="1"><span class="mk">Б</span><span>Снизу вверх: нижние ближе к отправителю, верхним доверия больше</span></button>
-                <button class="opt"><span class="mk">В</span><span>Порядок произвольный, ориентироваться надо по времени</span></button>
+                <button class="opt" data-why="Порядок строгий. На время как раз полагаться нельзя: нижние строки писали серверы отправителя, и подделать их ничего не мешает."><span class="mk">В</span><span>Порядок произвольный, ориентироваться надо по времени</span></button>
               </div>
               <div class="exp"><b>Верно: Б.</b> Каждый сервер дописывает свою строку сверху. Значит, нижние строки писали серверы отправителя — их можно подделать, — а верхние добавил уже твой почтовый сервер, и им можно верить.</div>
             </div>
@@ -5372,9 +5460,9 @@ Received: from mail.company.ru (внутренний сервер)
               <span class="qn">Вопрос 4</span>
               <p class="qt">Почему архив с паролем, где пароль указан в тексте письма, — сам по себе признак?</p>
               <div class="opts">
-                <button class="opt"><span class="mk">А</span><span>Такие архивы повреждают почтовые серверы при пересылке</span></button>
+                <button class="opt" data-why="Архив с паролем пересылается как обычный файл, ничего не ломается. Проблема не в доставке, а в проверке."><span class="mk">А</span><span>Такие архивы повреждают почтовые серверы при пересылке</span></button>
                 <button class="opt" data-ok="1"><span class="mk">Б</span><span>Пароль мешает антивирусу на шлюзе распаковать и проверить содержимое, а пользователю не мешает</span></button>
-                <button class="opt"><span class="mk">В</span><span>Шифрованные архивы запрещены политиками большинства организаций</span></button>
+                <button class="opt" data-why="Где-то запрещены, где-то нет — от политики признак не зависит. Работает он потому, что защита внутрь заглянуть не может, а человек может."><span class="mk">В</span><span>Шифрованные архивы запрещены политиками большинства организаций</span></button>
               </div>
               <div class="exp"><b>Верно: Б.</b> Смысл приёма в асимметрии: защита не видит содержимое, а человек спокойно открывает по паролю из письма. Если бы отправитель заботился о безопасности, он передал бы пароль другим каналом — иначе шифрование бессмысленно.</div>
             </div>
@@ -5836,9 +5924,9 @@ CommonSecurityLog
               <span class="qn">Вопрос 1</span>
               <p class="qt">В алерте оба адреса приватные. Какой вывод делается первым?</p>
               <div class="opts">
-                <button class="opt"><span class="mk">А</span><span>Это атака из интернета на периметр</span></button>
+                <button class="opt" data-why="Из интернета пришёл бы публичный адрес источника. Два приватных означают, что трафик периметр не пересекал."><span class="mk">А</span><span>Это атака из интернета на периметр</span></button>
                 <button class="opt" data-ok="1"><span class="mk">Б</span><span>Трафик внутренний — источник уже внутри периметра</span></button>
-                <button class="opt"><span class="mk">В</span><span>Алерт ошибочный, приватные адреса не логируются</span></button>
+                <button class="opt" data-why="Внутренний трафик логируется наравне с внешним — иначе боковое перемещение никто бы и не увидел."><span class="mk">В</span><span>Алерт ошибочный, приватные адреса не логируются</span></button>
               </div>
               <div class="exp"><b>Верно: Б.</b> Направление — первое, что определяют. Приватный → приватный означает движение внутри сети, и если это не штатный трафик, речь о боковом перемещении: кто-то уже получил доступ.</div>
             </div>
@@ -5847,9 +5935,9 @@ CommonSecurityLog
               <span class="qn">Вопрос 2</span>
               <p class="qt">Почему <code>bytes 0</code> важнее, чем <code>count 1042</code>?</p>
               <div class="opts">
-                <button class="opt"><span class="mk">А</span><span>Потому что 1042 — небольшое число для сетевого трафика</span></button>
+                <button class="opt" data-why="Дело не в величине: тысяча соединений с переданными данными была бы обычной работой. Значение меняет именно нулевой объём."><span class="mk">А</span><span>Потому что 1042 — небольшое число для сетевого трафика</span></button>
                 <button class="opt" data-ok="1"><span class="mk">Б</span><span>Нулевой объём означает, что полезной работы не было: это разведка, а не использование служб</span></button>
-                <button class="opt"><span class="mk">В</span><span>Поле bytes всегда точнее, чем count</span></button>
+                <button class="opt" data-why="Точность полей ни при чём, они о разном: count — о скорости, bytes — о смысле происходившего."><span class="mk">В</span><span>Поле bytes всегда точнее, чем count</span></button>
               </div>
               <div class="exp"><b>Верно: Б.</b> Количество соединений говорит о скорости, а объём — о смысле. Тысяча соединений, в которых передали данные, — это работа. Тысяча с нулём байт — прощупывание.</div>
             </div>
@@ -5859,8 +5947,8 @@ CommonSecurityLog
               <p class="qt">С какого поля начинается разбор любого алерта межсетевого экрана?</p>
               <div class="opts">
                 <button class="opt" data-ok="1"><span class="mk">А</span><span><code>action</code>: заблокировано или прошло</span></button>
-                <button class="opt"><span class="mk">Б</span><span><code>severity</code>: уровень критичности из правила</span></button>
-                <button class="opt"><span class="mk">В</span><span><code>timestamp</code>: время события</span></button>
+                <button class="opt" data-why="Severity назначает автор правила заранее и вслепую: он не знает, сработала ли защита в этот раз."><span class="mk">Б</span><span><code>severity</code>: уровень критичности из правила</span></button>
+                <button class="opt" data-why="Время понадобится обязательно, но само по себе приоритет не меняет. Сначала — прошло событие или было заблокировано."><span class="mk">В</span><span><code>timestamp</code>: время события</span></button>
               </div>
               <div class="exp"><b>Верно: А.</b> Заблокированное событие означает, что защита сработала и угроза не реализовалась — приоритет резко ниже. Severity назначает автор правила, и оно часто не соответствует реальности.</div>
             </div>
@@ -5869,9 +5957,9 @@ CommonSecurityLog
               <span class="qn">Вопрос 4</span>
               <p class="qt">Два алерта с одного хоста за ночь: сканирование сети и выгрузка 4,8 ГБ наружу. Как это трактовать?</p>
               <div class="opts">
-                <button class="opt"><span class="mk">А</span><span>Разбирать каждый отдельно, связи между ними нет</span></button>
+                <button class="opt" data-why="По отдельности каждый алерт списывается на легальную активность. Смысл появляется в связке и в порядке, в котором они шли."><span class="mk">А</span><span>Разбирать каждый отдельно, связи между ними нет</span></button>
                 <button class="opt" data-ok="1"><span class="mk">Б</span><span>Как цепочку: разведка → доступ → вынос данных. Вместе они гораздо весомее</span></button>
-                <button class="opt"><span class="mk">В</span><span>Как две независимые ошибки конфигурации</span></button>
+                <button class="opt" data-why="Ошибка конфигурации не выбирает такую последовательность: сначала разведка, следом вынос данных с того же хоста за ту же ночь."><span class="mk">В</span><span>Как две независимые ошибки конфигурации</span></button>
               </div>
               <div class="exp"><b>Верно: Б.</b> По отдельности каждый можно было списать на легальную активность. Последовательность с одного хоста за короткое время — почти всегда говорящая. Поэтому историю хоста смотрят всегда.</div>
             </div>
@@ -5880,9 +5968,9 @@ CommonSecurityLog
               <span class="qn">Вопрос 5</span>
               <p class="qt">Что не так с эскалацией «сработал алерт про скан, посмотрите»?</p>
               <div class="opts">
-                <button class="opt"><span class="mk">А</span><span>Слишком короткая, надо приложить полный лог</span></button>
+                <button class="opt" data-why="Дело не в длине. Полный лог прикладывают ссылкой, а не вместо описания: читать его за тебя никто не станет."><span class="mk">А</span><span>Слишком короткая, надо приложить полный лог</span></button>
                 <button class="opt" data-ok="1"><span class="mk">Б</span><span>В ней пересказ заголовка вместо фактов, проверенных альтернатив и предложения по действиям</span></button>
-                <button class="opt"><span class="mk">В</span><span>Ничего, L2 сам разберётся быстрее</span></button>
+                <button class="opt" data-why="L2 начнёт с того, что первая линия уже сделала, и потеряет время. Эскалация нужна, чтобы передать проделанную работу, а не поставить в известность."><span class="mk">В</span><span>Ничего, L2 сам разберётся быстрее</span></button>
               </div>
               <div class="exp"><b>Верно: Б.</b> Эскалация должна содержать: что произошло, когда и в каком объёме, почему это важно для <em>этих</em> хостов, какие штатные объяснения уже отброшены и что предлагается сделать. Полный лог прикладывают ссылкой, а не вместо описания.</div>
             </div>
@@ -5891,9 +5979,9 @@ CommonSecurityLog
               <span class="qn">Вопрос 6</span>
               <p class="qt">Хост каждые 60 секунд шлёт одинаковые по размеру запросы. Трафик зашифрован. Можно ли вынести вердикт?</p>
               <div class="opts">
-                <button class="opt"><span class="mk">А</span><span>Нет, без расшифровки содержимого вывод сделать нельзя</span></button>
+                <button class="opt" data-why="Вердикт держится на метаданных: ритм и постоянный размер видны и в зашифрованном трафике."><span class="mk">А</span><span>Нет, без расшифровки содержимого вывод сделать нельзя</span></button>
                 <button class="opt" data-ok="1"><span class="mk">Б</span><span>Да: периодичность и постоянный размер — достаточные признаки beaconing</span></button>
-                <button class="opt"><span class="mk">В</span><span>Да, но только если известен домен назначения</span></button>
+                <button class="opt" data-why="Домен добавит контекста, но признаки автоматики уже налицо. К незнакомому домену beaconing не становится менее подозрительным."><span class="mk">В</span><span>Да, но только если известен домен назначения</span></button>
               </div>
               <div class="exp"><b>Верно: Б.</b> Метаданных достаточно. Шифрование скрывает содержимое, но не ритм обмена — а именно он выдаёт автоматику. Отпечаток JA3, если он совпадает с известным, превращает гипотезу в уверенность.</div>
             </div>
@@ -6002,6 +6090,8 @@ CommonSecurityLog
     if (st.seen.m8) { st.seen.m10 = true; delete st.seen.m8; }
     Object.keys(st.quiz).forEach(function (k) {
       if (k.indexOf('m8_') === 0) { st.quiz['m10_' + k.slice(3)] = st.quiz[k]; delete st.quiz[k]; }
+      // Старые записи 'no' больше не значат «отвечено»: неверный ответ теперь не сохраняется.
+      if (st.quiz[k] === 'no') delete st.quiz[k];
     });
     st.v = 4;
   }
@@ -6009,15 +6099,18 @@ CommonSecurityLog
     st.ts = Date.now();
     var body = JSON.stringify(st);
     try { localStorage.setItem(KEY, body); } catch (e) {}
-    /* в режиме приложения пишем на диск — от настроек браузера это не зависит */
+    /* в режиме приложения пишем на диск — от настроек браузера это не зависит.
+       Отказ гасим через .catch: try/catch ловит только синхронную ошибку, а сеть отваливается
+       позже, и без него упавший сервер забивает консоль необработанными отказами промисов. */
     if (APP) {
       try {
-        fetch('/progress', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: body });
+        fetch('/progress', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: body })
+          .catch(function () {});
       } catch (e) {}
     }
   }
   if (APP) {
-    setInterval(function () { try { fetch('/alive'); } catch (e) {} }, 60000);
+    setInterval(function () { try { fetch('/alive').catch(function () {}); } catch (e) {} }, 60000);
   }
 
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -6135,15 +6228,43 @@ CommonSecurityLog
   });
 
   /* ---- отметка «пройден» ---- */
+  /* Отметить модуль пройденным можно, только когда решены все его вопросы: с тех пор как
+     неверный ответ перестал сохраняться, галочка сама по себе ничего не подтверждает.
+     Уже отмеченные модули не разотмечаются задним числом, но снятую галочку вернуть
+     получится только через тесты. */
   document.addEventListener('change', function (e) {
     var f = e.target.closest('[data-fin]');
     if (!f) return;
     st.done['m' + f.getAttribute('data-fin')] = f.checked;
-    save(); paint();
+    save(); syncFin(); paint();
   });
+  function quizLeft(mod) {
+    var set = document.querySelector('.quizset[data-quiz="' + mod + '"]');
+    if (!set) return 0;
+    var left = 0;
+    [].forEach.call(set.querySelectorAll('.quiz'), function (q) {
+      if (st.quiz['m' + mod + '_' + q.getAttribute('data-i')] !== 'ok') left++;
+    });
+    return left;
+  }
+  function finHint(n) {
+    var t = n % 10, h = n % 100;
+    var w = (t === 1 && h !== 11) ? 'вопрос'
+          : (t >= 2 && t <= 4 && (h < 12 || h > 14)) ? 'вопроса' : 'вопросов';
+    return 'сначала решите ' + n + ' ' + w + ' теста';
+  }
   function syncFin() {
     [].forEach.call(document.querySelectorAll('[data-fin]'), function (f) {
-      f.checked = !!st.done['m' + f.getAttribute('data-fin')];
+      var mod = f.getAttribute('data-fin');
+      var done = !!st.done['m' + mod];
+      var left = quizLeft(mod);
+      f.checked = done;
+      f.disabled = !done && left > 0;
+      var wrap = f.parentNode;
+      wrap.classList.toggle('locked', f.disabled);
+      var hint = wrap.querySelector('.fin-hint');
+      if (!hint) { hint = document.createElement('span'); hint.className = 'fin-hint'; wrap.appendChild(hint); }
+      hint.textContent = f.disabled ? finHint(left) : '';
     });
   }
 
@@ -6160,6 +6281,7 @@ CommonSecurityLog
       });
       scoreEl.textContent = right + ' / ' + qs.length;
       scoreEl.classList.toggle('full', right === qs.length && ans === qs.length);
+      syncFin();   /* решённый вопрос может открыть отметку «модуль пройден» */
     }
     qs.forEach(function (q) {
       var key = 'm' + mod + '_' + q.getAttribute('data-i');
@@ -6187,8 +6309,48 @@ CommonSecurityLog
         });
         var btn = q.querySelector('.qcheck');
         if (btn) btn.style.display = '';
+        clearWhy();
       }
-      function applyStored() { unlock(); if (st.quiz[key]) lock(null); }
+      /* Пояснение, почему неверен именно выбранный вариант. Текст лежит в data-why самого
+         варианта; правильный при этом не называется, вопрос остаётся открытым. Пояснения
+         копятся по мере попыток и не сохраняются: после перезахода вопрос снова чистый —
+         как и сам неверный ответ. */
+      var whyBox = null;
+      function whys() {
+        if (!whyBox) {
+          whyBox = document.createElement('div');
+          whyBox.className = 'whys';
+          q.querySelector('.opts').insertAdjacentElement('afterend', whyBox);
+        }
+        return whyBox;
+      }
+      function addWhy(mark, html, plain) {
+        var box = whys();
+        if (box.querySelector('[data-w="' + mark + '"]')) return;
+        var p = document.createElement('p');
+        p.setAttribute('data-w', mark);
+        if (plain) p.textContent = html; else p.innerHTML = html;
+        box.appendChild(p);
+        box.classList.add('on');
+      }
+      function showWhy(o) {
+        var why = o.getAttribute('data-why');
+        if (!why) return;
+        var mk = o.querySelector('.mk').textContent;
+        addWhy(mk, '<b>' + mk + '</b>' + why);
+      }
+      function dropWhy(mark) {
+        if (!whyBox) return;
+        var p = whyBox.querySelector('[data-w="' + mark + '"]');
+        if (p) p.remove();
+        if (!whyBox.children.length) whyBox.classList.remove('on');
+      }
+      function clearWhy() { if (whyBox) { whyBox.innerHTML = ''; whyBox.classList.remove('on'); } }
+      /* Закрываем вопрос только когда он решён. Раньше закрывался любой отвеченный, а lock()
+         без списка выбранного подсвечивал правильный вариант и не помечал ошибку — после
+         перезахода неверный ответ выглядел неотличимо от верного. Теперь неверный ответ
+         просто не сохраняется, и вопрос возвращается открытым. */
+      function applyStored() { unlock(); if (st.quiz[key] === 'ok') lock(null); }
 
       REPAINT.push(applyStored);
       applyStored();
@@ -6197,6 +6359,7 @@ CommonSecurityLog
         opts.forEach(function (o) {
           o.addEventListener('click', function () {
             if (q.classList.contains('answered')) return;
+            o.classList.remove('wrong');     // после неудачной попытки набор можно пересобрать
             o.classList.toggle('pick');
           });
         });
@@ -6208,16 +6371,37 @@ CommonSecurityLog
             if (!picked.length) return;
             var need = opts.filter(function (o) { return o.hasAttribute('data-ok'); });
             var exact = picked.length === need.length && picked.every(function (o) { return o.hasAttribute('data-ok'); });
-            st.quiz[key] = exact ? 'ok' : 'no'; save();
-            lock(picked); upd();
+            if (exact) { st.quiz[key] = 'ok'; save(); lock(picked); upd(); return; }
+            /* см. одиночный выбор: неверный набор не закрывает вопрос и не выдаёт ответ */
+            picked.forEach(function (o) { o.classList.remove('pick'); o.classList.add('wrong'); });
+            var bad = picked.filter(function (o) { return !o.hasAttribute('data-ok'); });
+            bad.forEach(showWhy);
+            /* Набор бывает неверным и без единого ошибочного варианта — просто неполным;
+               говорим об этом прямо, но какого варианта не хватает, не подсказываем.
+               Заметка живёт только пока ошибочных вариантов не выбирали: иначе она
+               противоречила бы соседней строке разбора. */
+            if (bad.length) dropWhy('+');
+            else addWhy('+', 'Ошибочных среди отмеченных нет — набор неполный.', true);
+            delete st.quiz[key]; save(); upd();
           });
         }
       } else {
         opts.forEach(function (o) {
           o.addEventListener('click', function () {
             if (q.classList.contains('answered')) return;
-            st.quiz[key] = o.hasAttribute('data-ok') ? 'ok' : 'no'; save();
-            lock([o]); upd();
+            if (o.hasAttribute('data-ok')) {
+              st.quiz[key] = 'ok'; save();
+              lock([o]); upd();
+              return;
+            }
+            /* Неверный ответ не закрывает вопрос и не показывает правильный: гасим
+               выбранный вариант, объясняем, чем плох именно он, и даём пробовать дальше.
+               Модуль не отметить пройденным, пока все вопросы не решены, поэтому
+               подсказывать ответ незачем. */
+            o.classList.add('wrong');
+            o.disabled = true;
+            showWhy(o);
+            delete st.quiz[key]; save(); upd();
           });
         });
       }
@@ -6726,7 +6910,7 @@ CommonSecurityLog
     ['URG','tr',['URG'],'Флаг TCP срочных данных. Практически не используется, поэтому его появление в трафике — само по себе повод присмотреться: так работают «тихие» сканеры.'],
     ['SYN-скан','tr',['SYN-скан','half-open'],'Сканирование без завершения рукопожатия: отправил SYN, получил ответ, сразу оборвал. Приложение такого не видит, а межсетевой экран и системы обнаружения видят.'],
     ['Xmas-скан','tr',['Xmas','NULL-скан'],'Сканирование пакетами с необычными сочетаниями флагов. Опирается на строгое следование стандарту и потому бесполезно против Windows, который отвечает RST на любой порт.'],
-    ['круг обмена','tr',['круг обмена','RTT'],'Время, за которое пакет доходит до собеседника и возвращается. В нём меряют цену рукопожатий: HTTPS тратит два круга, QUIC — один.'],
+    ['круг обмена','tr',['круг обмена','RTT','задержк'],'Время, за которое пакет доходит до собеседника и возвращается. В нём меряют цену рукопожатий: HTTPS тратит два круга, QUIC — один. Скачок задержки без потери пакетов означает перегруженный участок по дороге, а не обрыв.'],
 
     // ---------- имена и веб, продолжение ----------
     ['зона DNS','name',['зона','зоны DNS'],'Часть пространства имён, за которую отвечает конкретный владелец и его серверы. Иерархия зон и позволяет обойтись без единой всемирной базы имён.'],
@@ -6800,7 +6984,47 @@ CommonSecurityLog
     ['КИИ','soc',['КИИ'],'Критическая информационная инфраструктура: системы в энергетике, транспорте, финансах, здравоохранении и связи, сбой которых бьёт по стране, а не по одной компании.'],
     ['персональные данные','soc',['персональн','ПДн'],'Любые сведения, относящиеся к определённому человеку. Их обработка регулируется отдельно, а утечка — самый частый повод для проверок и штрафов.'],
     ['категорирование','soc',['категорирован'],'Процедура определения значимости объекта критической инфраструктуры. От присвоенной категории зависит, какие меры защиты обязательны.'],
-    ['аттестация','soc',['аттестац'],'Официальное подтверждение, что информационная система соответствует требованиям по защите. Процедура формальная, но без неё систему нельзя вводить в эксплуатацию.']
+    ['аттестация','soc',['аттестац'],'Официальное подтверждение, что информационная система соответствует требованиям по защите. Процедура формальная, но без неё систему нельзя вводить в эксплуатацию.'],
+
+    // ---------- дополнение 15.08.2026 ----------
+    ['RFC','base',['RFC'],'Документ, в котором записан интернет-протокол или соглашение: RFC 791 — про IP, RFC 5321 — про SMTP. Номер RFC часто единственный способ ответить на вопрос, обязано устройство вести себя именно так или это вольность разработчика.'],
+    ['Wi-Fi','base',['Wi-Fi','беспроводн'],'Беспроводной аналог Ethernet: те же кадры и те же MAC-адреса, другая физика. Для разбора трафика разницы почти нет, но в эфире соседний хост слышит больше, чем в проводном сегменте, а точка доступа ведёт собственный журнал подключений.'],
+    ['полоса пропускания','base',['полос','пропускная способност'],'Сколько данных канал пропускает за секунду. Не путать с задержкой: широкий канал с большой задержкой ощущается медленным, а узкий и быстрый — отзывчивым. Резкий выход за обычную полосу — повод посмотреть, чем именно её заняли.'],
+    ['связность','base',['связност'],'Есть ли вообще путь между двумя адресами. Проверяется снизу вверх: сначала связность, потом имена, потом порты и приложения. Пока связности нет, разбираться с сертификатом или DNS бессмысленно — будешь чинить не то.'],
+    ['base64','base',['base64'],'Способ записать любые данные печатными символами. Это кодирование, а не шифрование: раскодировать может кто угодно и без ключа. Встречается в письмах, в токенах и в командах вредоносов, где им прикрывают полезную нагрузку от беглого взгляда.'],
+    ['OUI','net',['OUI'],'Первые три байта MAC-адреса — номер производителя оборудования. По ним видно, чья это сетевая карта: принтер известной марки с MAC-адресом виртуальной машины сразу вызывает вопросы.'],
+    ['статистическое мультиплексирование','net',['мультиплексирован','мультиплексированием'],'Общий канал делится между всеми не поровну, а по факту спроса: кто сейчас передаёт, тот и занимает. Отсюда переменная задержка, очереди и потери на пиках — они заложены в конструкцию сети, а не являются поломкой.'],
+    ['журнал трансляций','net',['трансляц'],'Записи NAT о том, какой внутренний адрес и порт занимали внешний адрес и порт в конкретную секунду. Без них публичный адрес организации в алерте не сопоставить с человеком: сотни пользователей выглядят одинаково.'],
+    ['SNAT и DNAT','net',['SNAT','DNAT','проброс порт'],'Две стороны трансляции адресов. SNAT подменяет адрес источника — так вся организация выходит наружу через один публичный адрес. DNAT подменяет адрес назначения — так внутренняя служба становится видна из интернета; именно проброс порта чаще всего и объясняет неожиданное подключение снаружи.'],
+    ['состояния сокета','tr',['LISTEN','SYN-SENT','SYN-RECV','CLOSE-WAIT'],'Стадии жизни соединения, которые показывают ss и netstat: LISTEN — служба ждёт входящих, SYN-SENT и SYN-RECV — рукопожатие не завершено, CLOSE-WAIT — сторона закрыла соединение, а программа его так и не отпустила. Массовые SYN-RECV означают сканирование или SYN-flood.'],
+    ['5-tuple','tr',['5-tuple','пятёрка полей'],'Пятёрка полей, которой однозначно описывается соединение: адрес и порт источника, адрес и порт назначения, протокол. По ней события из разных источников сшиваются в одно соединение при разборе.'],
+    ['FTP','tr',['FTP'],'Старый протокол передачи файлов, порты 20 и 21. Логин и пароль идут открытым текстом, поэтому внутри организаций его давно вытеснили SFTP и HTTPS. Живой FTP наружу — обычно либо забытая система, либо канал выноса данных.'],
+    ['Telnet','tr',['Telnet'],'Терминальный доступ без шифрования, порт 23. Всё, включая пароль, передаётся открытым текстом. Сегодня встречается в основном на сетевом оборудовании и промышленных устройствах, и каждая такая находка требует отдельного разговора с владельцем.'],
+    ['NTP','tr',['NTP'],'Протокол синхронизации времени, порт 123 UDP. Для мониторинга критичен: если часы на источниках разъехались, события выстроятся в неверном порядке и цепочку атаки будет не собрать. Ещё NTP используют для усиления DDoS.'],
+    ['DoT','name',['DoT','DNS over TLS'],'DNS поверх TLS, отдельный порт 853. От DoH отличается тем, что не растворяется в общем потоке HTTPS: соединение видно отдельно и при необходимости закрывается на порту.'],
+    ['stub-резолвер','name',['stub-резолвер','stub resolver','stub'],'Крошечный клиент DNS внутри операционной системы: сам ничего не ищет, а переспрашивает у настроенного сервера. Его настройки показывают ipconfig /all и resolvectl status — и их же подменяет вредонос, чтобы увести разрешение имён на свой сервер.'],
+    ['WPAD','name',['WPAD'],'Механизм автоматического поиска прокси: система спрашивает у сети, где взять настройки. Кто ответит первым, тот и станет прокси для всего трафика машины, поэтому wpad — классическая цель подмены во внутренней сети.'],
+    ['Happy Eyeballs','name',['Happy Eyeballs'],'Приём браузеров: соединение по IPv6 и по IPv4 пробуют почти одновременно, побеждает то, что ответило первым. Из-за него один и тот же сайт в логах виден то по одному протоколу, то по другому — это не аномалия.'],
+    ['X-Forwarded-For','name',['X-Forwarded-For'],'Заголовок, в который прокси или балансировщик кладёт исходный адрес клиента. Без него у всех запросов в логе веб-сервера будет один адрес — самого прокси. Клиент может подставить его сам, поэтому верить заголовку можно только от своего оборудования.'],
+    ['Referer','name',['Referer'],'Заголовок с адресом страницы, откуда пришёл переход. Помогает восстановить путь пользователя: с какого письма или сайта он попал на фишинговую страницу. Пишется с одной r — опечатка закреплена в стандарте навсегда.'],
+    ['атрибуты cookie','name',['HttpOnly','SameSite','атрибут cookie','атрибуты cookie'],'Флаги, ограничивающие сессионную cookie: HttpOnly запрещает читать её из JavaScript, Secure — отправлять по незашифрованному каналу, SameSite ограничивает отправку с чужих сайтов. Их отсутствие делает кражу сессии заметно проще.'],
+    ['MSA','mail',['MSA'],'Сервер, которому письмо сдаёт почтовая программа пользователя, порт 587 и обязательная аутентификация. При разборе это важно: письмо, ушедшее через MSA, отправлено из-под конкретной учётной записи, а не просто откуда-то из сети.'],
+    ['MDA','mail',['MDA'],'Последнее звено доставки: раскладывает принятое письмо по ящикам и папкам. На этом этапе срабатывают правила сортировки и пересылки — те самые, которые злоумышленник любит оставить после угона ящика.'],
+    ['Message-ID','mail',['Message-ID'],'Уникальный идентификатор письма. По нему письмо ищется в журналах почтового сервера и связываются копии у разных получателей — с него удобно начинать поиск всех, кому пришла та же рассылка.'],
+    ['X-Mailer','mail',['X-Mailer'],'Необязательный заголовок с названием программы, которой отправлено письмо. Подделывается тривиально, но в массовых рассылках часто честно выдаёт самописный скрипт вместо почтового клиента.'],
+    ['Authentication-Results','mail',['Authentication-Results'],'Заголовок, куда принимающий сервер записывает итоги проверок SPF, DKIM и DMARC. Первое, что читают при разборе письма. Показывает, что именно проверялось и с каким результатом, — но не то, что письмо безопасно.'],
+    ['гомоглиф','mail',['гомоглиф'],'Символ, на вид неотличимый от другого: rn вместо m, латинская a вместо русской. На нём держится подмена домена в фишинге — cornpany.ru читается как company.ru. Проверять адрес надо копированием в текст, а не глазами.'],
+    ['banner grabbing','mal',['banner grabbing'],'Подключиться к порту и прочитать, чем представится служба: название, версия, иногда операционная система. Дешёвая разведка и первый шаг к подбору эксплойта; в логах выглядит как короткое соединение почти без обмена данными.'],
+    ['living off trusted sites','mal',['living off trusted sites'],'Управление вредоносом через доверенные площадки: GitHub, Pastebin, облачные диски, мессенджеры. Соединение уходит на честный домен с честным сертификатом, и репутация адреса тут не поможет — смотреть надо, кто именно и в каком ритме туда ходит.'],
+    ['Cobalt Strike','mal',['Cobalt Strike','Cobalt'],'Коммерческий инструмент для имитации атак, давно ставший рабочим средством и у злоумышленников. Его агент даёт настраиваемый beaconing и профиль трафика под легитимный сайт, поэтому ловится не сигнатурой, а ритмом обмена.'],
+    ['репутация адреса','soc',['репутац'],'Накопленная история адреса или домена: замечен ли в рассылках, в хостинге вредоносов, в сканировании. Быстрый контекст для триажа, но не приговор: адреса облаков и провайдеров переиспользуются, и вчерашний плохой сегодня уже чужой.'],
+    ['VPS','soc',['VPS'],'Арендованный виртуальный сервер. Дешёвый и одноразовый, поэтому его часто берут под сервер управления или фишинговую страницу. Соединение к свежему VPS мелкого хостера — слабый сам по себе, но полезный в связке признак.'],
+    ['фильтр захвата','tool',['фильтр захват','фильтра захват','фильтром захват','capture filter'],'Фильтр, решающий, какие пакеты вообще писать в файл. Работает до записи, поэтому отброшенное им не восстановить никаким разбором. Ставится только при реальной нехватке места на диске.'],
+    ['фильтр отображения','tool',['фильтр отображени','фильтра отображени','фильтром отображени','display filter'],'Фильтр, прячущий лишнее в уже снятом дампе. Ничего не удаляет: снял ограничение — пакеты снова на месте. Именно им пользуются при разборе, а фильтр захвата трогают редко.'],
+    ['сетевой TAP','tool',['TAP'],'Устройство, включённое в разрыв кабеля и отдающее копию трафика на анализ. В отличие от SPAN-порта не зависит от загрузки коммутатора и не теряет пакеты на пиках, но требует физического доступа к линии.'],
+    ['Emerging Threats','tool',['Emerging Threats'],'Открытый набор правил для Suricata, который используют почти все. При разборе это стоит помнить: сработало правило из общего набора, а не написанное под вашу сеть, поэтому ложные срабатывания в нём — норма.'],
+    ['PID','tool',['PID'],'Номер процесса в операционной системе. Связывает сетевое соединение с конкретной программой: ss -tulnp и Get-NetTCPConnection показывают порт вместе с PID, а по нему уже находится сам исполняемый файл.'],
+    ['WHOIS','tool',['WHOIS'],'Справка о том, кому выданы домен или блок адресов и когда. Дата регистрации домена — один из самых полезных признаков в фишинге: созданный неделю назад домен, притворяющийся банком, говорит сам за себя.']
   ];
 
   /* ---- построение словаря ---- */
@@ -6809,6 +7033,74 @@ CommonSecurityLog
     g.key = 'g' + i;
     GMAP[g.key] = g;
   });
+
+  /* ---- поиск ----
+     Раньше искали простой подстрокой сразу по названию, определению и основам, а список
+     оставался разложенным по категориям. Запрос «порт» выдавал полсотни статей, где слово
+     просто попалось в тексте определения, и сам «порт» терялся где-то посередине.
+     Теперь совпадения взвешиваются: точное название → начало названия → основа → слово
+     внутри названия → определение. По определениям ищем только от трёх букв, иначе «ip»
+     подсвечивает весь словарь. Несколько слов в запросе — все должны совпасть. */
+  function gnorm(s) { return String(s == null ? '' : s).toLowerCase().replace(/ё/g, 'е'); }
+  function gesc(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+  function isLetter(ch) { return !!ch && /[a-zа-я0-9]/.test(ch); }
+  function atWordStart(hay, tok) {
+    var i = hay.indexOf(tok);
+    while (i !== -1) {
+      if (i === 0 || !isLetter(hay.charAt(i - 1))) return true;
+      i = hay.indexOf(tok, i + 1);
+    }
+    return false;
+  }
+  /* END объявлен ниже, вместе с разметкой терминов; собираем регулярку при первом поиске,
+     то есть заведомо после того, как весь скрипт выполнился */
+  var ENDRX = null;
+  function endOk(tail) {
+    if (!tail) return true;
+    if (!ENDRX) ENDRX = new RegExp('^' + END + '$');
+    return ENDRX.test(tail);
+  }
+  function gscore(g, tok) {
+    var name = gnorm(g[0]);
+    if (name === tok) return 1000;
+    if (name.indexOf(tok) === 0) return 600;
+    var stems = g[2], i, s;
+    for (i = 0; i < stems.length; i++) {
+      s = gnorm(stems[i]);
+      if (s.indexOf(tok) === 0) return 400;                 // недописанный запрос: «маршр…»
+      /* запрос — та же основа с окончанием: «маршрутизаторы» → «маршрутизатор».
+         Хвост сверяем с тем же списком END, что и разметка терминов в тексте, иначе
+         «портфель» сошёл бы за «порт». Короткие основы в эту сторону не работают. */
+      if (s.length >= 4 && tok.indexOf(s) === 0 && endOk(tok.slice(s.length))) return 400;
+    }
+    if (atWordStart(name, tok)) return 300;
+    if (name.indexOf(tok) !== -1) return 150;
+    if (tok.length >= 3 && atWordStart(gnorm(g[3]), tok)) return 40;
+    return 0;
+  }
+  /* Подсветка совпадений. Нормализация не меняет длину строки, поэтому позиции из
+     нормализованного текста годятся для исходного; если длина всё же разошлась —
+     показываем текст как есть. */
+  function ghi(text, toks) {
+    var low = gnorm(text);
+    if (!toks.length || low.length !== text.length) return gesc(text);
+    var marks = [], i, k;
+    toks.forEach(function (t) {
+      k = low.indexOf(t);
+      while (k !== -1) { marks.push([k, k + t.length]); k = low.indexOf(t, k + 1); }
+    });
+    if (!marks.length) return gesc(text);
+    marks.sort(function (a, b) { return a[0] - b[0]; });
+    var out = '', pos = 0;
+    for (i = 0; i < marks.length; i++) {
+      if (marks[i][0] < pos) { if (marks[i][1] > pos) marks[i][0] = pos; else continue; }
+      out += gesc(text.slice(pos, marks[i][0])) + '<mark>' + gesc(text.slice(marks[i][0], marks[i][1])) + '</mark>';
+      pos = marks[i][1];
+    }
+    return out + gesc(text.slice(pos));
+  }
+  var GCATNAME = {};
+  GCATS.forEach(function (c) { GCATNAME[c[0]] = c[1]; });
 
   function glossRender(filter, jump) {
     var list = document.getElementById('glist');
@@ -6836,23 +7128,46 @@ CommonSecurityLog
       });
     }
 
+    var toks = gnorm(q).split(/\s+/).filter(function (t) { return t; });
+    cats.style.display = toks.length ? 'none' : '';
+
     var shown = 0, html = '';
-    GCATS.forEach(function (c) {
-      var items = GLOSS.filter(function (g) {
-        if (g[1] !== c[0]) return false;
-        if (!q) return true;
-        return (g[0] + ' ' + g[3] + ' ' + g[2].join(' ')).toLowerCase().indexOf(q) !== -1;
+    if (!toks.length) {
+      GCATS.forEach(function (c) {
+        var items = GLOSS.filter(function (g) { return g[1] === c[0]; });
+        if (!items.length) return;
+        shown += items.length;
+        html += '<div class="gsec" id="gs-' + c[0] + '"><h3>' + c[1] + '</h3>' +
+          items.map(function (g) {
+            return '<div class="gitem" id="' + g.key + '"><b>' + gesc(g[0]) + '</b><p>' + gesc(g[3]) + '</p></div>';
+          }).join('') + '</div>';
       });
-      if (!items.length) return;
-      shown += items.length;
-      html += '<div class="gsec" id="gs-' + c[0] + '"><h3>' + c[1] + '</h3>' +
-        items.map(function (g) {
-          return '<div class="gitem" id="' + g.key + '"><b>' + g[0] + '</b><p>' + g[3] + '</p></div>';
-        }).join('') + '</div>';
-    });
+    } else {
+      var found = [];
+      GLOSS.forEach(function (g, i) {
+        var sum = 0;
+        for (var t = 0; t < toks.length; t++) {
+          var s = gscore(g, toks[t]);
+          if (!s) return;            // не совпало хотя бы одно слово запроса — статья не подходит
+          sum += s;
+        }
+        found.push({ g: g, s: sum, i: i });
+      });
+      /* при равном весе выше та статья, чьё название короче: точнее по смыслу */
+      found.sort(function (a, b) {
+        return b.s - a.s || a.g[0].length - b.g[0].length || a.i - b.i;
+      });
+      shown = found.length;
+      html = found.length ? '<div class="gsec">' + found.map(function (f) {
+        return '<div class="gitem" id="' + f.g.key + '"><i class="gtag">' + GCATNAME[f.g[1]] + '</i>' +
+          '<b>' + ghi(f.g[0], toks) + '</b><p>' + ghi(f.g[3], toks) + '</p></div>';
+      }).join('') + '</div>' : '';
+    }
 
     list.innerHTML = html || '<p class="gempty">Ничего не нашлось. Попробуй короче — например «arp» вместо «arp-спуфинг».</p>';
-    cnt.textContent = shown + ' из ' + GLOSS.length;
+    cnt.textContent = toks.length
+      ? (shown ? 'найдено ' + shown : 'ничего не нашлось')
+      : shown + ' из ' + GLOSS.length;
 
     if (jump) {
       var el = document.getElementById(jump);
@@ -6938,7 +7253,11 @@ CommonSecurityLog
   function markTerms(root) {
     if (!root || root.dataset.marked) return;
     root.dataset.marked = '1';
-    var used = {};
+    /* Отметка «уже встречался» общая на весь учебник и сохраняется в прогресс.
+       Раньше она была локальной для модуля, и одно и то же слово подчёркивалось заново
+       в начале каждого модуля — на длинной дистанции это рябь, а не подсказка.
+       Подсказка при наведении работает у всех вхождений, подчёркивание — только у первого. */
+    var used = (st.tseen = st.tseen || {}), fresh = false;
     var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
       acceptNode: function (n) {
         if (!n.nodeValue || n.nodeValue.length < 3) return NodeFilter.FILTER_REJECT;
@@ -6961,9 +7280,9 @@ CommonSecurityLog
         for (var i = 2; i < m.length; i++) { if (m[i] !== undefined) { gi = i - 2; break; } }
         if (gi < 0) continue;
         var key = RX.keys[gi];
-        /* размечаем каждое вхождение, но подчёркиваем только первое в модуле */
+        /* размечаем каждое вхождение, но подчёркиваем только первое во всём учебнике */
         var first = !used[key];
-        used[key] = 1;
+        if (first) { used[key] = 1; fresh = true; }
         pieces = pieces || document.createDocumentFragment();
         var start = m.index + m[1].length;
         pieces.appendChild(document.createTextNode(text.slice(last, start)));
@@ -6980,6 +7299,7 @@ CommonSecurityLog
         node.parentNode.replaceChild(pieces, node);
       }
     });
+    if (fresh) save();      // запоминаем, какие термины уже показывали подчёркнутыми
   }
 
   /* ---- тема: расписание 19:00–09:00 тёмная, плюс ручной выбор ---- */
@@ -7024,25 +7344,97 @@ CommonSecurityLog
     apply();
   })();
 
-  /* ---- полноэкранный режим: убирает заголовок окна целиком ---- */
+  /* ---- кнопки окна: свернуть, полный экран, закрыть ---- */
   (function () {
-    var fsBtn = document.getElementById('fsBtn');
-    if (!fsBtn) return;
-    var use = fsBtn.querySelector('use');
-    function sync() {
-      var on = !!document.fullscreenElement;
-      use.setAttribute('href', on ? '#i-exit' : '#i-full');
-      fsBtn.title = on ? 'Выйти из полноэкранного режима (F11)' : 'Во весь экран (F11)';
+    var bar = document.getElementById('winbar');
+    if (!bar) return;
+    var fs = document.getElementById('wbFs'), p = document.getElementById('wbFsPath');
+    var mn = document.getElementById('wbMin'), cl = document.getElementById('wbClose');
+    // Уголки наружу и внутрь. Квадрат тут не годится: рядом стоит системная кнопка
+    // «развернуть», тоже квадрат, и две одинаковые иконки читались как одно и то же.
+    var FULL = 'M1 3.6V1h2.6M6.4 1H9v2.6M9 6.4V9H6.4M3.6 9H1V6.4';
+    var EXIT = 'M3.6 1v2.6H1M9 3.6H6.4V1M6.4 9V6.4H9M1 6.4h2.6V9';
+
+    /* Полноэкранных режимов два, и это главная грабля. Свой, по запросу страницы, ставит
+       document.fullscreenElement. Браузерный, по F11, его не ставит — а окно приложения
+       Edge открывает именно в нём и запоминает между запусками. Поэтому спрашиваем ещё
+       и режим показа, иначе кнопка считает экран обычным и просит развернуть уже
+       развёрнутое окно: снаружи выглядит так, будто она сломана. */
+    var mq = window.matchMedia ? window.matchMedia('(display-mode: fullscreen)') : null;
+    function isFull() {
+      if (document.fullscreenElement) return true;
+      if (mq && mq.matches) return true;
+      // Запасная проверка по геометрии — нарочно строгая. Просто «высокого окна» мало:
+      // встроенные панели просмотра отдают нули в screen и outerHeight, и на нестрогом
+      // сравнении глиф врал про полный экран.
+      var s = window.screen;
+      return !!s && s.height > 0 && window.screenY === 0
+             && window.outerHeight >= s.height - 2;
     }
-    fsBtn.addEventListener('click', function () {
-      if (document.fullscreenElement) {
-        if (document.exitFullscreen) document.exitFullscreen();
-      } else if (document.documentElement.requestFullscreen) {
-        document.documentElement.requestFullscreen().catch(function () {});
-      }
-    });
+    var wasFull = false, wasMax = false, hold = 0;
+    function sync() {
+      var on = isFull();
+      if (wasFull && !on) hold = Date.now() + 1500;   // вышли из полного экрана — см. watch()
+      wasFull = on;
+      p.setAttribute('d', on ? EXIT : FULL);
+      fs.title = on ? 'Выйти из полноэкранного режима (F11)' : 'Во весь экран (F11)';
+      // В обычном окне все кнопки уже есть у системы, и свои там не нужны совсем.
+      // Полный экран прячет системную рамку — вот там наши три и появляются.
+      if (APP) { mn.hidden = !on; cl.hidden = !on; fs.hidden = !on; bar.hidden = !on; }
+    }
     document.addEventListener('fullscreenchange', sync);
+    window.addEventListener('resize', sync);
+    if (mq && mq.addEventListener) mq.addEventListener('change', sync);
     sync();
+    // В приложении видимостью панели распоряжается sync(); на сайте она нужна всегда.
+    if (!APP) bar.hidden = false;
+
+    // Дальше — только режим приложения: на сайте сворачивать и закрывать нечего.
+    if (!APP) {
+      fs.addEventListener('click', function () {
+        if (document.fullscreenElement) {
+          if (document.exitFullscreen) document.exitFullscreen();
+        } else if (document.documentElement.requestFullscreen) {
+          document.documentElement.requestFullscreen().catch(function () {});
+        }
+      });
+      return;
+    }
+    function win(act) {
+      try {
+        fetch('/win/' + act, { method: 'POST', headers: { 'X-App': '1' } }).catch(function () {});
+      } catch (e) {}
+    }
+    // Переключаем тем же способом, которым Windows этот режим и включила, — клавишей F11.
+    // Свой полноэкранный режим поверх браузерного не выключается: выйти можно только F11.
+    fs.addEventListener('click', function () { win('fullscreen'); setTimeout(sync, 350); });
+    mn.addEventListener('click', function () { win('minimize'); });
+    cl.addEventListener('click', function () { save(); win('close'); });
+    win('tag');                                    // своё имя и значок для панели задач
+
+    /* Системная кнопка «развернуть» — часть рамки браузера, её нажатие странице не приходит.
+       Зато приходит последствие: окно занимает всю рабочую область. Ловим переход в это
+       состояние и превращаем его в полный экран, поэтому отдельная кнопка в оконном режиме
+       больше не нужна.
+       Раньше так было нельзя: requestFullscreen() требует жеста внутри страницы, а клик по
+       рамке им не считается. Теперь F11 нажимает winctl на уровне системы — жест не нужен.
+       hold нужен из-за обратного перехода: при выходе из полного экрана окно снова
+       становится развёрнутым, и без паузы оно тут же ушло бы обратно в полный экран. */
+    function maximized() {
+      if (isFull()) return false;
+      var s = window.screen;
+      if (!s || !s.availWidth) return false;
+      return window.outerWidth >= s.availWidth - 4 && window.outerHeight >= s.availHeight - 4;
+    }
+    function watch() {
+      var now = maximized();
+      if (now && !wasMax && Date.now() > hold) win('fullscreen');
+      wasMax = now;
+    }
+    window.addEventListener('resize', watch);
+    wasMax = maximized();
+    // Полный экран сам не включаем: Edge помнит состояние окна между запусками,
+    // и режим остаётся таким, каким его закрыли.
   })();
 
   /* ---- мобильное меню ---- */
