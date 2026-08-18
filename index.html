@@ -555,15 +555,19 @@
   .task.open .reveal { display:none; }
   .task-a .lbl { font-family:var(--mono); font-size:10.5px; font-weight:700; letter-spacing:.11em; text-transform:uppercase; color:var(--ink-3); display:block; margin:0 0 8px; }
   .rubric { list-style:none; padding:0; margin:0 0 16px; }
+  /* Не display:grid: разметка терминов режет текст пункта на несколько узлов (span.term
+     между кусками текста), и грид раскладывал бы каждый такой узел в свою ячейку
+     23px/1fr — текст расползался по строкам и наезжал сам на себя. Обычный поток
+     с отступом слева не зависит от того, на сколько узлов разбит текст. */
   .rubric li {
-    display:grid; grid-template-columns:22px 1fr; gap:11px; font-size:15.5px; margin-bottom:6px;
-    color:var(--ink-2); cursor:pointer; padding:7px 10px; border-radius:var(--r-s);
+    position:relative; font-size:15.5px; margin-bottom:6px;
+    color:var(--ink-2); cursor:pointer; padding:7px 10px 7px 43px; border-radius:var(--r-s);
     border:1px solid transparent; transition:.15s var(--ease);
   }
   .rubric li:hover { background:var(--card-2); border-color:var(--line); }
   .rubric li::before {
-    content:""; width:20px; height:20px; border-radius:5px; border:1.5px solid var(--line-2);
-    background:var(--card); margin-top:2px; display:grid; place-items:center;
+    content:""; position:absolute; left:10px; top:9px; width:20px; height:20px; border-radius:5px;
+    border:1.5px solid var(--line-2); background:var(--card); display:grid; place-items:center;
     font-family:var(--mono); font-size:12px; font-weight:700; color:#fff; line-height:1;
   }
   .rubric li.hit { color:var(--ink); }
