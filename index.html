@@ -466,6 +466,100 @@
   .prac p { font-size:15.5px; color:var(--ink-2); }
   .prac pre:last-child { margin-bottom:0; }
 
+  /* ---- тренажёр команд: окно терминала ---- */
+  /* Не настоящий терминал — команды никуда не выполняются, это симулятор с распознаванием
+     ожидаемых команд и заранее написанным выводом. Но выглядеть должен как настоящее окно,
+     не как строка ввода под списком: точки-кнопки, вкладки, задача печатается прямо в сессии,
+     а не рядом отдельным блоком. */
+  .term-app {
+    border-radius:var(--r-l); overflow:hidden; margin:34px 0; box-shadow:var(--sh-2);
+    border:1px solid var(--term-line); background:var(--term);
+  }
+  .term-app-bar {
+    display:flex; align-items:center; gap:14px; padding:12px 16px;
+    background:color-mix(in srgb, var(--term) 88%, var(--ink) 12%);
+    border-bottom:1px solid var(--term-line);
+  }
+  .term-app-dots { display:flex; gap:7px; flex:none; }
+  .term-app-dots i { width:11px; height:11px; border-radius:50%; display:block; }
+  .term-app-dots i:nth-child(1) { background:#EF6A5F; }
+  .term-app-dots i:nth-child(2) { background:#F4BF4F; }
+  .term-app-dots i:nth-child(3) { background:#61C454; }
+  .term-app-tabs { display:flex; gap:4px; flex:1; min-width:0; overflow-x:auto; }
+  .term-app-tab {
+    font-family:var(--mono); font-size:12px; font-weight:600; letter-spacing:.02em;
+    padding:6px 13px; border-radius:var(--r-pill); border:1px solid transparent;
+    background:none; color:var(--term-c); cursor:pointer; white-space:nowrap;
+    display:flex; align-items:center; gap:7px; transition:.15s var(--ease);
+  }
+  .term-app-tab:hover { color:var(--term-ink); }
+  .term-app-tab.on { background:var(--card); border-color:var(--term-line); color:var(--term-ink); }
+  .term-app-badge {
+    /* --ink-2 здесь давал 3.99 в тёмной теме на фоне --line-2 — ниже порога AA; --ink даёт 6.85 */
+    font-size:10px; padding:1px 6px; border-radius:var(--r-pill); background:var(--line-2);
+    color:var(--ink); font-weight:700;
+  }
+  .term-app-tab.on .term-app-badge.full { background:var(--ok); color:#fff; }
+  .term-app-pane { display:none; }
+  .term-app-pane.on { display:block; }
+  .term-app-screen {
+    color:var(--term-ink); padding:18px 20px; font-family:var(--mono); font-size:13.5px;
+    line-height:1.7; cursor:text; max-height:420px; overflow-y:auto;
+  }
+  .term-app-log > div, .term-app-log > pre { white-space:pre-wrap; word-break:break-word; margin:0 0 3px; }
+  .term-app-log .cmd { color:var(--term-ink); }
+  .term-app-log .cmd::before { content:"❯ "; color:var(--gold-ink); font-weight:700; }
+  .term-app-log .out { color:var(--term-c); }
+  .term-app-log .out.ok { color:var(--term-g); }
+  .term-app-log .msg { color:var(--term-r); }
+  .term-app-log .task {
+    margin:4px 0 12px; padding:10px 14px; border-left:3px solid var(--gold);
+    background:color-mix(in srgb, var(--gold) 8%, transparent); border-radius:0 var(--r-s) var(--r-s) 0;
+    color:var(--term-ink);
+  }
+  .term-app-log .task b { color:var(--gold-ink); font-weight:700; }
+  .term-app-log .done-banner {
+    margin:4px 0 12px; padding:10px 14px; border-left:3px solid var(--term-g);
+    background:color-mix(in srgb, var(--term-g) 10%, transparent); border-radius:0 var(--r-s) var(--r-s) 0;
+    color:var(--term-g); font-weight:600;
+  }
+  .term-app-row { display:flex; align-items:center; padding:0 20px 16px; }
+  /* Забыл при первой вёрстке не только font-family, но и font-size: .term-app-row лежит
+     СНАРУЖИ .term-app-screen (соседний блок, не потомок), поэтому 13.5px оттуда не
+     наследуются — промпт держался на 17px по умолчанию у body. Разница в размере поверх
+     разницы в семье шрифта и давала стойкое ощущение «набрано другим шрифтом». */
+  .term-app-row .ps { color:var(--gold-ink); flex:none; font-weight:700; font-family:var(--mono); font-size:13.5px; }
+  .term-app-row input {
+    flex:1; min-width:0; background:transparent; border:0; outline:0; padding:0 0 0 9px;
+    font-family:var(--mono); font-size:13.5px; color:var(--term-ink); caret-color:var(--gold-ink);
+  }
+  .term-app-row input::placeholder { color:var(--term-c); }
+  /* Вывод команды плавно всплывает — единый эффект для любой длины строки.
+     Раньше короткий вывод «печатался» через анимацию ширины с white-space:nowrap — красиво
+     на широком экране и сломано на узком: те же 302px контейнера на телефоне не вмещают
+     даже короткую строку без переноса, а nowrap перенос запрещает, обрезая текст по overflow.
+     Отдельный эффект под «влезет / не влезет в одну строку» пришлось бы держать в уме
+     при каждой правке текста — надёжнее один приём, который работает при любой ширине. */
+  @keyframes blockIn { from { opacity:0; transform:translateY(4px) } to { opacity:1; transform:none } }
+  .out.block-in { display:block; animation:blockIn .3s var(--ease) both; }
+  /* вкладка «Практика» — тот же готовый блок кода, что и в остальных модулях (pre/.c из общих
+     стилей), но без собственной рамки и фона: они у него совпадают с окном терминала снаружи,
+     и вложенная рамка внутри рамки выглядела бы коробкой в коробке */
+  .term-app-pane[data-pane="prac"] pre {
+    background:none; border:0; margin:0; border-radius:0; padding:18px 20px;
+    max-height:420px; overflow-y:auto;   /* та же высота, что у экрана «Терминала» — вкладки не прыгают */
+  }
+  .term-app-foot { display:flex; align-items:center; gap:8px; padding:10px 16px; border-top:1px solid var(--term-line); }
+  .term-app-foot button {
+    /* было font-family:inherit — кнопки не наследуют шрифт по умолчанию (UA-стиль форм-элементов),
+       inherit тянул его от body, то есть --sans, а рядом в том же подвале --term-app-progress
+       уже стоял на --mono. Те же грабли, что с промптом: часть строки в моно, часть нет. */
+    font-family:var(--mono); font-size:12.5px; font-weight:600; background:none; border:0;
+    color:var(--term-c); cursor:pointer; padding:5px 10px; border-radius:var(--r-s);
+  }
+  .term-app-foot button:hover { color:var(--term-ink); background:color-mix(in srgb, var(--term-ink) 8%, transparent); }
+  .term-app-foot .term-app-progress { margin-left:auto; font-family:var(--mono); font-size:11.5px; color:var(--term-c); }
+
   /* ---- схемы ---- */
   figure { margin:36px 0; }
   .fig { background:var(--card); border:1px solid var(--line); border-radius:var(--r-m); padding:26px 22px; overflow-x:auto; box-shadow:var(--sh-1); }
@@ -1736,10 +1830,18 @@ $ ip neigh
             <li>Намеренная фрагментация — <strong>техника обхода IDS</strong>: сигнатура атаки разрезается между пакетами, и система, не собирающая фрагменты, её не видит.</li>
           </ul>
 
-          <div class="prac rv">
-            <div class="prac-h"><svg><use href="#i-term"></use></svg><span>Практика</span></div>
-            <p>Посмотри на настоящие кадры своими глазами. <code>tcpdump</code> показывает то, что реально уходит с интерфейса.</p>
-            <pre><code>sudo apt install tcpdump -y
+          <div class="term-app" data-lab="m1-arp">
+            <div class="term-app-bar">
+              <span class="term-app-dots"><i></i><i></i><i></i></span>
+              <div class="term-app-tabs">
+                <button type="button" class="term-app-tab on" data-tab="prac">Практика</button>
+                <button type="button" class="term-app-tab" data-tab="lab">Терминал <span class="term-app-badge"></span></button>
+              </div>
+            </div>
+
+            <div class="term-app-pane on" data-pane="prac">
+              <p>Посмотри на настоящие кадры своими глазами. <code>tcpdump</code> показывает то, что реально уходит с интерфейса.</p>
+              <pre><code>sudo apt install tcpdump -y
 
 <span class="c"># пять любых пакетов: -n не резолвить имена, -c 5 — сколько поймать</span>
 sudo tcpdump -i any -n -c 5
@@ -1759,6 +1861,19 @@ ip neigh
 
 <span class="c"># поймать сам ARP-обмен</span>
 sudo tcpdump -i any -n arp</code></pre>
+            </div>
+
+            <div class="term-app-pane" data-pane="lab">
+              <div class="term-app-screen">
+                <div class="term-app-log"></div>
+              </div>
+              <div class="term-app-row"><span class="ps">user@lab:~$</span><input type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false"></div>
+            </div>
+
+            <div class="term-app-foot">
+              <button type="button" class="term-lab-reset">Начать заново</button>
+              <span class="term-app-progress"></span>
+            </div>
           </div>
 
           <div class="quizset" data-quiz="1">
@@ -2420,9 +2535,17 @@ sudo tcpdump -i any -n 'icmp6 and ip6[40] == 134'
 <span class="c">#   134 — тип ICMPv6 для Router Advertisement</span>
 <span class="c">#   если объявлений больше одного источника — разбирайся, кто второй</span></code></pre>
 
-          <div class="prac rv">
-            <div class="prac-h"><svg><use href="#i-term"></use></svg><span>Практика</span></div>
-            <pre><code><span class="c"># свои адреса, маски, состояние интерфейсов</span>
+          <div class="term-app" data-lab="m2-addr">
+            <div class="term-app-bar">
+              <span class="term-app-dots"><i></i><i></i><i></i></span>
+              <div class="term-app-tabs">
+                <button type="button" class="term-app-tab on" data-tab="prac">Практика</button>
+                <button type="button" class="term-app-tab" data-tab="lab">Терминал <span class="term-app-badge"></span></button>
+              </div>
+            </div>
+
+            <div class="term-app-pane on" data-pane="prac">
+              <pre><code><span class="c"># свои адреса, маски, состояние интерфейсов</span>
 ip -c a
 ip -br a                       <span class="c"># кратко, одной строкой на интерфейс</span>
 
@@ -2439,6 +2562,19 @@ journalctl -u NetworkManager --no-pager | grep -i dhcp | tail -20
 
 <span class="c"># поймать DHCP-обмен: перезапусти сеть в другом окне</span>
 sudo tcpdump -i any -n port 67 or port 68</code></pre>
+            </div>
+
+            <div class="term-app-pane" data-pane="lab">
+              <div class="term-app-screen">
+                <div class="term-app-log"></div>
+              </div>
+              <div class="term-app-row"><span class="ps">user@lab:~$</span><input type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false"></div>
+            </div>
+
+            <div class="term-app-foot">
+              <button type="button" class="term-lab-reset">Начать заново</button>
+              <span class="term-app-progress"></span>
+            </div>
           </div>
 
           <div class="quizset" data-quiz="2">
@@ -2809,9 +2945,17 @@ default via 192.168.1.1 dev enp0s3 proto dhcp metric 100
             уже сам по себе повод насторожиться.
           </p>
 
-          <div class="prac rv">
-            <div class="prac-h"><svg><use href="#i-term"></use></svg><span>Практика</span></div>
-            <pre><code>ip route                          <span class="c"># есть ли default</span>
+          <div class="term-app" data-lab="m3-route">
+            <div class="term-app-bar">
+              <span class="term-app-dots"><i></i><i></i><i></i></span>
+              <div class="term-app-tabs">
+                <button type="button" class="term-app-tab on" data-tab="prac">Практика</button>
+                <button type="button" class="term-app-tab" data-tab="lab">Терминал <span class="term-app-badge"></span></button>
+              </div>
+            </div>
+
+            <div class="term-app-pane on" data-pane="prac">
+              <pre><code>ip route                          <span class="c"># есть ли default</span>
 ip route get 8.8.8.8              <span class="c"># каким маршрутом уйдёт конкретный пакет</span>
 ip neigh                          <span class="c"># ARP-таблица соседей</span>
 
@@ -2827,6 +2971,19 @@ mtr -n 1.1.1.1                    <span class="c"># traceroute + ping, видн�
 ping -c 2 -t 1 1.1.1.1            <span class="c"># умрёт на первом хопе → Time Exceeded</span>
 ping -c 2 -t 2 1.1.1.1            <span class="c"># на втором</span>
 ping -c 1 1.1.1.1 | grep ttl      <span class="c"># прикинь ОС собеседника</span></code></pre>
+            </div>
+
+            <div class="term-app-pane" data-pane="lab">
+              <div class="term-app-screen">
+                <div class="term-app-log"></div>
+              </div>
+              <div class="term-app-row"><span class="ps">user@lab:~$</span><input type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false"></div>
+            </div>
+
+            <div class="term-app-foot">
+              <button type="button" class="term-lab-reset">Начать заново</button>
+              <span class="term-app-progress"></span>
+            </div>
           </div>
 
           <div class="quizset" data-quiz="3">
@@ -3176,9 +3333,17 @@ SSH-2.0-OpenSSH_8.9p1 Ubuntu-3ubuntu0.4</code></pre>
             то есть подготовки к атаке.
           </p>
 
-          <div class="prac rv">
-            <div class="prac-h"><svg><use href="#i-term"></use></svg><span>Практика</span></div>
-            <pre><code><span class="c"># что слушает твоя машина</span>
+          <div class="term-app" data-lab="m4-ports">
+            <div class="term-app-bar">
+              <span class="term-app-dots"><i></i><i></i><i></i></span>
+              <div class="term-app-tabs">
+                <button type="button" class="term-app-tab on" data-tab="prac">Практика</button>
+                <button type="button" class="term-app-tab" data-tab="lab">Терминал <span class="term-app-badge"></span></button>
+              </div>
+            </div>
+
+            <div class="term-app-pane on" data-pane="prac">
+              <pre><code><span class="c"># что слушает твоя машина</span>
 sudo ss -tulnp
 
 <span class="c"># активные соединения прямо сейчас</span>
@@ -3221,6 +3386,19 @@ nc -v localhost 22
 
 <span class="c"># диапазон эфемерных портов своей системы</span>
 cat /proc/sys/net/ipv4/ip_local_port_range</code></pre>
+            </div>
+
+            <div class="term-app-pane" data-pane="lab">
+              <div class="term-app-screen">
+                <div class="term-app-log"></div>
+              </div>
+              <div class="term-app-row"><span class="ps">user@lab:~$</span><input type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false"></div>
+            </div>
+
+            <div class="term-app-foot">
+              <button type="button" class="term-lab-reset">Начать заново</button>
+              <span class="term-app-progress"></span>
+            </div>
           </div>
 
           <div class="quizset" data-quiz="4">
@@ -3734,9 +3912,17 @@ cat /proc/sys/net/ipv4/ip_local_port_range</code></pre>
             </div>
           </div>
 
-          <div class="prac rv">
-            <div class="prac-h"><svg><use href="#i-term"></use></svg><span>Практика</span></div>
-            <pre><code><span class="c"># поймать рукопожатие живьём: запусти в одном окне</span>
+          <div class="term-app" data-lab="m5-rst">
+            <div class="term-app-bar">
+              <span class="term-app-dots"><i></i><i></i><i></i></span>
+              <div class="term-app-tabs">
+                <button type="button" class="term-app-tab on" data-tab="prac">Практика</button>
+                <button type="button" class="term-app-tab" data-tab="lab">Терминал <span class="term-app-badge"></span></button>
+              </div>
+            </div>
+
+            <div class="term-app-pane on" data-pane="prac">
+              <pre><code><span class="c"># поймать рукопожатие живьём: запусти в одном окне</span>
 sudo tcpdump -i any -n 'tcp port 443 and tcp[tcpflags] &amp; (tcp-syn|tcp-ack) != 0'
 <span class="c"># в другом окне:  curl -s -o /dev/null https://example.com</span>
 <span class="c"># в выводе найди Flags [S], потом [S.], потом [.] — это и есть три шага</span>
@@ -3751,6 +3937,19 @@ ss -tan | awk 'NR&gt;1 {print $1}' | sort | uniq -c | sort -rn
 <span class="c"># увидеть RST на закрытом порту</span>
 sudo tcpdump -i any -n 'tcp port 9999' &amp;
 nc -zv 127.0.0.1 9999</code></pre>
+            </div>
+
+            <div class="term-app-pane" data-pane="lab">
+              <div class="term-app-screen">
+                <div class="term-app-log"></div>
+              </div>
+              <div class="term-app-row"><span class="ps">user@lab:~$</span><input type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false"></div>
+            </div>
+
+            <div class="term-app-foot">
+              <button type="button" class="term-lab-reset">Начать заново</button>
+              <span class="term-app-progress"></span>
+            </div>
           </div>
 
           <div class="quizset" data-quiz="5">
@@ -4160,9 +4359,17 @@ c2VjcmV0ZG9jdW1lbnQucGRm.evil.com</code></pre>
             </div>
           </div>
 
-          <div class="prac rv">
-            <div class="prac-h"><svg><use href="#i-term"></use></svg><span>Практика</span></div>
-            <pre><code>dig example.com                    <span class="c"># полный ответ: секции, TTL, кто ответил</span>
+          <div class="term-app" data-lab="m6-dns">
+            <div class="term-app-bar">
+              <span class="term-app-dots"><i></i><i></i><i></i></span>
+              <div class="term-app-tabs">
+                <button type="button" class="term-app-tab on" data-tab="prac">Практика</button>
+                <button type="button" class="term-app-tab" data-tab="lab">Терминал <span class="term-app-badge"></span></button>
+              </div>
+            </div>
+
+            <div class="term-app-pane on" data-pane="prac">
+              <pre><code>dig example.com                    <span class="c"># полный ответ: секции, TTL, кто ответил</span>
 dig +short example.com             <span class="c"># только адрес</span>
 dig example.com MX                 <span class="c"># конкретный тип записи</span>
 dig example.com TXT
@@ -4182,6 +4389,19 @@ cat /etc/hosts                     <span class="c"># проверь, что та
 
 <span class="c"># DNS-трафик своей машины живьём</span>
 sudo tcpdump -i any -n port 53</code></pre>
+            </div>
+
+            <div class="term-app-pane" data-pane="lab">
+              <div class="term-app-screen">
+                <div class="term-app-log"></div>
+              </div>
+              <div class="term-app-row"><span class="ps">user@lab:~$</span><input type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false"></div>
+            </div>
+
+            <div class="term-app-foot">
+              <button type="button" class="term-lab-reset">Начать заново</button>
+              <span class="term-app-progress"></span>
+            </div>
           </div>
 
           <h3>Задания: сформулируй ответ сам</h3>
@@ -4661,9 +4881,17 @@ POST /login  <span class="g">200</span></code></pre>
             </div>
           </div>
 
-          <div class="prac rv">
-            <div class="prac-h"><svg><use href="#i-term"></use></svg><span>Практика</span></div>
-            <pre><code>curl -v http://example.com          <span class="c"># весь диалог целиком</span>
+          <div class="term-app" data-lab="m7-http">
+            <div class="term-app-bar">
+              <span class="term-app-dots"><i></i><i></i><i></i></span>
+              <div class="term-app-tabs">
+                <button type="button" class="term-app-tab on" data-tab="prac">Практика</button>
+                <button type="button" class="term-app-tab" data-tab="lab">Терминал <span class="term-app-badge"></span></button>
+              </div>
+            </div>
+
+            <div class="term-app-pane on" data-pane="prac">
+              <pre><code>curl -v http://example.com          <span class="c"># весь диалог целиком</span>
 curl -I https://example.com         <span class="c"># только заголовки ответа</span>
 curl -s -o /dev/null -w '%{http_code} %{size_download} %{time_total}\n' https://example.com
 
@@ -4680,6 +4908,19 @@ sudo tcpdump -i any -n -A 'tcp port 80' -c 20
 
 <span class="c"># подделать User-Agent</span>
 curl -A 'python-requests/2.31' -I https://example.com</code></pre>
+            </div>
+
+            <div class="term-app-pane" data-pane="lab">
+              <div class="term-app-screen">
+                <div class="term-app-log"></div>
+              </div>
+              <div class="term-app-row"><span class="ps">user@lab:~$</span><input type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false"></div>
+            </div>
+
+            <div class="term-app-foot">
+              <button type="button" class="term-lab-reset">Начать заново</button>
+              <span class="term-app-progress"></span>
+            </div>
           </div>
 
           <div class="quizset" data-quiz="7">
@@ -5885,9 +6126,17 @@ X-Mailer: PHPMailer 6.5.0
             </div>
           </div>
 
-          <div class="prac rv">
-            <div class="prac-h"><svg><use href="#i-term"></use></svg><span>Практика</span></div>
-            <pre><code><span class="c"># посмотреть почтовую инфраструктуру любого домена</span>
+          <div class="term-app" data-lab="m9-spf">
+            <div class="term-app-bar">
+              <span class="term-app-dots"><i></i><i></i><i></i></span>
+              <div class="term-app-tabs">
+                <button type="button" class="term-app-tab on" data-tab="prac">Практика</button>
+                <button type="button" class="term-app-tab" data-tab="lab">Терминал <span class="term-app-badge"></span></button>
+              </div>
+            </div>
+
+            <div class="term-app-pane on" data-pane="prac">
+              <pre><code><span class="c"># посмотреть почтовую инфраструктуру любого домена</span>
 dig +short company.ru MX
 dig +short company.ru TXT | grep spf
 dig +short _dmarc.company.ru TXT
@@ -5904,6 +6153,19 @@ sha256sum suspicious.bin
 
 <span class="c"># свои собственные заголовки: открой любое письмо в почте,</span>
 <span class="c"># найди «показать оригинал» и разбери его по таблице из модуля</span></code></pre>
+            </div>
+
+            <div class="term-app-pane" data-pane="lab">
+              <div class="term-app-screen">
+                <div class="term-app-log"></div>
+              </div>
+              <div class="term-app-row"><span class="ps">user@lab:~$</span><input type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false"></div>
+            </div>
+
+            <div class="term-app-foot">
+              <button type="button" class="term-lab-reset">Начать заново</button>
+              <span class="term-app-progress"></span>
+            </div>
           </div>
 
           <h3>Задания: сформулируй ответ сам</h3>
@@ -7155,7 +7417,7 @@ CommonSecurityLog
       history.replaceState(null, '', location.pathname);
     } catch (e) {}
   })();
-  st.done = st.done || {}; st.seen = st.seen || {}; st.quiz = st.quiz || {};
+  st.done = st.done || {}; st.seen = st.seen || {}; st.quiz = st.quiz || {}; st.lab = st.lab || {};
   /* миграция: модуль разбора алертов переехал с m8 на m10, между ними вставлены два новых */
   if (st.v !== 4) {
     if (st.done.m8) { st.done.m10 = true; delete st.done.m8; }
@@ -7836,11 +8098,320 @@ CommonSecurityLog
     });
   })();
 
+  /* ---- тренажёр команд ----
+     Не настоящий терминал: команды никуда не уходят, это распознавание ожидаемой команды
+     и заранее написанный вывод — ровно то, что вернула бы настоящая машина. Прогресс — счётчик
+     пройденных шагов в st.lab[id], без хранения текста набранных команд: это не эссе для
+     сверки, а проверяемый факт «дошёл до шага N», его достаточно хранить числом. */
+  var LAB_STEPS = {
+    'm1-arp': [
+      {
+        goal: 'Посмотреть ARP-таблицу — кого из соседей машина уже знает.',
+        prog: 'ip', sudo: 'none', flags: '', args: ['neigh'],
+        show: 'ip neigh',
+        out: '192.168.1.1  dev enp0s3 lladdr 30:b5:c2:11:8a:04 REACHABLE\n' +
+             '192.168.1.5  dev enp0s3 lladdr a4:5e:60:c1:9f:02 STALE',
+        note: 'REACHABLE — ответ подтверждён недавно. STALE — запись жива, но давно не проверялась; всё ещё используется, просто без гарантии.'
+      }
+    ],
+    'm2-addr': [
+      {
+        goal: 'Посмотреть свои адреса и интерфейсы — кратко, одной строкой на интерфейс.',
+        prog: 'ip', sudo: 'none', flags: 'br', args: ['a'],
+        show: 'ip -br a',
+        out: 'lo               UNKNOWN        127.0.0.1/8 ::1/128\n' +
+             'enp0s3           UP             10.4.19.66/24 fe80::a00:27ff:fe4e:66a1/64',
+        note: 'lo — петлевой интерфейс, всегда UNKNOWN и не в счёт. enp0s3 — рабочий: и IPv4, и «бесплатный» link-local IPv6 rядом.'
+      },
+      {
+        goal: 'Посчитать границы сети — на бумаге уже посчитал, теперь проверь.',
+        prog: 'ipcalc', sudo: 'none', flags: '', args: ['192.168.10.200/26'],
+        show: 'ipcalc 192.168.10.200/26',
+        out: 'Address:   192.168.10.200\n' +
+             'Netmask:   255.255.255.192 = 26\n' +
+             'Network:   192.168.10.192/26\n' +
+             'HostMin:   192.168.10.193\n' +
+             'HostMax:   192.168.10.254\n' +
+             'Broadcast: 192.168.10.255\n' +
+             'Hosts/Net: 62',
+        note: 'Шаг блока при /26 равен 64: границы .192 и .256(=0 следующего блока). Адрес .200 попадает в блок, начинающийся с .192 — ровно как считали в модуле.'
+      }
+    ],
+    'm3-route': [
+      {
+        goal: 'Пройти путь до 1.1.1.1 по шагам.',
+        prog: 'traceroute', sudo: 'none', flags: 'n', args: ['1.1.1.1'],
+        show: 'traceroute -n 1.1.1.1',
+        out: ' 1  192.168.1.1     1.2 ms  1.1 ms  1.3 ms\n' +
+             ' 2  10.55.0.1       4.8 ms  4.9 ms  5.1 ms\n' +
+             ' 3  * * *\n' +
+             ' 4  188.114.98.1   12.1 ms 11.8 ms 12.4 ms\n' +
+             ' 5  1.1.1.1        11.9 ms 12.0 ms 11.7 ms',
+        note: 'Хоп 1 — твой роутер, хоп 2 — провайдер. На хопе 3 звёздочки, но 4 и 5 отвечают — значит транзит через 3-й идёт, он просто не отвечает на служебное.'
+      },
+      {
+        goal: 'Устроить TTL=1 своими руками — пакет обязан умереть на первом же хопе.',
+        prog: 'ping', sudo: 'none', flags: 'ct', args: ['2', '1', '1.1.1.1'],
+        show: 'ping -c 2 -t 1 1.1.1.1',
+        out: 'From 192.168.1.1 icmp_seq=1 Time to live exceeded\n' +
+             'From 192.168.1.1 icmp_seq=2 Time to live exceeded\n\n' +
+             '--- 1.1.1.1 ping statistics ---\n' +
+             '2 packets transmitted, 0 received, +2 errors, 100% packet loss',
+        note: 'Ответ пришёл от 192.168.1.1 — твоего же роутера, не от 1.1.1.1. TTL=1 истёк ровно на первом хопе, дальше пакет физически не ушёл.'
+      }
+    ],
+    'm5-rst': [
+      {
+        goal: 'Постучаться на закрытый порт своей машины — ответ придёт мгновенно.',
+        prog: 'nc', sudo: 'none', flags: 'zv', args: ['127.0.0.1', '9999'],
+        show: 'nc -zv 127.0.0.1 9999',
+        out: 'nc: connect to 127.0.0.1 port 9999 (tcp) failed: Connection refused',
+        note: 'Мгновенный отказ — это и есть RST: хост есть, а службы на порту нет. Молчание с таймаутом означало бы фильтрацию, а не закрытый порт.'
+      }
+    ],
+    'm6-dns': [
+      {
+        goal: 'Спросить DNS про example.com — полный ответ со всеми секциями.',
+        prog: 'dig', sudo: 'none', flags: '', args: ['example.com'],
+        show: 'dig example.com',
+        out: ';; QUESTION SECTION:\n' +
+             ';example.com.            IN  A\n\n' +
+             ';; ANSWER SECTION:\n' +
+             'example.com.  86400  IN  A  192.0.2.30\n\n' +
+             ';; Query time: 24 msec\n' +
+             ';; SERVER: 127.0.0.53#53(127.0.0.53)',
+        note: '86400 — TTL записи в секундах, срок жизни в кеше. 127.0.0.53 — это твой локальный резолвер, а не сервер, реально хранящий запись.'
+      },
+      {
+        goal: 'То же самое, но без служебных секций — только адрес.',
+        prog: 'dig', sudo: 'none', flags: '', args: ['+short', 'example.com'],
+        show: 'dig +short example.com',
+        out: '192.0.2.30',
+        cls: 'ok',
+        note: 'Тот же ответ, что и выше — просто без обвязки. Удобно, когда адрес нужен для скрипта, а не для чтения глазами.'
+      }
+    ],
+    'm7-http': [
+      {
+        goal: 'Забрать только заголовки ответа, без тела страницы.',
+        prog: 'curl', sudo: 'none', flags: 'I', args: ['https://example.com'],
+        show: 'curl -I https://example.com',
+        out: 'HTTP/1.1 200 OK\n' +
+             'Server: nginx/1.24.0\n' +
+             'Content-Type: text/html; charset=utf-8\n' +
+             'Content-Length: 5120',
+        note: '-I — заглавная: только заголовки, без тела. Строчная -i добавила бы заголовки перед телом, а не вместо него — это разные флаги curl.'
+      }
+    ],
+    'm9-spf': [
+      {
+        goal: 'Посмотреть SPF-запись домена — кто вправе слать почту от его имени.',
+        prog: 'dig', sudo: 'none', flags: '', args: ['+short', 'company.ru', 'txt'],
+        show: 'dig +short company.ru TXT',
+        out: '"v=spf1 include:_spf.yandex.net ip4:203.0.113.0/24 -all"',
+        note: 'include: — доверенный отправитель по ссылке на чужую политику. ip4: — конкретная сеть. -all в конце — всё остальное отклонить, не просто пометить подозрительным.'
+      },
+      {
+        goal: 'Теперь политику DMARC того же домена.',
+        prog: 'dig', sudo: 'none', flags: '', args: ['+short', '_dmarc.company.ru', 'txt'],
+        show: 'dig +short _dmarc.company.ru TXT',
+        out: '"v=DMARC1; p=quarantine; rua=mailto:dmarc@company.ru"',
+        note: 'p=quarantine — подозрительное в спам, не отклонить полностью. rua= — куда слать отчёты о нарушениях; по ним и видно, кто подделывает домен.'
+      }
+    ],
+    'm4-ports': [
+      {
+        goal: 'Посмотреть, что слушает твоя машина — со всеми процессами.',
+        prog: 'ss', sudo: 'optional', flags: 'tulnp', args: [],
+        show: 'sudo ss -tulnp',
+        out: 'Netid  State   Local Address:Port     Process\n' +
+             'tcp    LISTEN  127.0.0.1:3306          mysqld\n' +
+             'tcp    LISTEN  0.0.0.0:22              sshd\n' +
+             'tcp    LISTEN  0.0.0.0:8080            python3\n' +
+             'udp    UNCONN  127.0.0.53:53           systemd-resolved',
+        note: '127.0.0.1:3306 — только локально, это нормально. А вот 0.0.0.0:8080 — уже вопрос: кто это и зачем смотрит наружу?'
+      },
+      {
+        goal: 'Проверить порт 22 на своей машине — служба живая?',
+        prog: 'nc', sudo: 'none', flags: 'zv', args: ['127.0.0.1', '22'],
+        show: 'nc -zv 127.0.0.1 22',
+        out: 'Connection to 127.0.0.1 22 port [tcp/ssh] succeeded!',
+        cls: 'ok'
+      },
+      {
+        goal: 'Теперь порт 9999 — там никто не слушает.',
+        prog: 'nc', sudo: 'none', flags: 'zv', args: ['127.0.0.1', '9999'],
+        show: 'nc -zv 127.0.0.1 9999',
+        out: 'nc: connect to 127.0.0.1 port 9999 (tcp) failed: Connection refused',
+        note: 'Отказ пришёл мгновенно — это и есть RST. «Фильтруется» выглядело бы тишиной и таймаутом, но это уже в блоке практики выше, руками через iptables.'
+      }
+    ]
+  };
+
+  function normLabArg(a) {
+    var aliases = { localhost: '127.0.0.1' };
+    return (aliases[a.toLowerCase()] || a).toLowerCase();
+  }
+  /* Проверка нарочно нестрогая: программа + набор нужных флагов (в любом порядке, слитно
+     или раздельно) + позиционные аргументы через алиасы. Лишний флаг не валит попытку —
+     валит только отсутствие обязательного. Порядок токенов после программы не важен нигде,
+     кроме позиционных аргументов (адрес, потом порт) — там он различает результат. */
+  function matchLabCmd(step, raw) {
+    var s = raw.trim().replace(/\s+/g, ' ');
+    if (!s) return { ok: false };
+    var hadSudo = /^sudo\s+/.test(s);
+    if (hadSudo) s = s.replace(/^sudo\s+/, '');
+    var tokens = s.split(' ');
+    var prog = tokens[0];
+    if (prog !== step.prog) {
+      return { ok: false, msg: 'Команда «' + prog + '» здесь не подойдёт — в этом шаге нужен ' + step.prog + '.' };
+    }
+    if (step.sudo === 'required' && !hadSudo) {
+      return { ok: false, msg: 'Без sudo эта команда не увидит того, что нужно — добавь его в начало.' };
+    }
+    var flags = {}, positional = [];
+    for (var i = 1; i < tokens.length; i++) {
+      var t = tokens[i];
+      if (/^-[a-zA-Z]+$/.test(t)) { t.slice(1).split('').forEach(function (c) { flags[c] = true; }); }
+      else positional.push(t);
+    }
+    var missing = step.flags.split('').filter(function (c) { return !flags[c]; });
+    if (missing.length) {
+      return { ok: false, msg: 'Не хватает флага ' + missing.map(function (c) { return '-' + c; }).join(', ') + '.' };
+    }
+    var want = (step.args || []).map(normLabArg);
+    var got = positional.map(normLabArg);
+    if (want.length && want.join(' ') !== got.join(' ')) {
+      return { ok: false, msg: 'Адрес или порт не те — смотри цель шага выше.' };
+    }
+    return { ok: true };
+  }
+
+  [].forEach.call(document.querySelectorAll('.term-app'), function (lab) {
+    var id = lab.getAttribute('data-lab');
+    var steps = LAB_STEPS[id];
+    if (!steps) return;
+    var log = lab.querySelector('.term-app-log');
+    var input = lab.querySelector('.term-app-row input');
+    var screen = lab.querySelector('.term-app-screen');
+    var labTab = lab.querySelector('.term-app-tab[data-tab="lab"]');
+    var badge = labTab.querySelector('.term-app-badge');
+    var progressEl = lab.querySelector('.term-app-progress');
+    var hist = [], histAt = 0, printedTaskFor = -1;
+
+    function idx() { st.lab = st.lab || {}; return st.lab[id] || 0; }
+    function setIdx(n) { st.lab = st.lab || {}; st.lab[id] = n; save(); }
+
+    function line(cls, text) {
+      var d = document.createElement('div');
+      d.className = cls;
+      d.textContent = text;
+      log.appendChild(d);
+      screen.scrollTop = screen.scrollHeight;
+      return d;
+    }
+    /* Текст в DOM выставлен сразу — анимация только визуальная (opacity/translateY), поэтому
+       её не обязано ждать ничего, что читает содержимое строки. Reduced-motion гасит её
+       глобальным правилом *{animation:none}, отдельно думать о нём тут не нужно. */
+    function outLine(cls, text) {
+      var d = line('out ' + cls + ' block-in', text);
+      return d;
+    }
+    function taskBanner(step, n) {
+      if (printedTaskFor === n) return;
+      printedTaskFor = n;
+      var d = document.createElement('div');
+      d.className = 'task';
+      d.innerHTML = '<b>Задача ' + (n + 1) + ' из ' + steps.length + '.</b> ';
+      d.appendChild(document.createTextNode(step.goal));
+      log.appendChild(d);
+      screen.scrollTop = screen.scrollHeight;
+    }
+
+    /* Баннер завершения печатается ровно из двух мест, каждое своим текстом: здесь —
+       только при восстановлении уже пройденного тренажёра со свежей загрузки страницы
+       (лог пуст, banner ещё не показывали в этой сессии), а «прямо сейчас прошёл» —
+       из обработчика Enter, сразу после того как idx() дотянулся до конца. Раньше оба
+       пути решали одно и то же в render(), и после живого завершения баннера оказывалось два. */
+    function render() {
+      var n = idx(), done = n >= steps.length;
+      badge.textContent = Math.min(n, steps.length) + '/' + steps.length;
+      badge.classList.toggle('full', done);
+      progressEl.textContent = done ? 'пройдено' : 'шаг ' + (n + 1) + ' из ' + steps.length;
+      input.disabled = done;
+      if (!done) { taskBanner(steps[n], n); return; }
+      if (printedTaskFor === -1 && !log.querySelector('.done-banner')) {
+        printedTaskFor = -2;   /* пометка «баннер восстановления уже показан», не путать с -1 */
+        doneBanner('✓ Пройдено раньше. Кнопка «Начать заново» внизу — если хочешь повторить руками.');
+      }
+    }
+    function doneBanner(text) {
+      var d = document.createElement('div');
+      d.className = 'done-banner';
+      d.textContent = text;
+      log.appendChild(d);
+      screen.scrollTop = screen.scrollHeight;
+    }
+
+    input.addEventListener('keydown', function (e) {
+      if (e.key === 'ArrowUp') {
+        if (hist.length) { histAt = Math.max(0, histAt - 1); input.value = hist[histAt] || ''; }
+        e.preventDefault(); return;
+      }
+      if (e.key === 'ArrowDown') {
+        histAt = Math.min(hist.length, histAt + 1);
+        input.value = hist[histAt] || '';
+        e.preventDefault(); return;
+      }
+      if (e.key !== 'Enter') return;
+      var raw = input.value;
+      if (!raw.trim()) return;
+      hist.push(raw); histAt = hist.length;
+      line('cmd', raw);
+      input.value = '';
+      var n = idx();
+      if (n >= steps.length) { line('msg', 'Уже пройдено — жми «Начать заново», если хочешь повторить.'); return; }
+      var step = steps[n];
+      var res = matchLabCmd(step, raw);
+      if (res.ok) {
+        outLine(step.cls || 'ok', step.out);
+        if (step.note) outLine('', '# ' + step.note);
+        var justFinished = n + 1 >= steps.length;
+        setIdx(n + 1);
+        render();
+        if (justFinished) doneBanner('✓ Все шаги пройдены — ровно это увидела бы твоя машина, выполни она эти команды по-настоящему.');
+      } else {
+        line('msg', res.msg || 'Не то — попробуй ещё раз.');
+      }
+    });
+    screen.addEventListener('click', function () { if (!input.disabled) input.focus(); });
+
+    var resetBtn = lab.querySelector('.term-lab-reset');
+    if (resetBtn) resetBtn.addEventListener('click', function () {
+      setIdx(0); log.innerHTML = ''; hist = []; histAt = 0; printedTaskFor = -1; render();
+    });
+
+    /* вкладки: «Терминал» — рабочая сессия, «Подсказка» — эталонные команды и выводы разом */
+    var tabs = [].slice.call(lab.querySelectorAll('.term-app-tab'));
+    var panes = [].slice.call(lab.querySelectorAll('.term-app-pane'));
+    tabs.forEach(function (tab) {
+      tab.addEventListener('click', function () {
+        tabs.forEach(function (t) { t.classList.toggle('on', t === tab); });
+        var name = tab.getAttribute('data-tab');
+        panes.forEach(function (p) { p.classList.toggle('on', p.getAttribute('data-pane') === name); });
+        if (name === 'lab' && !input.disabled) input.focus();
+      });
+    });
+
+    REPAINT.push(render);
+    render();
+  });
+
   REPAINT.push(paintFinal);
 
   function repaintAll() {
     st.done = st.done || {}; st.seen = st.seen || {}; st.quiz = st.quiz || {};
-    st.task = st.task || {}; st.note = st.note || {}; st.hit = st.hit || {};
+    st.task = st.task || {}; st.note = st.note || {}; st.hit = st.hit || {}; st.lab = st.lab || {};
     REPAINT.forEach(function (f) { try { f(); } catch (e) {} });
     syncFin(); paint();
   }
