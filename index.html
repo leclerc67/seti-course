@@ -2789,7 +2789,7 @@ sudo tcpdump -i any -n port 67 or port 68</code></pre>
               <text x="528" y="40" text-anchor="middle" font-size="10" fill="currentColor" opacity=".7">TTL 62</text>
               <text x="708" y="40" text-anchor="middle" font-size="10" fill="currentColor" opacity=".7">TTL 52</text>
 
-              <line class="hl" x1="348" y1="18" x2="348" y2="140" stroke-width="1.2" stroke-dasharray="5 4"></line>
+              <line class="hl" x1="348" y1="50" x2="348" y2="140" stroke-width="1.2" stroke-dasharray="5 4"></line>
               <text class="hlt" x="356" y="134" font-size="10">граница NAT</text>
 
               <rect x="8" y="184" width="320" height="54" rx="10" fill="none" stroke="currentColor" stroke-width="1.1" opacity=".5"></rect>
@@ -3848,14 +3848,14 @@ cat /proc/sys/net/ipv4/ip_local_port_range</code></pre>
               <line class="oks" x1="230" y1="92" x2="32" y2="92" stroke-width="1.7" marker-end="url(#a5)"></line>
               <text class="okt" x="130" y="84" text-anchor="middle" font-size="11" font-weight="700">SYN + ACK</text>
               <text x="130" y="124" text-anchor="middle" font-size="10.5" fill="currentColor" opacity=".65">служба слушает</text>
-              <line x1="278" y1="14" x2="278" y2="200" stroke="currentColor" stroke-width="1" opacity=".18"></line>
+              <line x1="278" y1="14" x2="278" y2="146" stroke="currentColor" stroke-width="1" opacity=".18"></line>
               <text class="badt" x="418" y="24" text-anchor="middle" font-size="12.5" font-weight="700">Порт ЗАКРЫТ</text>
               <line x1="318" y1="54" x2="516" y2="54" stroke="currentColor" stroke-width="1.4" marker-end="url(#a5)"></line>
               <text x="418" y="46" text-anchor="middle" font-size="11" fill="currentColor">SYN</text>
               <line class="bads" x1="518" y1="92" x2="320" y2="92" stroke-width="1.7" marker-end="url(#a5)"></line>
               <text class="badt" x="418" y="84" text-anchor="middle" font-size="11" font-weight="700">RST</text>
               <text x="418" y="124" text-anchor="middle" font-size="10.5" fill="currentColor" opacity=".65">хост есть, службы нет</text>
-              <line x1="566" y1="14" x2="566" y2="200" stroke="currentColor" stroke-width="1" opacity=".18"></line>
+              <line x1="566" y1="14" x2="566" y2="146" stroke="currentColor" stroke-width="1" opacity=".18"></line>
               <text x="706" y="24" text-anchor="middle" font-size="12.5" fill="currentColor" font-weight="700" opacity=".75">ПОРТ ФИЛЬТРУЕТСЯ</text>
               <line x1="606" y1="54" x2="804" y2="54" stroke="currentColor" stroke-width="1.4" marker-end="url(#a5)"></line>
               <text x="706" y="46" text-anchor="middle" font-size="11" fill="currentColor">SYN</text>
@@ -4241,13 +4241,13 @@ nc -zv 127.0.0.1 9999</code></pre>
               <text class="okt" x="188" y="199" text-anchor="middle" font-size="11" font-weight="700">6</text>
               <line x1="402" y1="140" x2="618" y2="54" stroke="currentColor" stroke-width="1.3" marker-end="url(#a6)"></line>
               <text x="500" y="86" text-anchor="middle" font-size="11" fill="currentColor" font-weight="700">2</text>
-              <text x="504" y="101" text-anchor="middle" font-size="9.5" fill="currentColor" opacity=".6">«кто держит .org?»</text>
+              <text x="504" y="68" text-anchor="middle" font-size="9.5" fill="currentColor" opacity=".6">«кто держит .org?»</text>
               <line x1="402" y1="160" x2="618" y2="160" stroke="currentColor" stroke-width="1.3" marker-end="url(#a6)"></line>
               <text x="510" y="152" text-anchor="middle" font-size="11" fill="currentColor" font-weight="700">3</text>
               <text x="510" y="175" text-anchor="middle" font-size="9.5" fill="currentColor" opacity=".6">«кто держит overthewire.org?»</text>
               <line x1="402" y1="196" x2="618" y2="282" stroke="currentColor" stroke-width="1.3" marker-end="url(#a6)"></line>
-              <text x="498" y="234" text-anchor="middle" font-size="11" fill="currentColor" font-weight="700">4</text>
-              <text x="506" y="249" text-anchor="middle" font-size="9.5" fill="currentColor" opacity=".6">«какой A у bandit.labs…?»</text>
+              <text x="520" y="216" text-anchor="middle" font-size="11" fill="currentColor" font-weight="700">4</text>
+              <text x="520" y="200" text-anchor="middle" font-size="9.5" fill="currentColor" opacity=".6">«какой A у bandit.labs…?»</text>
               <line class="oks" x1="618" y1="304" x2="404" y2="210" stroke-width="1.5" marker-end="url(#a6)"></line>
               <text class="okt" x="562" y="274" text-anchor="middle" font-size="11" font-weight="700">5</text>
               <text x="8" y="338" font-size="10.5" fill="currentColor" opacity=".62">Шаги 2–5 выполняются только при промахе кеша. При попадании ответ уходит сразу, за миллисекунды.</text>
@@ -6191,7 +6191,7 @@ cG93ZXJzaGVsbCAtZW5jIFVoQmxZM1Z5...</code></pre>
 
                 <rect x="6" y="264" width="688" height="66" rx="10" fill="none" stroke="currentColor" stroke-width="1.1" opacity=".45"></rect>
                 <text x="22" y="288" font-size="11" fill="currentColor">SPF и DKIM смотрят на <tspan font-weight="700">конверт</tspan> — то есть на домен атакующего. Он свой, настроен верно, обе проверки зелёные.</text>
-                <text x="22" y="310" font-size="11" fill="currentColor">Только DMARC смотрит на <tspan font-weight="700">то, что видит человек</tspan>. Поэтому вердикт письма определяет он, а не две зелёные строки выше.</text>
+                <text x="22" y="310" font-size="11" fill="currentColor">Только DMARC смотрит на <tspan font-weight="700">то, что видит человек</tspan>, — поэтому вердикт определяет он, а не зелёные строки выше.</text>
               </svg>
             </div>
             <figcaption>
