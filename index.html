@@ -2165,7 +2165,7 @@ sudo tcpdump -i any -n arp</code></pre>
                 <rect class="bads" x="506" y="216" width="48" height="34" rx="5" fill="none" stroke-width="1.5"></rect><text class="badt" x="530" y="239" text-anchor="middle" font-size="15">1</text>
 
                 <line class="hl" x1="266" y1="52" x2="266" y2="258" stroke-width="2" stroke-dasharray="6 4"></line>
-                <text class="hlt" x="262" y="48" text-anchor="end" font-size="11" font-weight="700">граница /26</text>
+                <text class="hlt" x="262" y="160" text-anchor="end" font-size="11" font-weight="700">граница /26</text>
                 <text x="218" y="276" text-anchor="middle" font-size="11" fill="currentColor" opacity=".7">биты сети</text>
                 <text x="410" y="276" text-anchor="middle" font-size="11" fill="currentColor" opacity=".7">биты хоста — их 6, значит 2⁶ = 64 адреса</text>
                 <text x="8" y="298" font-size="11" fill="currentColor" opacity=".62">обнулили биты хоста → адрес сети · заполнили единицами → широковещательный</text>
@@ -2368,7 +2368,7 @@ sudo tcpdump -i any -n arp</code></pre>
 
                 <line class="oks" x1="526" y1="150" x2="492" y2="150" stroke-width="1.6" marker-end="url(#an)"></line>
                 <text class="okt" x="509" y="172" text-anchor="middle" font-size="10" font-weight="700">ответ</text>
-                <text class="okt" x="480" y="188" text-anchor="end" font-size="10">пришёл на :40002 → значит хосту B</text>
+                <text class="okt" x="694" y="190" text-anchor="end" font-size="10">пришёл на :40002 → значит хосту B</text>
 
                 <text x="6" y="300" font-size="11" fill="currentColor" opacity=".65">Внешний порт — единственное, что связывает ответ с внутренним хостом. Нет журнала трансляций — нет и связи.</text>
               </svg>
@@ -4250,7 +4250,7 @@ nc -zv 127.0.0.1 9999</code></pre>
               <text x="506" y="249" text-anchor="middle" font-size="9.5" fill="currentColor" opacity=".6">«какой A у bandit.labs…?»</text>
               <line class="oks" x1="618" y1="304" x2="404" y2="210" stroke-width="1.5" marker-end="url(#a6)"></line>
               <text class="okt" x="562" y="274" text-anchor="middle" font-size="11" font-weight="700">5</text>
-              <text x="8" y="234" font-size="10.5" fill="currentColor" opacity=".62">Шаги 2–5 выполняются только при промахе кеша. При попадании ответ уходит сразу, за миллисекунды.</text>
+              <text x="8" y="338" font-size="10.5" fill="currentColor" opacity=".62">Шаги 2–5 выполняются только при промахе кеша. При попадании ответ уходит сразу, за миллисекунды.</text>
             </svg>
           </div>
           <figcaption>
@@ -9425,6 +9425,13 @@ CommonSecurityLog
       acceptNode: function (n) {
         if (!n.nodeValue || n.nodeValue.length < 3) return NodeFilter.FILTER_REJECT;
         for (var p = n.parentNode; p && p !== root; p = p.parentNode) {
+          /* Внутрь схем не лезем ни при каких условиях. Проверять по SKIP тут нельзя:
+             у SVG-элементов nodeName возвращается в исходном регистре ('svg', 'text',
+             'tspan'), а не заглавными, как у HTML, — из-за этого SKIP.SVG молча
+             не срабатывал, и в <text> попадал <span class="term">. SVG отрисовать
+             HTML-span внутри текста не умеет, поэтому слово просто исчезало
+             со схемы. Пространство имён от регистра не зависит. */
+          if (p.namespaceURI === 'http://www.w3.org/2000/svg') return NodeFilter.FILTER_REJECT;
           if (SKIP[p.nodeName] || (p.classList && p.classList.contains('term'))) return NodeFilter.FILTER_REJECT;
         }
         return NodeFilter.FILTER_ACCEPT;
