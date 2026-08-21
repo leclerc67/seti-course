@@ -32,8 +32,13 @@
     --gold-soft:#0F262A;
     --gold-line:#1D454B;
     --orange:#E8944F;
-    --ok:#5FCB9E; --ok-soft:#122A22; --ok-line:#244A3C;
-    --bad:#EF8F82; --bad-soft:#2C1714; --bad-line:#4A2622;
+    /* --ok/--bad в тёмной теме — светлые (нужны как читаемый текст на графитовом фоне).
+       Но там же они служат ФОНОМ под буквой варианта ответа (.opt.right/.wrong .mk) — светлый
+       фон под белым текстом не читается. --ok-ink/--bad-ink — обратные, тёмные, для этого фона;
+       в светлой теме роли обратные: --ok/--bad сами тёмные, ink — белый. Не обнаружилось бы
+       обычным прогоном контраста: до первого отвеченного вопроса .opt.right/.wrong нет в DOM. */
+    --ok:#5FCB9E; --ok-soft:#122A22; --ok-line:#244A3C; --ok-ink:#14161B;
+    --bad:#EF8F82; --bad-soft:#2C1714; --bad-line:#4A2622; --bad-ink:#14161B;
     /* Блок кода темнее страницы — перепад маленький, глаз не перестраивается на каждый блок. */
     --term:#0A0D10; --term-ink:#D7DEE3; --term-line:#1E262B;
     --term-c:#7A8790; --term-k:#FFD35C; --term-g:#5FCB9E; --term-r:#EF8F82;
@@ -66,8 +71,8 @@
     --gold-soft:#E1F4F6;
     --gold-line:#B7E3E7;
     --orange:#B5591B;
-    --ok:#0C6B45; --ok-soft:#E6F3EC; --ok-line:#B6DCC6;
-    --bad:#B23125; --bad-soft:#FBEBE8; --bad-line:#EFC7C0;
+    --ok:#0C6B45; --ok-soft:#E6F3EC; --ok-line:#B6DCC6; --ok-ink:#FFFFFF;
+    --bad:#B23125; --bad-soft:#FBEBE8; --bad-line:#EFC7C0; --bad-ink:#FFFFFF;
     --term:#E7ECED; --term-ink:#171B1E; --term-line:#D3DADD;
     --term-c:#57646C; --term-k:#0B6570; --term-g:#0C6B45; --term-r:#A82D22;
     --sh-1:0 1px 2px rgba(16,20,23,.06), 0 3px 10px -5px rgba(16,20,23,.12);
@@ -189,6 +194,8 @@
     padding:9px 12px; border-radius:var(--r-s); transition:background .18s var(--ease), color .18s var(--ease);
   }
   .nav button .n { font-family:var(--mono); font-size:11px; color:var(--ink-3); font-variant-numeric:tabular-nums; }
+  .nav button.soon { cursor:default; opacity:.42; }
+  .nav button.soon:hover { background:transparent; }
   .nav button .dot { width:7px; height:7px; border-radius:50%; background:var(--line-2); justify-self:end; transition:background .2s; }
   .nav button:hover { background:var(--card-2); color:var(--ink); }
   .nav button.on { background:var(--gold-soft); color:var(--ink); font-weight:600; }
@@ -284,8 +291,29 @@
   .sec-h span { font-family:var(--mono); font-size:11.5px; color:var(--ink-3); letter-spacing:.06em; text-transform:uppercase; }
 
   .cards { display:grid; grid-template-columns:repeat(auto-fill,minmax(292px,1fr)); gap:16px; padding-bottom:64px; }
+  .course-pick { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:18px; max-width:760px; margin-top:8px; }
+  .cpick {
+    position:relative; text-align:left; cursor:pointer; font-family:inherit;
+    background:var(--card); border:1px solid var(--line); border-radius:var(--r-m);
+    padding:26px 24px 22px; box-shadow:var(--sh-1); color:var(--ink);
+    display:flex; flex-direction:column; gap:8px;
+    transition:transform .22s var(--ease), box-shadow .22s var(--ease), border-color .22s var(--ease);
+  }
+  .cpick:hover { transform:translateY(-4px); box-shadow:var(--sh-2); border-color:var(--gold-line); }
+  .cpick-n {
+    font-family:var(--mono); font-size:11px; font-weight:700; letter-spacing:.1em;
+    color:var(--gold-ink); background:var(--gold-soft); border:1px solid var(--gold-line);
+    width:fit-content; padding:3px 9px; border-radius:var(--r-pill); margin-bottom:4px;
+  }
+  .cpick h3 { font-family:var(--serif); font-size:20px; line-height:1.25; margin:0; letter-spacing:-.012em; }
+  .cpick p { font-size:14.5px; line-height:1.55; color:var(--ink-2); margin:0; }
+  .cpick-meta { font-family:var(--mono); font-size:11px; color:var(--ink-3); margin-top:4px; }
 
   .src-list { display:flex; flex-direction:column; gap:14px; padding-bottom:96px; }
+  /* видимость по активному курсу: JS переключает .course-off, а не .course-only —
+     так не нужно угадывать «правильный» display для возврата (button:grid, div:block
+     и т.д. разные, а !important-скрытие снимается без восстановления исходного значения) */
+  .course-only.course-off { display:none !important; }
   .src { background:var(--card); border:1px solid var(--line); border-radius:var(--r-m); padding:20px 24px; box-shadow:var(--sh-1); }
   .src-h { display:flex; align-items:baseline; justify-content:space-between; gap:14px; flex-wrap:wrap; margin-bottom:8px; }
   .src-h b { font-family:var(--serif); font-size:18px; letter-spacing:-.012em; }
@@ -319,6 +347,8 @@
   }
   .mcard.is-done .status { background:var(--ok-soft); border-color:var(--ok-line); color:var(--ok); }
   .mcard.is-prog .status { background:var(--gold-soft); border-color:var(--gold-line); color:var(--gold-ink); }
+  .mcard.is-soon { cursor:default; opacity:.55; }
+  .mcard.is-soon:hover { transform:none; box-shadow:var(--sh-1); border-color:var(--line); }
   .mcard h3 { font-family:var(--serif); font-size:19px; line-height:1.25; margin:2px 0 0; letter-spacing:-.012em; font-weight:700; }
   .mcard p { font-size:14.5px; line-height:1.55; color:var(--ink-2); margin:0; flex:1; }
   .mcard .meta { display:flex; align-items:center; gap:10px; font-family:var(--mono); font-size:11px; color:var(--ink-3); }
@@ -502,7 +532,7 @@
     font-size:10px; padding:1px 6px; border-radius:var(--r-pill); background:var(--line-2);
     color:var(--ink); font-weight:700;
   }
-  .term-app-tab.on .term-app-badge.full { background:var(--ok); color:#fff; }
+  .term-app-tab.on .term-app-badge.full { background:var(--ok); color:var(--ok-ink); }
   .term-app-pane { display:none; }
   .term-app-pane.on { display:block; }
   .term-app-screen {
@@ -610,9 +640,9 @@
   .opt:hover:not(:disabled) { border-color:var(--line-2); background:var(--card); transform:translateX(3px); }
   .opt:disabled { cursor:default; }
   .opt.right { background:var(--ok-soft); border-color:var(--ok-line); }
-  .opt.right .mk { background:var(--ok); border-color:var(--ok); color:#fff; }
+  .opt.right .mk { background:var(--ok); border-color:var(--ok); color:var(--ok-ink); }
   .opt.wrong { background:var(--bad-soft); border-color:var(--bad-line); }
-  .opt.wrong .mk { background:var(--bad); border-color:var(--bad); color:#fff; }
+  .opt.wrong .mk { background:var(--bad); border-color:var(--bad); color:var(--bad-ink); }
   .opt.dim { opacity:.5; }
   .exp {
     display:none; margin-top:14px; padding:14px 16px; border-radius:var(--r-s);
@@ -675,7 +705,7 @@
     font-family:var(--mono); font-size:12px; font-weight:700; color:#fff; line-height:1;
   }
   .rubric li.hit { color:var(--ink); }
-  .rubric li.hit::before { content:"✓"; background:var(--ok); border-color:var(--ok); }
+  .rubric li.hit::before { content:"✓"; background:var(--ok); border-color:var(--ok); color:var(--ok-ink); }
   .self { margin-top:16px; padding-top:14px; border-top:1px dashed var(--line); }
   .self-line { display:flex; align-items:center; gap:12px; flex-wrap:wrap; font-size:14.5px; color:var(--ink-2); }
   .self-line b { font-family:var(--mono); font-size:15px; }
@@ -967,8 +997,8 @@
   <aside class="rail" id="rail">
     <div class="rail-top">
       <button class="brand" data-go="home">
-        <span class="mk"><svg width="20" height="20"><use href="#i-net"></use></svg></span>
-        <span class="nm">Сети<small>трек SOC-аналитика</small></span>
+        <span class="mk" id="brandMk"><svg width="20" height="20"><use href="#i-net"></use></svg></span>
+        <span class="nm" id="brandNm">Сети<small id="brandSub">трек SOC-аналитика</small></span>
       </button>
       <button class="iconbtn" id="thBtn" title="Тема" aria-label="Переключить тему">
         <svg><use href="#i-auto"></use></svg>
@@ -981,17 +1011,17 @@
     </div>
 
     <nav class="nav" id="nav">
-      <div class="nav-h">Программа курса</div>
+      <div class="nav-h" id="navH">Программа курса</div>
     </nav>
 
     <nav class="nav" id="navExtra">
-      <div class="nav-h">После курса</div>
-      <button data-go="final" id="navFinal"><i>СМ</i><span>Смена: очередь алертов</span><span class="dot" style="visibility:hidden"></span></button>
+      <div class="nav-h" id="navExtraH">После курса</div>
+      <button data-go="final" id="navFinal" class="course-only" data-course="seti"><i>СМ</i><span>Смена: очередь алертов</span><span class="dot" style="visibility:hidden"></span></button>
       <div class="nav-h">Справочник</div>
       <button data-go="gloss"><i>АЯ</i><span>Словарь терминов</span><span class="dot" style="visibility:hidden"></span></button>
     </nav>
 
-    <div class="rail-f">Модули опираются друг на друга — проходи по порядку. Состояние прогресса и выгрузка в файл — <button class="lnk" data-go="home">на главной</button>.</div>
+    <div class="rail-f">Модули опираются друг на друга — проходи по порядку. <button class="lnk" data-go="choose">Все курсы</button> · <button class="lnk" data-go="home">на главной</button>.</div>
   </aside>
 
   <main>
@@ -1005,14 +1035,14 @@
     <section class="view on" id="v-home">
       <div class="col">
         <div class="hero">
-          <span class="tag">Модуль 2 программы · после Linux</span>
-          <h1>Сети: от кадра Ethernet до строчки в SIEM</h1>
-          <p class="lede">
+          <span class="tag" id="heroTag">Модуль 2 программы · после Linux</span>
+          <h1 id="heroH1">Сети: от кадра Ethernet до строчки в SIEM</h1>
+          <p class="lede" id="heroLede">
             Полный курс для тех, кто идёт в SOC первой линии. Не пересказ стандартов, а разбор того,
             что реально видит аналитик на экране: почему сработало правило, что означает каждое поле
             события и как отличить атаку от штатной работы инфраструктуры.
           </p>
-          <div class="facts">
+          <div class="facts" id="heroFacts">
             <span class="fact">11 модулей</span>
             <span class="fact">55–70 часов</span>
             <span class="fact">9 схем</span>
@@ -1028,6 +1058,7 @@
         </div>
         <div class="cards" id="cards"></div>
 
+<div class="course-only" data-course="seti">
         <div class="sec-h" style="padding-top:0">
           <h2>Где отрабатывать руками</h2>
           <span>важнее, чем чтение</span>
@@ -1106,6 +1137,51 @@
               <code>send()</code>, <code>select()</code>. Оттуда — порядок байт в заголовках, поток байт
               без границ сообщений и очередь ожидающих соединений в модуле 05.
             </p>
+        </div>
+<div class="course-only" data-course="ad">
+        <div class="sec-h" style="padding-top:0">
+          <h2>Где отрабатывать руками</h2>
+          <span>лаборатория обязательна, теорией домен не пощупать</span>
+        </div>
+        <div class="src-list">
+          <div class="src">
+            <div class="src-h"><b>Testo: разворачивание AD + DNS + DHCP</b><span class="src-lvl">лаборатория · база</span></div>
+            <p>
+              Пошаговое поднятие контроллера домена на Windows Server с DNS и DHCP, плюс ввод клиента
+              в домен. То самое место, где стоит поставить руками первую пару виртуалок — модуль 01
+              этого курса даёт понимание, а разворачивать физически удобнее по этой инструкции.
+            </p>
+            <p class="src-w">habr.com, компания testo_lang. Это инструкция админа — бери из неё только шаги установки, не структуру курса.</p>
+          </div>
+          <div class="src">
+            <div class="src-h"><b>1cloud: установка AD DS</b><span class="src-lvl">лаборатория · короче</span></div>
+            <p>
+              Более сжатая версия того же самого: подготовка сети, установка роли, повышение до
+              контроллера домена, первый пользователь. Меньше объяснений, больше скриншотов —
+              годится, когда домен уже понятен и нужно просто быстро поднять стенд заново.
+            </p>
+            <p class="src-w">1cloud.ru/help. Без групповых политик и репликации — этого для лаборатории аналитика достаточно.</p>
+          </div>
+        </div>
+        </div>
+        <div class="course-only" data-course="ad">
+        <div class="sec-h" style="padding-top:0">
+          <h2>Что читать помимо</h2>
+          <span>если захочется глубже устройства, не только логов</span>
+        </div>
+        <div class="src-list">
+          <div class="src">
+            <div class="src-h"><b>Mastering Active Directory, 2nd ed.</b><span class="src-lvl">когда мало модуля 00</span></div>
+            <p>
+              Дишан Фрэнсис, Packt. Полное проектирование инфраструктуры: лес, сайты, роли FSMO,
+              дизайн OU, миграция, AD CS/FS/RMS. Это книга администратора, а не аналитика — 80% её
+              объёма курс сознательно не покрывает, см. README про то, почему.
+            </p>
+            <p class="src-w">Читай выборочно: главы про Kerberos и структуру каталога дадут больше, чем главы про миграцию и федерацию.</p>
+          </div>
+        </div>
+        </div>
+
             <p class="src-w">Для L1 <strong>не обязательна</strong>: это про написание сетевого кода, а не про его анализ. Пригодится, если решишь писать свои утилиты.</p>
           </div>
         </div>
@@ -1134,6 +1210,36 @@
             </div>
           </div>
           <p class="sp-msg" id="spMsg" style="display:none"></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= ВЫБОР КУРСА ================= -->
+    <section class="view" id="v-choose">
+      <div class="col">
+        <div class="hero" style="padding-bottom:8px">
+          <span class="tag">Один трек, разные темы</span>
+          <h1>Какой курс открыть?</h1>
+          <p class="lede">
+            Прогресс, ответы тестов и заметки в каждом курсе свои и не пропадают при переключении.
+            Вернуться сюда можно в любой момент — ссылка «Все курсы» внизу бокового меню.
+          </p>
+        </div>
+        <div class="course-pick">
+          <button class="cpick" data-course="seti">
+            <span class="cpick-n">01</span>
+            <h3>Сети для SOC-аналитика</h3>
+            <p>От кадра Ethernet до строчки в SIEM. 11 модулей, практика в терминале, капстоун
+              с очередью алертов.</p>
+            <span class="cpick-meta">11 модулей · 55–70 ч</span>
+          </button>
+          <button class="cpick" data-course="ad">
+            <span class="cpick-n">02</span>
+            <h3>Домен глазами аналитика</h3>
+            <p>Windows изнутри, журнал событий, Sysmon и то, как атаки в домене видно в логах —
+              не администрирование, а чтение чужих следов.</p>
+            <span class="cpick-meta">7 модулей · в работе, готовы первые два</span>
+          </button>
         </div>
       </div>
     </section>
@@ -7689,6 +7795,559 @@ CommonSecurityLog
         </div>
       </div>
     </section>
+
+    <!-- ================= AD 00 ================= -->
+    <section class="view" id="v-m11">
+      <div class="col">
+        <div class="lesson">
+          <div class="crumb"><b>Модуль 00 · Домен</b> · 2,5 часа · без практики</div>
+          <h2>Домен глазами аналитика</h2>
+
+          <div class="goal rv">
+            <p><b>Что будет в модуле.</b> Проблема, которую домен решает, и почему без неё
+            организация на сотне машин не живёт. Как компьютер на самом деле узнаёт, кто перед ним, —
+            билет Kerberos, а не пароль по сети. Что такое групповая политика с точки зрения того,
+            кто её читает, а не пишет. Почему группа Domain Admins — самая дорогая цель во всей
+            инфраструктуре.</p>
+          </div>
+
+          <h3>Проблема, которую решает домен</h3>
+          <p>
+            В модуле про Linux ты заводил пользователя на одной машине: <code>useradd</code>, пароль,
+            права — и всё это живёт локально, в файлах самой машины. Это работает, пока машина одна.
+          </p>
+          <p>
+            Представь компанию на триста компьютеров. Без общего механизма у каждого — свой
+            локальный список пользователей. Уволился сотрудник — идти на все триста машин руками
+            и удалять его учётку. Сменил пароль — то же самое. Новый сотрудник — заводить его
+            заново на каждом ноутбуке, к которому он подойдёт. Это не масштабируется физически,
+            и держать так инфраструктуру в сто раз крупнее компании невозможно в принципе.
+          </p>
+          <p>
+            <strong>Domain Services</strong> — ответ на эту проблему. Идея простая: пусть один
+            сервер хранит <em>все</em> учётные записи организации, а остальные машины ему доверяют
+            и спрашивают у него, а не решают сами. Уволился сотрудник — одна операция в одном месте,
+            и он мгновенно теряет доступ везде.
+          </p>
+
+          <h3>Кто есть кто</h3>
+          <p>
+            Сервер, который хранит учётные записи и отвечает на вопросы «кто ты» — это
+            <strong>контроллер домена</strong> (domain controller, DC). Сама база — каталог, где
+            вперемешку с пользователями лежат компьютеры, группы и принтеры. Организация может расти
+            и делиться на несколько таких каталогов — тогда это уже <strong>лес</strong> из нескольких
+            <strong>доменов</strong>, но для первой линии почти всегда достаточно знать: контроллер
+            домена — это тот, у кого спрашивают правду.
+          </p>
+          <div class="tbl rv">
+            <table>
+              <thead><tr><th>Термин</th><th>Что это</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Контроллер домена (DC)</strong></td><td>сервер, хранящий базу учётных записей и отвечающий на запросы аутентификации</td></tr>
+                <tr><td><strong>Домен</strong></td><td>одна такая база плюс всё, что в неё входит: пользователи, компьютеры, группы</td></tr>
+                <tr><td><strong>Лес</strong></td><td>несколько доменов, связанных доверием между собой — у крупных организаций</td></tr>
+                <tr><td><strong>OU</strong> (организационная единица)</td><td>папка внутри каталога: «Бухгалтерия», «Филиал в Казани» — для группировки и разных политик</td></tr>
+                <tr><td><strong>Domain Admins</strong></td><td>группа с полными правами над всем доменом — см. врезку ниже</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>Как машина узнаёт, что перед ней — действительно ты</h3>
+          <p>
+            Ты садишься за рабочий компьютер и вводишь пароль. Кажется, что дальше просто: машина
+            сверяет пароль и пускает. На самом деле пароль по сети <em>не передаётся вообще</em> —
+            и это принципиальный момент, вокруг которого построена вся защита от перехвата в домене.
+          </p>
+          <p>
+            Вместо этого работает протокол <strong>Kerberos</strong>, названный в честь трёхголового
+            пса из мифологии не просто так: в обмене участвуют три стороны, и ни одна не видит пароль
+            другой напрямую.
+          </p>
+          <ol>
+            <li><strong>Ты вводишь пароль</strong> — он остаётся на твоей машине и используется только
+              чтобы локально расшифровать то, что придёт в ответ на следующем шаге. По сети не идёт.</li>
+            <li><strong>Машина просит у контроллера домена подтверждение</strong> — если расчёт совпал,
+              контроллер знает, что пароль был верным, и выдаёт <strong>TGT</strong> (Ticket Granting
+              Ticket) — что-то вроде «этому человеку я доверяю до конца дня».</li>
+            <li><strong>Дальше ты предъявляешь TGT, а не пароль</strong>, каждый раз когда нужен доступ
+              к новому серверу — файловой шаре, базе, почте. Контроллер меняет TGT на отдельный билет
+              именно для этого сервера.</li>
+            <li><strong>Сервер проверяет билет и пускает</strong> — сам он пароль не видел ни разу
+              за всю цепочку.</li>
+          </ol>
+          <div class="cal warn rv">
+            <svg><use href="#i-warn"></use></svg>
+            <div>
+              <span class="ttl">Запомни это на будущее, не разбирай сейчас</span>
+              <p>
+                Билет — это файл, который на время подтверждает личность вместо пароля. Значит,
+                если билет <em>украден</em>, а не подсмотрен пароль, то с ним можно действовать
+                от чужого имени, пока он не истёк, — смена пароля уже выданный билет не отзывает. Это ровно
+                то, на чём строятся <code>pass-the-hash</code> и <code>kerberoasting</code>: не подбор
+                пароля, а работа с самими билетами. Подробно — в модуле «Атаки в домене», сейчас
+                достаточно знать, что билет и есть новая «личность» в этой системе.
+              </p>
+            </div>
+          </div>
+
+          <figure class="rv">
+            <div class="fig">
+              <svg viewBox="0 0 840 400" role="img" aria-label="Диаграмма обмена Kerberos тремя дорожками: рабочая станция запрашивает у контроллера домена TGT, получает его, затем меняет TGT на билет конкретного сервера, получает и этот билет, и только на последнем шаге впервые обращается к файловому серверу напрямую, предъявляя готовый билет">
+                <defs><marker id="ak" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="currentColor"></path></marker></defs>
+
+                <rect x="70" y="12" width="130" height="44" rx="12" fill="none" stroke="currentColor" stroke-width="1.4"></rect>
+                <text x="135" y="32" text-anchor="middle" font-size="12.5" fill="currentColor" font-weight="700">Твой ПК</text>
+                <text x="135" y="48" text-anchor="middle" font-size="9.5" fill="currentColor" opacity=".6">пароль остаётся тут</text>
+
+                <rect class="hlf" x="355" y="8" width="130" height="52" rx="12" stroke-width="1.8"></rect>
+                <text x="420" y="30" text-anchor="middle" font-size="12.5" fill="currentColor" font-weight="700">Контроллер домена</text>
+                <text x="420" y="48" text-anchor="middle" font-size="9.5" fill="currentColor" opacity=".7">хранит учётки, выдаёт билеты</text>
+
+                <rect x="640" y="12" width="130" height="44" rx="12" fill="none" stroke="currentColor" stroke-width="1.4"></rect>
+                <text x="705" y="32" text-anchor="middle" font-size="12" fill="currentColor" font-weight="700">Файловый сервер</text>
+                <text x="705" y="48" text-anchor="middle" font-size="9.5" fill="currentColor" opacity=".6">пароль не видел</text>
+
+                <line x1="135" y1="64" x2="135" y2="380" stroke="currentColor" stroke-width="1" opacity=".3" stroke-dasharray="4 4"></line>
+                <line x1="420" y1="64" x2="420" y2="380" stroke="currentColor" stroke-width="1" opacity=".3" stroke-dasharray="4 4"></line>
+                <line x1="705" y1="64" x2="705" y2="380" stroke="currentColor" stroke-width="1" opacity=".3" stroke-dasharray="4 4"></line>
+
+                <line x1="135" y1="96" x2="418" y2="96" stroke="currentColor" stroke-width="1.4" marker-end="url(#ak)"></line>
+                <text x="277" y="88" text-anchor="middle" font-size="11.5" fill="currentColor" font-weight="700">1 · запрос TGT</text>
+                <text x="277" y="112" text-anchor="middle" font-size="9.5" fill="currentColor" opacity=".62">по локально проверенному паролю</text>
+
+                <line class="oks" x1="420" y1="150" x2="137" y2="150" stroke-width="1.6" marker-end="url(#ak)"></line>
+                <text class="okt" x="277" y="142" text-anchor="middle" font-size="11.5" font-weight="700">2 · выдан TGT</text>
+                <text x="277" y="166" text-anchor="middle" font-size="9.5" fill="currentColor" opacity=".62">«этому человеку я доверяю до конца дня»</text>
+
+                <line x1="135" y1="204" x2="418" y2="204" stroke="currentColor" stroke-width="1.4" marker-end="url(#ak)"></line>
+                <text x="277" y="196" text-anchor="middle" font-size="11.5" fill="currentColor" font-weight="700">3 · TGT → прошу билет для сервера</text>
+                <text x="277" y="220" text-anchor="middle" font-size="9.5" fill="currentColor" opacity=".62">пароль уже не нужен — только что выданный TGT</text>
+
+                <line class="oks" x1="420" y1="258" x2="137" y2="258" stroke-width="1.6" marker-end="url(#ak)"></line>
+                <text class="okt" x="277" y="250" text-anchor="middle" font-size="11.5" font-weight="700">4 · билет для сервера выдан</text>
+                <text x="277" y="274" text-anchor="middle" font-size="9.5" fill="currentColor" opacity=".62">контроллер сам с сервером не связывается никогда</text>
+
+                <line x1="135" y1="326" x2="703" y2="326" stroke="currentColor" stroke-width="1.4" marker-end="url(#ak)"></line>
+                <text x="420" y="316" text-anchor="middle" font-size="11.5" fill="currentColor" font-weight="700">5 · предъявил билет — доступ открыт</text>
+                <text x="420" y="340" text-anchor="middle" font-size="9.5" fill="currentColor" opacity=".62">впервые за всю цепочку ПК обращается к серверу напрямую</text>
+              </svg>
+            </div>
+            <figcaption>
+              Пароль не покидает рабочую станцию ни на одном шаге. Дальше по цепочке ходят билеты —
+              и именно билеты, а не пароль, становятся целью атакующего внутри уже скомпрометированной сети.
+            </figcaption>
+          </figure>
+
+          <h3>Групповая политика — глазами того, кто её читает</h3>
+          <p>
+            <strong>GPO</strong> (Group Policy Object) — механизм, которым администратор одной
+            настройкой меняет поведение сразу тысяч машин: запрещает флешки, требует сложный пароль,
+            включает журналирование PowerShell, разворачивает антивирус. Задать её можно на весь
+            домен, на конкретную OU или на группу компьютеров.
+          </p>
+          <p>
+            Аналитику администрировать GPO не нужно — этому целиком посвящены чужие курсы
+            и сертификации, и здесь эта тема сознательно не разбирается вглубь. Нужно другое:
+            <strong>знать, что это рычаг, до которого дотягивается весь домен разом</strong>. Если
+            атакующий получил права менять GPO, он может одной политикой развернуть вредонос
+            на всех компьютерах организации за один цикл обновления политик. Это и делает GPO
+            привлекательной целью — и это единственное, что аналитику про неё по-настоящему важно.
+          </p>
+
+          <h3>Domain Admins — самая дорогая цель в инфраструктуре</h3>
+          <p>
+            Некоторые учётные записи состоят в группе <strong>Domain Admins</strong> — у них права
+            на весь домен целиком: любая машина, любой файл, возможность создавать и удалять
+            любые учётки, менять любые GPO. Это не «ещё один админ» — это ключ от всего здания сразу.
+          </p>
+          <div class="cal eye rv">
+            <svg><use href="#i-eye"></use></svg>
+            <div>
+              <span class="ttl">Почему это главная мысль модуля</span>
+              <p>
+                Почти любая серьёзная атака на компанию с доменом стремится ровно к одному:
+                <strong>завладеть учёткой Domain Admins или билетом контроллера домена</strong>.
+                Как только это происходит, дальше атакующему открыто буквально всё — не нужно
+                взламывать каждую машину по отдельности. Именно поэтому в модуле «Атаки в домене»
+                разбираются техники, которые ведут именно туда: не «как испортить один компьютер»,
+                а «как дойти до контроллера домена».
+              </p>
+            </div>
+          </div>
+
+          <div class="quizset" data-quiz="11">
+            <div class="quizset-h"><h3>Проверь себя</h3><span class="score">0 / 4</span></div>
+
+            <div class="quiz" data-i="1">
+              <span class="qn">Вопрос 1</span>
+              <p class="qt">Зачем организации на триста компьютеров нужен домен, если можно завести локальных пользователей на каждой машине?</p>
+              <div class="opts">
+                <button class="opt" data-ok="1"><span class="mk">А</span><span>Чтобы управлять учётками централизованно — один раз, а не на трёхстах машинах по отдельности</span></button>
+                <button class="opt" data-why="Домен не про производительность входа, а про то, где физически хранится и меняется список учётных записей."><span class="mk">Б</span><span>Чтобы пользователи входили в систему быстрее</span></button>
+                <button class="opt" data-why="Домен, наоборот, требует контроллера и постоянной связи с ним — это дополнительная инфраструктура, а не экономия на серверах."><span class="mk">В</span><span>Чтобы не покупать сервер для хранения файлов</span></button>
+              </div>
+              <div class="exp"><b>Верно: А.</b> Без домена увольнение сотрудника — это обход трёхсот машин руками. С доменом — одна операция в одном месте, применяющаяся сразу везде.</div>
+            </div>
+
+            <div class="quiz" data-i="2">
+              <span class="qn">Вопрос 2</span>
+              <p class="qt">На каком шаге аутентификации Kerberos пароль передаётся по сети?</p>
+              <div class="opts">
+                <button class="opt" data-why="TGT — это уже результат проверки, а не сам пароль. К моменту его выдачи пароль по сети не уходил."><span class="mk">А</span><span>При получении TGT от контроллера домена</span></button>
+                <button class="opt" data-why="Финальный билет для конкретного сервера тоже не содержит пароль — сервер проверяет билет, а не учётные данные пользователя."><span class="mk">Б</span><span>При предъявлении билета файловому серверу</span></button>
+                <button class="opt" data-ok="1"><span class="mk">В</span><span>Ни на каком — пароль остаётся на рабочей станции и используется только локально</span></button>
+              </div>
+              <div class="exp"><b>Верно: В.</b> Это и есть ключевая мысль про Kerberos: по сети ходят билеты, не пароль. Именно поэтому атаки в скомпрометированном домене нацелены на кражу билетов, а не на перехват пароля в трафике.</div>
+            </div>
+
+            <div class="quiz" data-i="3">
+              <span class="qn">Вопрос 3</span>
+              <p class="qt">Почему украденный билет Kerberos опасен даже без пароля пользователя?</p>
+              <div class="opts">
+                <button class="opt" data-ok="1"><span class="mk">А</span><span>Билет сам по себе подтверждает личность — предъявивший его получает доступ, как будто пароль уже проверен</span></button>
+                <button class="opt" data-why="Билеты выдаёт контроллер домена по итогам проверки пароля — сами по себе они с сервисами напрямую не взаимодействуют до предъявления."><span class="mk">Б</span><span>Билет содержит пароль в открытом виде, и его можно прочитать</span></button>
+                <button class="opt" data-why="Билет привязан к конкретной учётной записи и обычно ограничен временем и охватом — но это не отменяет того, что он сам по себе служит проверкой личности."><span class="mk">В</span><span>Билет не имеет ограничений и работает вечно для любой учётной записи</span></button>
+              </div>
+              <div class="exp"><b>Верно: А.</b> Смена пароля после кражи билета не обнуляет уже выданные билеты — они действуют независимо от пароля, пока не истекут. Отсюда и техники вроде pass-the-hash и kerberoasting: цель — билет или его эквивалент, а не сам пароль.</div>
+            </div>
+
+            <div class="quiz" data-i="4">
+              <span class="qn">Вопрос 4</span>
+              <p class="qt">Почему группа Domain Admins — приоритетная цель почти любой атаки на инфраструктуру с доменом?</p>
+              <div class="opts">
+                <button class="opt" data-why="Domain Admins не про удобство входа — это набор прав, а не механизм аутентификации."><span class="mk">А</span><span>Потому что участники группы входят в систему без пароля</span></button>
+                <button class="opt" data-ok="1"><span class="mk">Б</span><span>Потому что права этой группы распространяются на весь домен разом — не нужно взламывать каждую машину отдельно</span></button>
+                <button class="opt" data-why="GPO — отдельный, хоть и связанный, рычаг. Права Domain Admins шире одной групповой политики: это доступ ко всему домену целиком."><span class="mk">В</span><span>Потому что только эта группа может редактировать GPO</span></button>
+              </div>
+              <div class="exp"><b>Верно: Б.</b> Захватив Domain Admins или контроллер домена, атакующему больше не нужно пробиваться на каждую машину по отдельности — доступ открыт сразу везде. Это и делает захват контроллера домена главной целью атаки на инфраструктуру такого масштаба.</div>
+            </div>
+          </div>
+
+          <div class="cheat rv" id="cheat-m11">
+            <div class="cheat-h"><svg><use href="#i-list"></use></svg><span>Конспект модуля</span></div>
+            <div class="cheat-grid">
+              <div class="cheat-g">
+                <h4>Зачем домен</h4>
+                <ul>
+                <li>Централизует учётки: одна операция в одном месте вместо обхода каждой машины.</li>
+                <li>Контроллер домена (DC) — сервер, хранящий базу и отвечающий на запросы аутентификации.</li>
+                <li>Домен → лес (несколько доменов с доверием). OU — папка внутри каталога для группировки.</li>
+                </ul>
+              </div>
+              <div class="cheat-g">
+                <h4>Kerberos, пять шагов</h4>
+                <ul>
+                <li>Пароль проверяется локально и по сети не передаётся никогда.</li>
+                <li>TGT — билет от контроллера домена, подтверждающий, что пароль был верным.</li>
+                <li>Отдельный билет выдаётся под каждый конкретный сервис на основе TGT.</li>
+                <li>Сервис проверяет билет, а не пароль, — пароля он не видел ни разу.</li>
+                </ul>
+              </div>
+              <div class="cheat-g">
+                <h4>GPO — что важно аналитику</h4>
+                <ul>
+                <li>Одна политика меняет поведение тысяч машин разом.</li>
+                <li>Опасность не в администрировании, а в рычаге: захват GPO — вредонос на весь домен разом.</li>
+                </ul>
+              </div>
+              <div class="cheat-g">
+                <h4>Domain Admins</h4>
+                <ul>
+                <li>Права на весь домен: любая машина, любая учётка, любая GPO.</li>
+                <li>Почти любая серьёзная атака на домен целится именно сюда или в контроллер домена.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="finish"><input type="checkbox" id="f11" data-fin="11"><label for="f11">Модуль 00 · Домен пройден</label></div>
+        </div>
+      </div>
+    </section>
+    <!-- ================= AD 01 ================= -->
+    <section class="view" id="v-m12">
+      <div class="col">
+        <div class="lesson">
+          <div class="crumb"><b>Модуль 01 · Домен</b> · 4 часа + лабораторная</div>
+          <h2>Windows изнутри</h2>
+
+          <div class="goal rv">
+            <p><b>Что будет в модуле.</b> Процессы и почему цепочка «кто кого запустил» важнее
+            самого процесса. Службы и почему их так много называются <code>svchost.exe</code>.
+            Реестр — не весь, а ровно то, что нужно узнавать с одного взгляда. Автозапуск —
+            любимое место malware, чтобы пережить перезагрузку. И лабораторная: поднимаем
+            контроллер домена и вводим в него клиент, своими руками.</p>
+          </div>
+
+          <h3>Процесс — не что, а от кого</h3>
+          <p>
+            В Linux ты уже смотрел на процессы через <code>ps</code>: у каждого есть PID и есть
+            родитель, PPID. В Windows устройство ровно то же самое, только штатный способ
+            посмотреть — диспетчер задач или команда <code>tasklist</code>, и родительский процесс
+            там называется <em>parent process</em>.
+          </p>
+          <p>
+            Один процесс сам по себе почти ничего не говорит. <code>powershell.exe</code> запущен —
+            и что? Администратор так делает постоянно. Вопрос, который на самом деле важен, —
+            <strong>кто его запустил</strong>. Если родитель — <code>explorer.exe</code>, это ты сам
+            открыл PowerShell из меню. Если родитель — <code>winword.exe</code>, это открытый
+            документ Word только что запустил командную оболочку сам, без твоего участия. Второе —
+            почти всегда вредоносный макрос.
+          </p>
+          <figure class="rv">
+            <div class="fig">
+              <svg viewBox="0 0 780 220" role="img" aria-label="Схема дерева процессов: explorer.exe в норме порождает winword.exe при открытии документа, но когда winword.exe сам порождает powershell.exe, а тот — cmd.exe, это подозрительная цепочка выполнения макроса">
+                <defs><marker id="ap" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="currentColor"></path></marker></defs>
+
+                <rect x="8" y="78" width="150" height="56" rx="12" fill="none" stroke="currentColor" stroke-width="1.4"></rect>
+                <text x="83" y="102" text-anchor="middle" font-size="12" fill="currentColor" font-weight="700">explorer.exe</text>
+                <text x="83" y="120" text-anchor="middle" font-size="9.5" fill="currentColor" opacity=".62">открыл документ</text>
+
+                <rect x="230" y="78" width="150" height="56" rx="12" fill="none" stroke="currentColor" stroke-width="1.4"></rect>
+                <text x="305" y="102" text-anchor="middle" font-size="12" fill="currentColor" font-weight="700">winword.exe</text>
+                <text x="305" y="120" text-anchor="middle" font-size="9.5" fill="currentColor" opacity=".62">пока нормально</text>
+
+                <rect class="bads" x="452" y="18" width="150" height="56" rx="12" fill="none" stroke-width="1.8"></rect>
+                <text x="527" y="42" text-anchor="middle" font-size="12" fill="currentColor" font-weight="700">powershell.exe</text>
+                <text class="badt" x="527" y="60" text-anchor="middle" font-size="9.5" font-weight="700">запущен из Word</text>
+
+                <rect class="bads" x="452" y="140" width="150" height="56" rx="12" fill="none" stroke-width="1.8"></rect>
+                <text x="527" y="164" text-anchor="middle" font-size="12" fill="currentColor" font-weight="700">cmd.exe</text>
+                <text class="badt" x="527" y="182" text-anchor="middle" font-size="9.5" font-weight="700">и дальше вниз</text>
+
+                <line x1="160" y1="106" x2="228" y2="106" stroke="currentColor" stroke-width="1.3" marker-end="url(#ap)"></line>
+                <line class="bads" x1="382" y1="98" x2="450" y2="58" stroke-width="1.6" marker-end="url(#ap)"></line>
+                <line class="bads" x1="382" y1="114" x2="450" y2="158" stroke-width="1.6" marker-end="url(#ap)"></line>
+
+                <text x="8" y="200" font-size="11" fill="currentColor" opacity=".65">Родитель у процесса всегда один. Word, порождающий оболочку без твоего участия, — это и есть макрос, а не рутина.</text>
+              </svg>
+            </div>
+            <figcaption>
+              Тот же процесс <code>powershell.exe</code> — норма под <code>explorer.exe</code> и тревога
+              под <code>winword.exe</code>. Смысл несёт не сам процесс, а его родитель.
+            </figcaption>
+          </figure>
+
+          <h3>Службы — тихие процессы без окна</h3>
+          <p>
+            <strong>Служба</strong> (service) — программа, которая работает в фоне без интерфейса
+            и запускается ещё до входа пользователя в систему: антивирус, сетевой стек, планировщик
+            печати. Список даёт команда <code>sc query</code> или оснастка <code>services.msc</code>.
+          </p>
+          <p>
+            Первое, что путает всех новичков в диспетчере задач, — десяток одинаковых процессов
+            <code>svchost.exe</code>. Это не ошибка и не заражение само по себе: Windows группирует
+            мелкие службы внутри одного процесса-контейнера, чтобы не плодить сотни отдельных
+            программ. <code>svchost.exe</code> сам по себе не делает ничего — важно, <em>какую
+            службу</em> он в себе несёт, это видно по параметрам командной строки процесса.
+          </p>
+          <div class="cal warn rv">
+            <svg><use href="#i-warn"></use></svg>
+            <div>
+              <span class="ttl">Почему это интересно аналитику</span>
+              <p>
+                Malware маскируется под <code>svchost.exe</code> буквально по имени файла — расчёт
+                на то, что в списке процессов его никто не заметит среди десятка настоящих. Отличить
+                легко по одному признаку: настоящий <code>svchost.exe</code> лежит только
+                в <code>C:\\Windows\\System32</code>. Тот же файл, запущенный из
+                <code>C:\\Users\\...\\AppData</code> или из временной папки, — подделка,
+                как бы он ни назывался.
+              </p>
+            </div>
+          </div>
+
+          <h3>Реестр — только то, что нужно узнавать</h3>
+          <p>
+            <strong>Реестр</strong> — база настроек всей системы: от разрешения экрана до того,
+            какие программы стартуют вместе с Windows. Устроен как дерево папок, и у аналитика
+            вызывают вопросы обычно только два раздела верхнего уровня.
+          </p>
+          <div class="tbl rv">
+            <table>
+              <thead><tr><th>Раздел</th><th>Что в нём</th><th>Аналог из Linux</th></tr></thead>
+              <tbody>
+                <tr><td><code>HKEY_LOCAL_MACHINE</code> (<code>HKLM</code>)</td><td>настройки всей машины, общие для всех пользователей</td><td><code>/etc/</code></td></tr>
+                <tr><td><code>HKEY_CURRENT_USER</code> (<code>HKCU</code>)</td><td>настройки именно того, кто сейчас вошёл в систему</td><td><code>~/.config/</code></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p>
+            Различие важно буквально: запись в <code>HKCU</code> запускается только когда вошёл
+            конкретный пользователь, запись в <code>HKLM</code> — при загрузке системы для всех.
+            Второе даёт вредоносу более широкий охват и обычно требует прав администратора.
+          </p>
+
+          <h3>Автозапуск — то, ради чего вредонос переживает перезагрузку</h3>
+          <p>
+            Заразить машину — половина дела: без механизма пережить перезагрузку заражение исчезает
+            при первой же перезагрузке. <strong>Автозапуск</strong> — общее название для мест,
+            откуда Windows сама стартует программы, и это одно из самых частых мест закрепления
+            (<em>persistence</em>) в реальных инцидентах.
+          </p>
+          <div class="tbl rv">
+            <table>
+              <thead><tr><th>Место</th><th>Когда срабатывает</th></tr></thead>
+              <tbody>
+                <tr><td><code>...\Run</code> в HKLM или HKCU</td><td>при загрузке системы или входе пользователя — самое частое место в отчётах о заражении</td></tr>
+                <tr><td>Папка «Автозагрузка» (Startup)</td><td>то же самое, но видно глазами: ярлыки в проводнике, без реестра</td></tr>
+                <tr><td>Служба с автозапуском</td><td>стартует ещё до входа пользователя — переживает даже смену учётки</td></tr>
+                <tr><td>Задача в планировщике</td><td>можно запускать не только при загрузке, но и по расписанию или событию — самое незаметное место</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="cal eye rv">
+            <svg><use href="#i-eye"></use></svg>
+            <div>
+              <span class="ttl">Ключевая мысль модуля</span>
+              <p>
+                Заметить сам факт заражения часто получается уже постфактум — по алерту, по жалобе
+                пользователя. А вот <strong>найти, как именно вредонос закрепился</strong>, — это
+                и есть работа по автозапуску и службам: без ответа на этот вопрос чистка машины
+                бессмысленна, он вернётся при следующей перезагрузке тем же путём.
+              </p>
+            </div>
+          </div>
+
+          <div class="prac rv">
+            <div class="prac-h"><svg><use href="#i-term"></use></svg><span>Лабораторная: поднимаем контроллер домена</span></div>
+            <p>
+              Дальше в курсе постоянно будут примеры вида «в логе контроллера домена видно…» —
+              и это должно быть <em>твоим</em> логом, не абстракцией из книги. Разворачивать
+              стенд руками — отдельная, чисто административная работа, для которой есть готовые
+              пошаговые инструкции; здесь — что должно получиться на выходе и как это проверить.
+            </p>
+            <p>
+              <strong>Понадобится:</strong> две виртуалки. Первая — Windows Server (Evaluation-версия
+              бесплатна у Microsoft, 180 дней), станет контроллером домена. Вторая — любой клиент
+              Windows, войдёт в этот домен. 4 ГБ памяти и 40 ГБ диска на каждую хватит с запасом.
+            </p>
+            <p>
+              <strong>Куда идти за самими шагами</strong> — в README этого курса, раздел
+              «Материалы» указывает две инструкции: подробную с объяснениями (habr, автор
+              testo_lang) и короткую, если домен уже понятен и нужно просто быстро поднять
+              стенд заново (1cloud). Обе — инструкции администратора, поэтому бери из них только
+              последовательность действий, а не то, чему они учат сверх установки.
+            </p>
+            <pre><code><span class="c"># на клиенте: убедиться, что домен подключён</span>
+whoami /fqdn
+<span class="c"># должно вернуть имя_машины.имя_домена, а не просто имя_машины</span>
+
+<span class="c"># на клиенте: клиент реально видит контроллер домена через DNS</span>
+nslookup имя-домена
+
+<span class="c"># на контроллере домена: общая проверка здоровья домена</span>
+dcdiag
+<span class="c"># в выводе должно быть "... passed test" по каждому пункту, без failed</span></code></pre>
+            <p>
+              Если <code>whoami /fqdn</code> вернул только имя машины без домена — клиент физически
+              не присоединён, и весь материал следующих модулей будет неоткуда взять. Это тот шаг,
+              который стоит перепроверить прежде, чем двигаться дальше.
+            </p>
+          </div>
+
+          <div class="quizset" data-quiz="12">
+            <div class="quizset-h"><h3>Проверь себя</h3><span class="score">0 / 5</span></div>
+
+            <div class="quiz" data-i="1">
+              <span class="qn">Вопрос 1</span>
+              <p class="qt">В логах: <code>winword.exe</code> запустил <code>powershell.exe</code>. Что в первую очередь настораживает?</p>
+              <div class="opts">
+                <button class="opt" data-why="PowerShell сам по себе используется постоянно и легитимно — вопрос не в нём, а в том, кто именно его запустил."><span class="mk">А</span><span>Сам факт, что где-то на машине запущен powershell.exe</span></button>
+                <button class="opt" data-ok="1"><span class="mk">Б</span><span>То, что родителем powershell.exe оказался winword.exe, а не explorer.exe</span></button>
+                <button class="opt" data-why="Имя открытого документа само по себе ничего не говорит о том, что происходит в системе после его открытия."><span class="mk">В</span><span>Название открытого в Word документа</span></button>
+              </div>
+              <div class="exp"><b>Верно: Б.</b> Открытие оболочки самим документом, без действий пользователя, — типичный след вредоносного макроса. Это и есть смысл смотреть на родителя процесса, а не только на сам процесс.</div>
+            </div>
+
+            <div class="quiz" data-i="2">
+              <span class="qn">Вопрос 2</span>
+              <p class="qt">На машине десяток процессов svchost.exe. Это само по себе признак заражения?</p>
+              <div class="opts">
+                <button class="opt" data-why="Десяток svchost.exe — стандартная картина любой Windows: система группирует мелкие службы внутри процесса-контейнера, а не заводит их как отдельные программы."><span class="mk">А</span><span>Да, обычно их должно быть один-два</span></button>
+                <button class="opt" data-ok="1"><span class="mk">Б</span><span>Нет, это нормальная группировка служб; подозрение вызывает только запуск не из System32</span></button>
+                <button class="opt" data-why="Один процесс может нести несколько мелких служб внутри себя — жёсткого правила «одна служба — один svchost.exe» нет."><span class="mk">В</span><span>Да, если их количество не совпадает с числом установленных служб</span></button>
+              </div>
+              <div class="exp"><b>Верно: Б.</b> Настоящий svchost.exe лежит только в C:\\Windows\\System32. Тот же файл, запущенный из AppData или временной папки, — подделка, независимо от того, сколько таких процессов в системе одновременно.</div>
+            </div>
+
+            <div class="quiz" data-i="3">
+              <span class="qn">Вопрос 3</span>
+              <p class="qt">Чем принципиально отличается запись автозапуска в HKCU от записи в HKLM?</p>
+              <div class="opts">
+                <button class="opt" data-ok="1"><span class="mk">А</span><span>HKCU срабатывает только при входе конкретного пользователя, HKLM — при загрузке системы для всех</span></button>
+                <button class="opt" data-why="Оба раздела реестра относятся к системным настройкам одной и той же машины — различие не в том, где физически хранится запись."><span class="mk">Б</span><span>HKCU хранится в файле на диске, а HKLM — только в памяти</span></button>
+                <button class="opt" data-why="Права требуются для записи в HKLM именно потому, что она влияет на всех пользователей машины, а не наоборот."><span class="mk">В</span><span>HKLM нужен только для игр и мультимедиа, HKCU — для остального</span></button>
+              </div>
+              <div class="exp"><b>Верно: А.</b> HKLM даёт вредоносу более широкий охват — сработает для любого, кто войдёт в систему, — и обычно требует прав администратора для записи. HKCU привязана к конкретной учётке.</div>
+            </div>
+
+            <div class="quiz" data-i="4">
+              <span class="qn">Вопрос 4</span>
+              <p class="qt">Почему в разборе заражения важно найти именно место автозапуска, а не только сам вредоносный файл?</p>
+              <div class="opts">
+                <button class="opt" data-why="Удаление файла без снятия точки закрепления не помешает вредоносу вернуться — Windows просто попробует его запустить снова и не найдёт, но сама запись продолжит существовать."><span class="mk">А</span><span>Потому что сам файл на диске обычно ничего не весит и найти его сложнее записи в реестре</span></button>
+                <button class="opt" data-ok="1"><span class="mk">Б</span><span>Потому что без устранения точки закрепления заражение вернётся при следующей перезагрузке тем же путём</span></button>
+                <button class="opt" data-why="Планировщик и службы работают независимо от факта входа пользователя в систему — точка закрепления не обязана быть привязана к конкретной учётке."><span class="mk">В</span><span>Потому что автозапуск виден только тому пользователю, под которым вредонос был установлен</span></button>
+              </div>
+              <div class="exp"><b>Верно: Б.</b> Удалить сам файл недостаточно: если осталась запись в Run, служба или задача в планировщике, система запустит вредонос заново или он подтянется откуда-то ещё. Чистка машины без поиска точки закрепления бессмысленна.</div>
+            </div>
+
+            <div class="quiz" data-i="5">
+              <span class="qn">Вопрос 5</span>
+              <p class="qt">После присоединения клиента к домену команда <code>whoami /fqdn</code> вернула только имя машины, без домена. Что это значит?</p>
+              <div class="opts">
+                <button class="opt" data-why="Проблема с самим присоединением к домену не связана с наличием или отсутствием обновлений системы."><span class="mk">А</span><span>На клиенте не установлены последние обновления Windows</span></button>
+                <button class="opt" data-ok="1"><span class="mk">Б</span><span>Клиент физически не присоединён к домену — операцию нужно повторить</span></button>
+                <button class="opt" data-why="Это не вопрос производительности сети: результат команды говорит именно о членстве в домене, а не о скорости отклика."><span class="mk">В</span><span>Домен работает нормально, просто ответ медленный из-за сети</span></button>
+              </div>
+              <div class="exp"><b>Верно: Б.</b> Полное доменное имя появляется у машины только после успешного присоединения к домену. Его отсутствие — прямой сигнал, что операцию нужно повторить, прежде чем двигаться дальше по курсу.</div>
+            </div>
+          </div>
+
+          <div class="cheat rv" id="cheat-m12">
+            <div class="cheat-h"><svg><use href="#i-list"></use></svg><span>Конспект модуля</span></div>
+            <div class="cheat-grid">
+              <div class="cheat-g">
+                <h4>Процессы</h4>
+                <ul>
+                <li>Важен не сам процесс, а его родитель — winword.exe → powershell.exe без участия пользователя = вредоносный макрос.</li>
+                <li>tasklist / диспетчер задач — то же самое, что ps в Linux.</li>
+                </ul>
+              </div>
+              <div class="cheat-g">
+                <h4>Службы</h4>
+                <ul>
+                <li>svchost.exe группирует мелкие службы — десяток таких процессов это норма.</li>
+                <li>Подделка узнаётся не по имени, а по пути: настоящий только в C:\\Windows\\System32.</li>
+                </ul>
+              </div>
+              <div class="cheat-g">
+                <h4>Реестр</h4>
+                <ul>
+                <li>HKLM — вся машина, все пользователи (аналог /etc). HKCU — только текущий пользователь (аналог ~/.config).</li>
+                </ul>
+              </div>
+              <div class="cheat-g">
+                <h4>Автозапуск — точки закрепления</h4>
+                <ul>
+                <li>Run в реестре, папка «Автозагрузка», служба с автозапуском, задача в планировщике.</li>
+                <li>Без устранения точки закрепления чистка машины не работает — заражение возвращается.</li>
+                </ul>
+              </div>
+              <div class="cheat-g">
+                <h4>Лаборатория</h4>
+                <ul>
+                <li>Проверка присоединения к домену: whoami /fqdn должен вернуть имя_машины.имя_домена.</li>
+                <li>dcdiag на контроллере — все пункты должны быть passed.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="finish"><input type="checkbox" id="f12" data-fin="12"><label for="f12">Модуль 01 · Домен пройден</label></div>
+        </div>
+      </div>
+    </section>
   </main>
 </div>
 
@@ -7703,7 +8362,12 @@ CommonSecurityLog
 
 <script>
 (function () {
-  var MODS = [
+  /* Два курса делят одну страницу, один словарь, один прогресс-файл — но не один список
+     модулей: NET_MODS/AD_MODS не пересекаются идентификаторами (m0..m10 и m11..m17),
+     поэтому done/seen/quiz для них хранятся в тех же объектах st.* без отдельного
+     пространства имён и без риска столкновения. MODS ниже — активный на данный момент
+     список, его переставляет applyCourse() при выборе курса. */
+  var NET_MODS = [
     { id:'m0',  n:'00', t:'Как работает SOC',      d:'Устройство центра мониторинга, откуда берутся алерты и метод разбора снизу вверх.', time:'1 ч' },
     { id:'m1',  n:'01', t:'Уровни и инкапсуляция', d:'Коммутация пакетов и best effort, модели OSI и TCP/IP, три вида адресов, VLAN и 802.1Q, ARP-спуфинг, MTU.', time:'3,5 ч' },
     { id:'m2',  n:'02', t:'IP, маски, NAT',        d:'Двоичная арифметика, тренажёр подсетей, приватные диапазоны, NAT, DHCP, атака через Router Advertisement.', time:'5 ч + отработка' },
@@ -7716,6 +8380,40 @@ CommonSecurityLog
     { id:'m9',  n:'09', t:'Почта и фишинг',        d:'SMTP, заголовки письма, SPF/DKIM/DMARC, разбор фишинга по шагам, вложения и ссылки.', time:'3,5 ч' },
     { id:'m10', n:'10', t:'Разбор алертов',        d:'Три алерта по полям, Sysmon Event ID 3, запросы к SIEM, порядок триажа, экзамен с разбором.', time:'5 ч' }
   ];
+  /* ready:false — модуль ещё не написан, карточка и пункт меню показываются, но неактивны.
+     Так честно видно весь план курса, а не только готовый кусок. */
+  var AD_MODS = [
+    { id:'m11', n:'00', t:'Домен глазами аналитика', d:'Что такое лес и домен, зачем нужен Kerberos, кто такие Domain Admins — модель, а не администрирование.', time:'2,5 ч', ready:true },
+    { id:'m12', n:'01', t:'Windows изнутри',         d:'Процессы, службы, реестр, автозапуск. Плюс лаборатория: поднимаем контроллер домена и клиент.', time:'4 ч + лаб', ready:true },
+    { id:'m13', n:'02', t:'PowerShell для чтения',   d:'Не программирование — поиск, фильтрация и разбор вывода командами, которые уже стоят в системе.', time:'2,5 ч', ready:false },
+    { id:'m14', n:'03', t:'Журнал событий',          d:'Event ID наизусть: 4624, 4625, 4634, 4672, 4688, 4720, 7045. Типы входа и почему 3 и 10 важнее прочих.', time:'5 ч', ready:false },
+    { id:'m15', n:'04', t:'Sysmon',                  d:'То, чего нет в штатном журнале: полная командная строка, сетевые соединения, создание файлов.', time:'2,5 ч', ready:false },
+    { id:'m16', n:'05', t:'Атаки в домене',          d:'Brute force, pass-the-hash, kerberoasting, DCSync — не проводить, а узнавать по событиям.', time:'3,5 ч', ready:false },
+    { id:'m17', n:'06', t:'Капстоун: разбор доменных алертов', d:'Смена с доменными инцидентами вперемешку с сетевыми — повторение уже пройденного.', time:'1,5 ч', ready:false }
+  ];
+  var COURSES = {
+    seti: {
+      title:'Сети', sub:'трек SOC-аналитика', mtitle:'Сети для SOC-аналитика',
+      heroTag:'Модуль 2 программы · после Linux',
+      heroH1:'Сети: от кадра Ethernet до строчки в SIEM',
+      heroLede:'Полный курс для тех, кто идёт в SOC первой линии. Не пересказ стандартов, а разбор того, '
+        + 'что реально видит аналитик на экране: почему сработало правило, что означает каждое поле '
+        + 'события и как отличить атаку от штатной работы инфраструктуры.',
+      facts:['11 модулей', '55–70 часов', '9 схем', 'практика в терминале', '10 заданий на разбор', 'тренажёр подсетей'],
+      navH:'Программа курса'
+    },
+    ad: {
+      title:'Домен', sub:'Windows и Active Directory', mtitle:'Домен глазами аналитика',
+      heroTag:'Следующий трек · после сетей',
+      heroH1:'Домен глазами аналитика',
+      heroLede:'Большинство реальных инцидентов происходит в домене Windows, а не в чистой сети. '
+        + 'Курс не учит администрировать AD — этого достаточно в чужих книгах. Он учит читать то, '
+        + 'что домен оставляет в логах, когда в нём происходит что-то не то.',
+      facts:['7 модулей', 'готовы 00–01', 'лаборатория на двух виртуалках', 'журнал событий наизусть'],
+      navH:'Программа курса'
+    }
+  };
+  var MODS = NET_MODS;
   var KEY = 'net-course-v3';
 
   /* доступно ли хранилище вообще: во встроенной странице его может не быть */
@@ -7809,17 +8507,36 @@ CommonSecurityLog
   var navScroll = false;   /* true — идёт программный прыжок прокрутки внутри show(), см. там */
 
   /* ---- боковое меню ---- */
-  MODS.forEach(function (m, i) {
-    var b = document.createElement('button');
-    b.setAttribute('data-go', m.id);
-    b.innerHTML = '<span class="n">' + m.n + '</span><span>' + m.t + '</span><span class="dot"></span>';
-    nav.appendChild(b);
-  });
+  function buildNav() {
+    [].slice.call(nav.querySelectorAll('button')).forEach(function (b) { b.remove(); });
+    MODS.forEach(function (m) {
+      var b = document.createElement('button');
+      if (m.ready === false) {
+        b.className = 'soon';
+        b.disabled = true;
+        b.innerHTML = '<span class="n">' + m.n + '</span><span>' + m.t + '</span><span class="dot" style="visibility:hidden"></span>';
+      } else {
+        b.setAttribute('data-go', m.id);
+        b.innerHTML = '<span class="n">' + m.n + '</span><span>' + m.t + '</span><span class="dot"></span>';
+      }
+      nav.appendChild(b);
+    });
+  }
 
   /* ---- карточки на главной ---- */
   function buildCards() {
     cards.innerHTML = '';
     MODS.forEach(function (m) {
+      if (m.ready === false) {
+        var soon = document.createElement('div');
+        soon.className = 'mcard is-soon';
+        soon.innerHTML =
+          '<div class="mcard-top"><span class="num">' + m.n + '</span><span class="status">Скоро</span></div>' +
+          '<h3>' + m.t + '</h3><p>' + m.d + '</p>' +
+          '<div class="meta"><span>' + m.time + '</span></div>';
+        cards.appendChild(soon);
+        return;
+      }
       var done = !!st.done[m.id], seen = !!st.seen[m.id];
       var cls = done ? 'is-done' : (seen ? 'is-prog' : '');
       var lbl = done ? 'Пройден' : (seen ? 'В процессе' : 'Не начат');
@@ -7834,6 +8551,32 @@ CommonSecurityLog
       cards.appendChild(el);
     });
   }
+
+  /* ---- переключение курса ---- */
+  function applyCourse(course, opts) {
+    opts = opts || {};
+    st.course = course;
+    MODS = course === 'ad' ? AD_MODS : NET_MODS;
+    var c = COURSES[course];
+    document.getElementById('brandNm').firstChild.nodeValue = c.title;
+    document.getElementById('brandSub').textContent = c.sub;
+    document.getElementById('navH').textContent = c.navH;
+    if (current === 'home' || !opts.silent) document.getElementById('mtitle').textContent = c.mtitle;
+    var tagEl = document.getElementById('heroTag'); if (tagEl) tagEl.textContent = c.heroTag;
+    var h1El = document.getElementById('heroH1'); if (h1El) h1El.textContent = c.heroH1;
+    var ledeEl = document.getElementById('heroLede'); if (ledeEl) ledeEl.textContent = c.heroLede;
+    var factsEl = document.getElementById('heroFacts');
+    if (factsEl) factsEl.innerHTML = c.facts.map(function (f) { return '<span class="fact">' + f + '</span>'; }).join('');
+    [].forEach.call(document.querySelectorAll('.course-only'), function (el) {
+      el.classList.toggle('course-off', el.getAttribute('data-course') !== course);
+    });
+    buildNav();
+    buildCards();
+    if (!opts.silent) { save(); paint(); show('home'); }
+  }
+  [].forEach.call(document.querySelectorAll('.cpick'), function (b) {
+    b.addEventListener('click', function () { applyCourse(b.getAttribute('data-course')); });
+  });
 
   /* ---- прогресс ---- */
   function paint() {
@@ -7867,7 +8610,7 @@ CommonSecurityLog
 
     current = id;
     st.last = id;
-    var isMod = id !== 'home' && id !== 'gloss' && id !== 'final';
+    var isMod = id !== 'home' && id !== 'choose' && id !== 'gloss' && id !== 'final';
     if (isMod) { st.seen[id] = true; markTerms(el); }
     if (id === 'gloss') glossRender(document.getElementById('gq').value);
     if (id === 'final') { markTerms(el); paintFinal(); }
@@ -7892,7 +8635,8 @@ CommonSecurityLog
     }
     lnav.classList.toggle('on', isMod);
     var mt = document.getElementById('mtitle');
-    if (id === 'home') { mt.textContent = 'Сети для SOC-аналитика'; }
+    if (id === 'home') { mt.textContent = (COURSES[st.course] || COURSES.seti).mtitle; }
+    else if (id === 'choose') { mt.textContent = 'Выбор курса'; }
     else if (id === 'gloss') { mt.textContent = 'Словарь терминов'; }
     else if (id === 'final') { mt.textContent = 'Смена: очередь алертов'; }
     else {
@@ -10034,10 +10778,21 @@ CommonSecurityLog
   markScrollableFigs();
   window.addEventListener('resize', markScrollableFigs, { passive: true });
 
+  /* важно проверить ДО applyCourse(): она сама пишет st.course, и после вызова
+     st.course уже не пустой — по нему нельзя будет отличить первый визит от обычного */
+  var hadCourse = !!st.course;
+
+  /* курс ещё не выбран (первый визит вообще, либо файл открыли до этой версии) —
+     nav/cards всё равно строим по сетям как безопасному значению по умолчанию,
+     silent:true не трогает mtitle/show(), чтобы не мигнуть чужим заголовком под чузером */
+  applyCourse(st.course === 'ad' ? 'ad' : 'seti', { silent:true });
+
   syncFin(); paint(); arm(); window.initCalc(); window.initDrill();
 
-  /* возвращаемся туда, где закрыли: и раздел, и позиция в тексте */
-  if (st.last && st.last !== 'home' && document.getElementById('v-' + st.last)) {
+  /* курс не выбирали ни разу — сначала чузер, а не сохранённая позиция */
+  if (!hadCourse) {
+    show('choose');
+  } else if (st.last && st.last !== 'home' && document.getElementById('v-' + st.last)) {
     show(st.last);
   }
 })();
