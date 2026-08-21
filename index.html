@@ -4,72 +4,75 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="color-scheme" content="light dark">
-<meta name="theme-color" content="#F5F4F0">
+<meta name="theme-color" content="#10141A">
 <meta name="description" content="Учебник по сетям для аналитика SOC первой линии: 11 модулей и словарь на 343 термина.">
 <title>Сети для будущего SOC-аналитика</title>
 </head>
 <body>
 <style>
+  /* Тёмная тема — основная. Курс сменил читательскую эстетику на сдержанный
+     infosec-отчёт: графит вместо тёплой бумаги, холодный акцент вместо золота,
+     жёстче углы. Имена переменных (--gold и т.д.) намеренно не переименованы —
+     их 60 применений по всему файлу, смена имени ничего не даёт и только
+     добавляет риск. Меняется значение, не название токена.
+     Фон не чёрный, а графитовый, текст приглушён до 87% — так убирается ореол
+     вокруг букв. Все пары проходят AA, основной текст — AAA (проверено). */
   :root {
-    color-scheme: light;
-    /* Светлая тема. Фон намеренно не чисто-белый: убирает блики при долгом чтении,
-       контраст основного текста 15.8:1 — выше порога AAA (7:1) по WCAG 1.4.6. */
-    --paper:#F5F4F0;
-    --card:#FDFCFA;
-    --card-2:#F7F6F2;
-    --ink:#23201B;
-    --ink-2:#574F44;
-    --ink-3:#736B60;
-    --line:#E5E1D8;
-    --line-2:#CFC9BC;
-    --gold:#F2B01E;
-    --gold-ink:#8A5200;
-    --gold-soft:#FDF2D8;
-    --gold-line:#EED79B;
-    --orange:#C2540A;
-    --ok:#0C6B45; --ok-soft:#E6F3EC; --ok-line:#B6DCC6;
-    --bad:#B23125; --bad-soft:#FBEBE8; --bad-line:#EFC7C0;
-    /* Блок кода в светлой теме — светлый. Тёмная плита на светлой странице даёт перепад
-       яркости примерно 1:14 в пределах одной строки чтения; глаз перестраивается на каждый
-       блок, и от этого устаёт. Порог AAA (7:1) держим внутри блока, а не между блоком и фоном. */
-    --term:#EFEAE0; --term-ink:#2A2620; --term-line:#DED7C7;
-    --term-c:#5F6875; --term-k:#8A5200; --term-g:#0C6B45; --term-r:#A82D22;
-    --r-s:8px; --r-m:16px; --r-l:24px; --r-pill:999px;
-    --sh-1:0 1px 2px rgba(35,32,27,.04), 0 3px 10px -5px rgba(35,32,27,.10);
-    --sh-2:0 2px 5px rgba(35,32,27,.05), 0 16px 32px -14px rgba(35,32,27,.20);
+    color-scheme: dark;
+    --paper:#10141A;
+    --card:#171C20;
+    --card-2:#12161B;
+    --ink:#D7DEE3;
+    --ink-2:#97A3AB;
+    --ink-3:#7E8B93;
+    --line:#242C31;
+    --line-2:#333D43;
+    --gold:#4FD7E6;
+    --gold-ink:#7EE8F2;
+    --gold-soft:#0F262A;
+    --gold-line:#1D454B;
+    --orange:#E8944F;
+    --ok:#5FCB9E; --ok-soft:#122A22; --ok-line:#244A3C;
+    --bad:#EF8F82; --bad-soft:#2C1714; --bad-line:#4A2622;
+    /* Блок кода темнее страницы — перепад маленький, глаз не перестраивается на каждый блок. */
+    --term:#0A0D10; --term-ink:#D7DEE3; --term-line:#1E262B;
+    --term-c:#7A8790; --term-k:#FFD35C; --term-g:#5FCB9E; --term-r:#EF8F82;
+    /* infosec-отчёт: углы жёстче прежних 8/16/24 — было бы мягче, читалось бы как книга, не как инструмент */
+    --r-s:4px; --r-m:8px; --r-l:12px; --r-pill:999px;
+    /* в темноте тени не читаются — структуру держат границы */
+    --sh-1:0 1px 2px rgba(0,0,0,.35);
+    --sh-2:0 4px 14px -6px rgba(0,0,0,.6);
     --ease:cubic-bezier(.22,.68,.32,1);
     --serif:Cambria, "PT Serif", "Noto Serif", Georgia, serif;
     --sans:"Segoe UI", system-ui, -apple-system, "Noto Sans", Ubuntu, Arial, sans-serif;
     --mono:Consolas, "JetBrains Mono", "DejaVu Sans Mono", ui-monospace, Menlo, monospace;
-    --fig:#8A5200;
+    --fig:#4FD7E6;
   }
-  /* Тёмная тема. Фон не чёрный, а тёмно-серый, текст приглушён до 87% —
-     так убирается ореол вокруг букв, от которого устают глаза и болит голова
-     у людей с астигматизмом. Все пары тоже проходят AA, основной текст — AAA. */
-  :root[data-theme="dark"] {
-    color-scheme: dark;
-    --paper:#191817;
-    --card:#232120;
-    --card-2:#1E1D1B;
-    --ink:#D8D3CA;
-    --ink-2:#A8A197;
-    --ink-3:#948C81;
-    --line:#332F2B;
-    --line-2:#474038;
-    --gold:#E8AE2B;
-    --gold-ink:#F0C566;
-    --gold-soft:#2E2718;
-    --gold-line:#4A3F26;
-    --orange:#EE9455;
-    --ok:#5CBF92; --ok-soft:#14261E; --ok-line:#27473A;
-    --bad:#E88779; --bad-soft:#2C1A17; --bad-line:#4A2A25;
-    /* В тёмной теме блок кода наоборот темнее страницы — перепад маленький, это работает. */
-    --term:#121110; --term-ink:#DCD7CE; --term-line:#2A2724;
-    --term-c:#79808D; --term-k:#F2C300; --term-g:#5FCB9E; --term-r:#EF8377;
-    /* в темноте тени не читаются — структуру держат границы */
-    --sh-1:0 1px 2px rgba(0,0,0,.35);
-    --sh-2:0 4px 14px -6px rgba(0,0,0,.6);
-    --fig:#E8B84B;
+  /* Светлая тема — второстепенная, доступна переключателем, но не витрина.
+     Фон холодный светло-серый, не тёплая бумага, как раньше — иначе две темы
+     выглядели бы как два разных продукта. Тот же принцип AAA для основного текста. */
+  :root[data-theme="light"] {
+    color-scheme: light;
+    --paper:#F4F6F7;
+    --card:#FFFFFF;
+    --card-2:#EEF1F2;
+    --ink:#171B1E;
+    --ink-2:#4B555C;
+    --ink-3:#5B666D;
+    --line:#DBE1E4;
+    --line-2:#C2CACE;
+    --gold:#12A7B5;
+    --gold-ink:#0B6570;
+    --gold-soft:#E1F4F6;
+    --gold-line:#B7E3E7;
+    --orange:#B5591B;
+    --ok:#0C6B45; --ok-soft:#E6F3EC; --ok-line:#B6DCC6;
+    --bad:#B23125; --bad-soft:#FBEBE8; --bad-line:#EFC7C0;
+    --term:#E7ECED; --term-ink:#171B1E; --term-line:#D3DADD;
+    --term-c:#57646C; --term-k:#0B6570; --term-g:#0C6B45; --term-r:#A82D22;
+    --sh-1:0 1px 2px rgba(16,20,23,.06), 0 3px 10px -5px rgba(16,20,23,.12);
+    --sh-2:0 2px 5px rgba(16,20,23,.06), 0 16px 32px -14px rgba(16,20,23,.22);
+    --fig:#0B6570;
   }
 
   * { box-sizing:border-box; }
@@ -915,7 +918,7 @@
     function paint() {
       if (!mt) return;
       mt.setAttribute('content',
-        document.documentElement.getAttribute('data-theme') === 'dark' ? '#191817' : '#F5F4F0');
+        document.documentElement.getAttribute('data-theme') === 'dark' ? '#10141A' : '#F4F6F7');
     }
     paint();
     new MutationObserver(paint).observe(document.documentElement,
