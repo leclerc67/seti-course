@@ -14513,6 +14513,27 @@ Sysmon с этой машины:
   /* Та же нестрогость, что и в Unix-ветке, но по-другому устроенная: у PowerShell нет
      флагов-букв, есть именованные параметры «-Имя значение». Имя сверяется без учёта
      регистра (PowerShell тоже его не различает), лишний параметр попытку не валит. */
+    /* Сообщение об отказе должно указывать на то, что человек набрал, а не на выдуманное.
+     Раньше любое расхождение аргументов отвечало «Адрес или порт не те» — фраза из шагов
+     про ping и nc, где порт действительно бывает. На шаге про SPF-запись портов нет вовсе,
+     и читатель по этой подсказке пять раз менял домен и тип записи, ни разу не заподозрив
+     конвейер. Ответ не называет правильного значения — он называет неподходящее. */
+  function argMsg(want, got, shown) {
+    if (got.length > want.length) {
+      var extra = shown[want.length];
+      return 'Лишнее в команде: «' + extra + '». Здесь нужна только сама команда.';
+    }
+    if (got.length < want.length) {
+      return 'Не хватает аргумента — сверься с целью шага выше и вкладкой «Практика».';
+    }
+    for (var i = 0; i < want.length; i++) {
+      if (want[i] !== got[i]) {
+        return 'Вот это не подходит: «' + shown[i] + '». Сверься с целью шага выше.';
+      }
+    }
+    return 'Аргументы не те — сверься с целью шага выше.';
+  }
+
   function matchPsCmd(step, raw) {
     /* Пробелы внутри @{...} схлопываются ДО разбиения на токены — иначе
        «@{LogName='Security'; Id=4625}» распалось бы на два независимых аргумента. */
@@ -14547,8 +14568,8 @@ Sysmon с этой машины:
     if (step.args) {
       var wantArgs = step.args.map(function (a) { return String(a).toLowerCase(); }).join(' ');
       var gotArgs = positional.map(function (a) { return a.toLowerCase().replace(/^["']|["']$/g, ''); }).join(' ');
-      if (wantArgs !== gotArgs) {
-        return { ok: false, msg: 'Аргументы не те — смотри цель шага выше и вкладку «Практика».' };
+            if (wantArgs !== gotArgs) {
+        return { ok: false, msg: argMsg(wantArgs.split(' '), gotArgs.split(' '), positional) };
       }
     }
     return { ok: true };
@@ -14579,8 +14600,18 @@ Sysmon с этой машины:
   function matchLabCmd(step, raw) {
     if (step.pipe) return matchPipeCmd(step, raw);
     if (step.ps) return matchPsCmd(step, raw);
-    var s = raw.trim().replace(/\s+/g, ' ');
+        var s = raw.trim().replace(/\s+/g, ' ');
     if (!s) return { ok: false };
+    /* Конвейер после команды — не ошибка понимания. «dig +short company.ru TXT | grep spf»
+       решает задачу шага; grep только фильтрует то, что уже получено. Раньше всё после «|»
+       падало в позиционные аргументы и валило сверку, хотя человек сделал всё правильно.
+       Сверяем первое звено, а про невыполненный хвост честно предупреждаем. */
+    var piped = false;
+    if (s.indexOf('|') !== -1) {
+      piped = true;
+      s = s.split('|')[0].trim();
+      if (!s) return { ok: false, msg: 'Команда начинается с «|» — до конвейера должно быть что выполнять.' };
+    }
     var hadSudo = /^sudo\s+/.test(s);
     if (hadSudo) s = s.replace(/^sudo\s+/, '');
     var tokens = s.split(' ');
@@ -14601,12 +14632,14 @@ Sysmon с этой машины:
     if (missing.length) {
       return { ok: false, msg: 'Не хватает флага ' + missing.map(function (c) { return '-' + c; }).join(', ') + '.' };
     }
-    var want = (step.args || []).map(normLabArg);
+        var want = (step.args || []).map(normLabArg);
     var got = positional.map(normLabArg);
     if (want.length && want.join(' ') !== got.join(' ')) {
-      return { ok: false, msg: 'Адрес или порт не те — смотри цель шага выше.' };
+      return { ok: false, msg: argMsg(want, got, positional) };
     }
-    return { ok: true };
+    return piped
+      ? { ok: true, hint: 'Конвейер тренажёр не выполняет — ниже полный вывод команды, без фильтра.' }
+      : { ok: true };
   }
 
   [].forEach.call(document.querySelectorAll('.term-app'), function (lab) {
@@ -14730,7 +14763,8 @@ Sysmon с этой машины:
       if (n >= steps.length) { line('msg', 'Уже пройдено — жми «Начать заново», если хочешь повторить.'); return; }
       var step = steps[n];
       var res = matchLabCmd(step, raw);
-      if (res.ok) {
+            if (res.ok) {
+        if (res.hint) line('msg', res.hint);
         outLine(step.cls || 'ok', step.out);
         if (step.note) outLine('', '# ' + step.note);
         var justFinished = n + 1 >= steps.length;
