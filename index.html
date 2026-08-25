@@ -14621,8 +14621,43 @@ Sysmon с этой машины:
     var progressEl = lab.querySelector('.term-app-progress');
     var hist = [], histAt = 0, printedTaskFor = -1;
 
-    function idx() { st.lab = st.lab || {}; return st.lab[id] || 0; }
-    function setIdx(n) { st.lab = st.lab || {}; st.lab[id] = n; save(); }
+    /* Подпись тренажёра — его собственные команды, свёрнутые в короткую строку.
+       Зачем: прогресс здесь — номер шага, и раньше он лежал голым числом, которое
+       сверялось с ТЕКУЩИМ числом шагов. Стоит модулям переехать по номерам или тренажёру
+       смениться под тем же id — и старое число читается как «пройдено». Ровно это и было
+       с m9-spf: в копии прогресса от 20.08.2026 он стоял на 2 из 2 в тот самый день, когда
+       появился, при непройденном модуле 09, и читатель, впервые открыв практику, видел
+       «Пройдено раньше». Подпись меняется вместе с командами, поэтому чужой прогресс
+       теперь просто не подходит к замку. */
+    var LAB_SIG = (function () {
+      var s = steps.map(function (x) { return x.show || ''; }).join('|');
+      var hash = 0;
+      for (var i = 0; i < s.length; i++) hash = (hash * 31 + s.charCodeAt(i)) | 0;
+      return steps.length + ':' + (hash >>> 0).toString(36);
+    })();
+
+    /* Разовый перевод старых записей. Числу без подписи верить можно не всегда:
+       «пройден до конца» в модуле, который читатель ещё не отметил пройденным, — это
+       ровно тот случай, с которого баг и начался. Такую запись обнуляем: цена ошибки
+       несимметрична. Ошибиться в сторону «пройди заново» — потерять три минуты
+       на две команды; ошибиться в другую — молча забрать у читателя всю практику модуля
+       и оставить его с сообщением, что он её уже делал. Частичный прогресс не трогаем:
+       он ничего не запирает. */
+    (function () {
+      st.lab = st.lab || {};
+      var v = st.lab[id];
+      if (typeof v !== 'number') return;
+      var modDone = !!(st.done && st.done[id.split('-')[0]]);
+      st.lab[id] = { n: (v >= steps.length && !modDone) ? 0 : v, sig: LAB_SIG };
+    })();
+
+    function idx() {
+      st.lab = st.lab || {};
+      var v = st.lab[id];
+      if (!v || typeof v !== 'object') return 0;
+      return v.sig === LAB_SIG ? (v.n || 0) : 0;
+    }
+    function setIdx(n) { st.lab = st.lab || {}; st.lab[id] = { n: n, sig: LAB_SIG }; save(); }
 
     function line(cls, text) {
       var d = document.createElement('div');
